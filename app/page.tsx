@@ -56,7 +56,7 @@ export default function Home() {
       <section className="grid min-h-svh place-items-center px-6 text-center">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold text-blue-600">Scroll threshold demo</p>
-          <h1 className="mt-4 text-4xl font-bold leading-tight tracking-[-0.02em] md:text-6xl">
+          <h1 className="mt-4 text-[2.1rem] font-bold leading-tight tracking-[-0.02em] md:text-[3.5rem]">
             스크롤 임계점에서
             <br />
             목업이 한 번 넘어가요
@@ -72,7 +72,7 @@ export default function Home() {
         <div className="sticky top-0 grid min-h-svh items-center gap-10 overflow-hidden px-6 py-14 md:grid-cols-[0.8fr_1.2fr] md:px-16 lg:px-24">
           <div className="mx-auto w-full max-w-md">
             <p className="text-sm font-semibold text-blue-600">Mockup list</p>
-            <h2 className="mt-4 text-3xl font-bold tracking-[-0.02em] md:text-5xl">
+            <h2 className="mt-4 text-[1.75rem] font-bold tracking-[-0.02em] md:text-[2.85rem]">
               목록과 폰 화면이
               <br />
               같이 바뀝니다
