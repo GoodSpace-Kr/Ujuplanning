@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, type MutableRefObject } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MutableRefObject,
+} from 'react';
 
 type GlobeNode = {
   x: number;
@@ -45,16 +51,30 @@ type NetworkGlobeCanvasProps = {
   scrollProgressRef: MutableRefObject<number>;
 };
 
-const mockups = [
+const projects = [
   {
-    title: '목업이미지1',
-    description: '어두운 화면 상태',
-    image: '/mockup-scroll-01.png',
+    company: '청호나이스',
+    label: '브랜딩 마케팅',
+    image: '/project-chungho.png',
   },
   {
-    title: '목업이미지2',
-    description: '밝은 화면 상태',
-    image: '/mockup-scroll-02.png',
+    company: 'BMW·MINI 바바리안모터스',
+    label: '온라인·SNS 콘텐츠 운영',
+    image: '/project-bavarian.png',
+  },
+  {
+    company: '오션더힐',
+    label: '쇼츠콘텐츠',
+    image: '/project-ocean.png',
+  },
+  {
+    company: '오륜스포츠',
+    label: '통합 광고 대행',
+  },
+  {
+    company: 'BYD',
+    label: '공간 디자인 제작',
+    image: '/project-byd.png',
   },
 ];
 
@@ -368,35 +388,92 @@ function NetworkGlobeCanvas({ scrollProgressRef }: NetworkGlobeCanvasProps) {
 export default function Home() {
   const heroRef = useRef<HTMLElement | null>(null);
   const heroPanelRef = useRef<HTMLDivElement | null>(null);
-  const canvasWrapRef = useRef<HTMLDivElement | null>(null);
+  const heroFrameRef = useRef<HTMLDivElement | null>(null);
+  const heroWorldRef = useRef<HTMLDivElement | null>(null);
   const heroProgressRef = useRef(0);
-  const sectionRef = useRef<HTMLElement | null>(null);
   const activeIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+
     let scrollFrameId = 0;
     let styleFrameId = 0;
     let targetHeroProgress = 0;
     let renderedHeroProgress = 0;
 
     const applyHeroStyles = (progress: number) => {
-      const heroScaleX = 1 - progress * 0.33;
-      const heroScaleY = 1 - progress * 0.18;
-      const canvasScale = 1 + progress * 0.42;
-      const heroRadius = progress * 32;
-      const heroShadow = progress * 0.18;
+      const frameProgress = Math.min(progress / 0.28, 1);
+      const worldProgress = Math.min(
+        Math.max((frameProgress - 0.38) / 0.42, 0),
+        1,
+      );
+      const heroRadius = frameProgress * 48;
+      const heroShadow = frameProgress * 0.18;
+      const worldScale = 1 + worldProgress * 5.2;
+      const phoneAspectRatio = 434 / 883;
+      const panelBounds = heroPanelRef.current?.getBoundingClientRect();
+      const panelWidth = panelBounds?.width ?? window.innerWidth;
+      const panelHeight = panelBounds?.height ?? window.innerHeight;
+      let phoneHeight = Math.min(panelHeight * 0.74, 660);
+      let phoneWidth = phoneHeight * phoneAspectRatio;
 
-      heroProgressRef.current = progress;
-
-      if (heroPanelRef.current) {
-        heroPanelRef.current.style.borderRadius = `${heroRadius}px`;
-        heroPanelRef.current.style.boxShadow = `0 30px 90px rgba(15, 23, 42, ${heroShadow})`;
-        heroPanelRef.current.style.transform = `scale(${heroScaleX}, ${heroScaleY})`;
+      if (phoneWidth > panelWidth * 0.62) {
+        phoneWidth = panelWidth * 0.62;
+        phoneHeight = phoneWidth / phoneAspectRatio;
       }
 
-      if (canvasWrapRef.current) {
-        canvasWrapRef.current.style.transform = `scale(${canvasScale})`;
+      const finalLeft = (panelWidth - phoneWidth) / 2;
+      const finalTop = (panelHeight - phoneHeight) / 2;
+      const currentWidth =
+        panelWidth + (phoneWidth - panelWidth) * frameProgress;
+      const currentHeight =
+        panelHeight + (phoneHeight - panelHeight) * frameProgress;
+      const currentLeft = finalLeft * frameProgress;
+      const currentTop = finalTop * frameProgress;
+      const blackOpacity = Math.min(
+        Math.max((frameProgress - 0.62) / 0.14, 0),
+        1,
+      );
+      const phoneOpacity = Math.min(Math.max((progress - 0.3) / 0.06, 0), 1);
+      const projectOpacity = Math.min(Math.max((progress - 0.36) / 0.08, 0), 1);
+
+      heroProgressRef.current = frameProgress;
+
+      if (heroPanelRef.current) {
+        heroPanelRef.current.style.setProperty(
+          '--hero-focus-progress',
+          String(frameProgress),
+        );
+        heroPanelRef.current.style.setProperty(
+          '--hero-screen-black-opacity',
+          String(blackOpacity),
+        );
+        heroPanelRef.current.style.setProperty(
+          '--hero-phone-opacity',
+          String(phoneOpacity),
+        );
+        heroPanelRef.current.style.setProperty(
+          '--hero-project-opacity',
+          String(projectOpacity),
+        );
+      }
+
+      if (heroFrameRef.current) {
+        heroFrameRef.current.style.left = `${currentLeft}px`;
+        heroFrameRef.current.style.top = `${currentTop}px`;
+        heroFrameRef.current.style.width = `${currentWidth}px`;
+        heroFrameRef.current.style.height = `${currentHeight}px`;
+        heroFrameRef.current.style.borderRadius = `${heroRadius}px`;
+        heroFrameRef.current.style.boxShadow = `0 30px 90px rgba(15, 23, 42, ${heroShadow})`;
+      }
+
+      if (heroWorldRef.current) {
+        heroWorldRef.current.style.width = `${panelWidth}px`;
+        heroWorldRef.current.style.height = `${panelHeight}px`;
+        heroWorldRef.current.style.transform = `translate3d(${-currentLeft}px, ${-currentTop}px, 0) scale(${worldScale})`;
       }
     };
 
@@ -433,22 +510,23 @@ export default function Home() {
           ),
           1,
         );
-        targetHeroProgress = 1 - Math.pow(1 - rawHeroProgress, 2.4);
+        targetHeroProgress = rawHeroProgress;
 
-        requestStyleUpdate();
-      }
-
-      if (sectionRef.current) {
-        const bounds = sectionRef.current.getBoundingClientRect();
-        const scrollableDistance = bounds.height - window.innerHeight;
-        const rawProgress =
-          Math.abs(bounds.top) / Math.max(scrollableDistance, 1);
-        const nextIndex = rawProgress > 0.48 ? 1 : 0;
+        const rawProgress = Math.min(
+          Math.max((rawHeroProgress - 0.36) / 0.64, 0),
+          1,
+        );
+        const nextIndex = Math.min(
+          projects.length - 1,
+          Math.floor(rawProgress * projects.length),
+        );
 
         if (activeIndexRef.current !== nextIndex) {
           activeIndexRef.current = nextIndex;
           setActiveIndex(nextIndex);
         }
+
+        requestStyleUpdate();
       }
     };
 
@@ -467,109 +545,136 @@ export default function Home() {
       window.cancelAnimationFrame(styleFrameId);
       window.removeEventListener('scroll', requestUpdate);
       window.removeEventListener('resize', requestUpdate);
+      window.history.scrollRestoration = previousScrollRestoration;
     };
   }, []);
 
   return (
     <main className="bg-white text-[#151922]">
-      <section ref={heroRef} className="relative h-[165svh] bg-white">
+      <section ref={heroRef} className="relative h-[620svh] bg-white">
         <div
           ref={heroPanelRef}
-          className="sticky top-0 grid min-h-svh place-items-center overflow-hidden bg-black px-6 text-center text-white"
+          className="sticky top-0 grid min-h-svh place-items-center overflow-hidden bg-white px-6 text-center text-white"
           style={{
-            borderRadius: 0,
-            boxShadow: '0 30px 90px rgba(15, 23, 42, 0)',
-            transform: 'scale(1)',
-            transformOrigin: 'center center',
-            willChange: 'transform, border-radius, box-shadow',
-          }}
+            '--hero-focus-progress': 0,
+          } as CSSProperties}
         >
           <div
-            ref={canvasWrapRef}
-            className="absolute inset-0"
+            ref={heroFrameRef}
+            className="hero-transition-frame"
             style={{
-              transform: 'scale(1)',
-              transformOrigin: '50% 62%',
-              willChange: 'transform',
+              left: 0,
+              top: 0,
+              width: '100%',
+              height: '100%',
+              borderRadius: 0,
+              boxShadow: '0 30px 90px rgba(15, 23, 42, 0)',
             }}
           >
-            <NetworkGlobeCanvas scrollProgressRef={heroProgressRef} />
+            <div
+              ref={heroWorldRef}
+              className="hero-frame-world"
+              style={{
+                transform: 'scale(1)',
+                transformOrigin: '50% 72%',
+                willChange: 'transform',
+              }}
+            >
+              <div className="hero-zoom-background" aria-hidden="true" />
+              <NetworkGlobeCanvas scrollProgressRef={heroProgressRef} />
+
+              <div className="absolute inset-0 grid place-items-center px-6 text-center">
+                <div className="relative z-10 max-w-2xl pb-[30svh]">
+                  <p className="text-sm font-semibold text-sky-300/90">
+                    Scroll threshold demo
+                  </p>
+                  <h1 className="mt-4 text-[1.9rem] font-bold leading-tight tracking-[-0.02em] md:text-[3.1rem]">
+                    스크롤 임계점에서
+                    <br />
+                    목업이 한 번 넘어가요
+                  </h1>
+                  <p className="mt-6 text-base leading-7 text-zinc-300 md:text-lg">
+                    아래로 스크롤하면 왼쪽 목록과 오른쪽 폰 화면이 같은 타이밍으로
+                    부드럽게 전환됩니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="hero-screen-black" aria-hidden="true" />
+            <div className="project-phone-screen hero-project-screen">
+              {projects.map((project, index) => {
+                const state =
+                  activeIndex === index
+                    ? 'is-active'
+                    : index < activeIndex
+                      ? 'is-before'
+                      : 'is-after';
+
+                return (
+                  <div
+                    key={project.company}
+                    className={`project-phone-panel ${state}`}
+                  >
+                    {project.image ? (
+                      <img src={project.image} alt="" aria-hidden="true" />
+                    ) : (
+                      <div className="project-placeholder">
+                        <span>ORYUN SPORTS</span>
+                        <strong>기획 · 제작 · 촬영 · 편집</strong>
+                        <small>옥외광고 송출까지 연결한 통합 캠페인</small>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <img
+              src="/iphone-14-pro.png"
+              alt=""
+              className="hero-phone-shell"
+              aria-hidden="true"
+            />
           </div>
 
-          <div className="relative z-10 max-w-2xl pb-[30svh]">
-            <p className="text-sm font-semibold text-sky-300/90">
-              Scroll threshold demo
-            </p>
-            <h1 className="mt-4 text-[1.9rem] font-bold leading-tight tracking-[-0.02em] md:text-[3.1rem]">
-              스크롤 임계점에서
-              <br />
-              목업이 한 번 넘어가요
-            </h1>
-            <p className="mt-6 text-base leading-7 text-zinc-300 md:text-lg">
-              아래로 스크롤하면 왼쪽 목록과 오른쪽 폰 화면이 같은 타이밍으로
-              부드럽게 전환됩니다.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section ref={sectionRef} className="relative h-[220svh] bg-white">
-        <div className="sticky top-0 grid min-h-svh items-center gap-10 overflow-hidden px-6 py-14 md:grid-cols-[0.8fr_1.2fr] md:px-16 lg:px-24">
-          <div className="mx-auto w-full max-w-md">
-            <p className="text-sm font-semibold text-blue-600">Mockup list</p>
-            <h2 className="mt-4 text-[1.6rem] font-bold tracking-[-0.02em] md:text-[2.45rem]">
-              목록과 폰 화면이
-              <br />
-              같이 바뀝니다
-            </h2>
-
-            <div className="mt-10 space-y-3">
-              {mockups.map((mockup, index) => (
-                <button
-                  key={mockup.title}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  className={`mockup-list-item ${
-                    activeIndex === index ? 'is-active' : ''
+          <div className="hero-project-copy-stage" aria-hidden="true">
+            <div className="project-side project-side-left">
+              {projects.map((project, index) => (
+                <div
+                  key={project.company}
+                  className={`project-copy ${
+                    activeIndex === index
+                      ? 'is-active'
+                      : index < activeIndex
+                        ? 'is-before'
+                        : 'is-after'
                   }`}
                 >
-                  <span>{mockup.title}</span>
-                  <small>{mockup.description}</small>
-                </button>
+                  <h2>{project.company}</h2>
+                </div>
+              ))}
+            </div>
+
+            <div />
+
+            <div className="project-side project-side-right">
+              {projects.map((project, index) => (
+                <div
+                  key={project.label}
+                  className={`project-copy ${
+                    activeIndex === index
+                      ? 'is-active'
+                      : index < activeIndex
+                        ? 'is-before'
+                        : 'is-after'
+                  }`}
+                >
+                  <h3>{project.label}</h3>
+                </div>
               ))}
             </div>
           </div>
-
-          <div className="relative flex min-h-[640px] items-center justify-center">
-            <div className="absolute size-[580px] rounded-full bg-blue-200/35 blur-3xl" />
-
-            <div className="scroll-phone" data-active={activeIndex}>
-              <div className="scroll-phone-window">
-                {mockups.map((mockup, index) => (
-                  <img
-                    key={mockup.title}
-                    src={mockup.image}
-                    alt=""
-                    className={`scroll-phone-image image-${index}`}
-                    aria-hidden="true"
-                  />
-                ))}
-              </div>
-
-              <img
-                src="/phone-frame-demo.png"
-                alt="스크롤 전환이 적용된 아이폰 목업"
-                className="scroll-phone-frame"
-              />
-            </div>
-          </div>
         </div>
-      </section>
-
-      <section className="grid min-h-[70svh] place-items-center px-6 text-center">
-        <p className="text-lg font-medium text-slate-500">
-          임계점을 다시 위로 넘기면 첫 번째 목업으로 돌아갑니다.
-        </p>
       </section>
     </main>
   );
