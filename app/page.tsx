@@ -591,18 +591,17 @@ export default function Home() {
               <NetworkGlobeCanvas scrollProgressRef={heroProgressRef} />
 
               <div className="absolute inset-0 grid place-items-center px-6 text-center">
-                <div className="relative z-10 max-w-2xl pb-[30svh]">
-                  <p className="text-sm font-semibold text-sky-300/90">
-                    Scroll threshold demo
+                <div className="relative z-10 w-full max-w-[1100px] pb-[30svh]">
+                  <p className="text-sm font-semibold text-[#2f67bf]">
+                    우주기획
                   </p>
-                  <h1 className="mt-4 text-[1.9rem] font-bold leading-tight tracking-[-0.02em] md:text-[3.1rem]">
-                    스크롤 임계점에서
+                  <h1 className="mt-4 text-[clamp(1.9rem,4.2vw,3.1rem)] font-bold leading-tight tracking-[-0.02em] [word-break:keep-all]">
+                    당신의 브랜드에는,
                     <br />
-                    목업이 한 번 넘어가요
+                    아직 발견하지 못한 우주가 있습니다.
                   </h1>
-                  <p className="mt-6 text-base leading-7 text-zinc-300 md:text-lg">
-                    아래로 스크롤하면 왼쪽 목록과 오른쪽 폰 화면이 같은 타이밍으로
-                    부드럽게 전환됩니다.
+                  <p className="mx-auto mt-6 max-w-[780px] text-base leading-7 text-pretty text-zinc-300 [word-break:keep-all] md:text-lg">
+                    우주기획은 시장과 고객을 관찰해 브랜드의 가능성을 발견하고, 전략부터 콘텐츠, 광고, 행사까지 연결해 성장의 다음 항로를 만드는 종합광고대행사입니다.
                   </p>
                 </div>
               </div>
