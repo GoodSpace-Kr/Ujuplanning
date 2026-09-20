@@ -36,7 +36,7 @@ export function getHeroFrame(width: number, height: number, focus: number, expan
   const coverScale = Math.max(
     Math.max(width / (phoneWidth * .884), height / (phoneHeight * .943)) * 1.03,
     // Even phone-shaped viewports must finish the white dissolve.
-    Math.min(width / phoneWidth, height / phoneHeight) * 1.51,
+    Math.min(width / phoneWidth, height / phoneHeight) * 1.71,
   );
   const scale = 1 + (coverScale - 1) * expansion;
   const frameWidth = expansion > 0 ? phoneWidth * scale : width + (phoneWidth - width) * focus;
@@ -48,8 +48,8 @@ export function getHeroFrame(width: number, height: number, focus: number, expan
     top: (height - frameHeight) / 2,
     radiusX: frameWidth * .135 * focus * (1 - expansion),
     radiusY: frameHeight * .065 * focus * (1 - expansion),
-    // Start dissolving just before the phone reaches a viewport edge. Using
+    // Start dissolving after the phone has grown beyond a viewport edge. Using
     // rendered size instead of scroll time keeps this consistent on mobile.
-    dissolve: expansion > 0 ? smooth(range(Math.max(frameWidth / width, frameHeight / height), .92, 1.5)) : 0,
+    dissolve: expansion > 0 ? smooth(range(Math.max(frameWidth / width, frameHeight / height), 1.12, 1.7)) : 0,
   };
 }

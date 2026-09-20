@@ -52,15 +52,15 @@ test('reduced motion switches directly between complete scenes', () => {
   }
 });
 
-test('phone fades near the viewport edge and is hidden before extreme enlargement', () => {
+test('phone remains visible beyond the viewport edge before dissolving', () => {
   for (const [width, height] of [[320, 568], [390, 844], [768, 1024], [844, 390], [1440, 900], [2560, 1440]]) {
     let previous = 0;
     for (let i = 0; i <= 100; i++) {
       const frame = getHeroFrame(width, height, 1, i / 100);
       const ratio = Math.max(frame.width / width, frame.height / height);
       assert.ok(frame.dissolve >= previous);
-      if (ratio <= .92) assert.equal(frame.dissolve, 0);
-      if (ratio >= 1.5) assert.equal(frame.dissolve, 1);
+      if (ratio <= 1.12) assert.equal(frame.dissolve, 0);
+      if (ratio >= 1.7) assert.equal(frame.dissolve, 1);
       previous = frame.dissolve;
     }
     assert.equal(previous, 1);
