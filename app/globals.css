@@ -852,28 +852,6 @@ body {
   height: 100%;
 }
 
-.strategy-motion-toggle {
-  position: absolute;
-  z-index: 2;
-  top: 1rem;
-  right: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-height: 2.75rem;
-  padding: 0.5rem 0.8rem;
-  border-radius: 2rem;
-  background: rgb(255 255 255 / 80%);
-  color: #526782;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.strategy-motion-toggle:focus-visible {
-  outline: 2px solid #426798;
-  outline-offset: 3px;
-}
-
 .strategy-document-fallback {
   position: absolute;
   top: 50%;

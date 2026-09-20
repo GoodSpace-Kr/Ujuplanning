@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Pause, Play } from 'lucide-react';
 import type * as Three from 'three';
 
 const DOCUMENTS = [
@@ -150,9 +149,6 @@ function drawDocument(index: number) {
 
 export function StrategyDocuments() {
   const hostRef = useRef<HTMLDivElement>(null);
-  const pausedRef = useRef(false);
-  const restartRef = useRef<(() => void) | null>(null);
-  const [paused, setPaused] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -278,11 +274,9 @@ diffuseColor.a *= documentFade;`);
       let lastTime = 0;
       let elapsed = 0;
       const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      pausedRef.current = motion.matches;
-      setPaused(motion.matches);
 
       const render = () => {
-        const reducedMotion = motion.matches && pausedRef.current;
+        const reducedMotion = motion.matches;
         const settle = (delay: number, duration: number) => {
           const progress = reducedMotion ? 1 : Math.max(0, Math.min(1, (elapsed - delay) / duration));
           return 1 - Math.pow(1 - progress, 3);
@@ -312,7 +306,7 @@ diffuseColor.a *= documentFade;`);
         });
         renderer.render(scene, camera);
       };
-      const shouldAnimate = () => inView && !pausedRef.current && !document.hidden;
+      const shouldAnimate = () => inView && !motion.matches && !document.hidden;
       const tick = (time: number) => {
         frame = 0;
         if (!shouldAnimate()) { lastTime = 0; return; }
@@ -328,7 +322,6 @@ diffuseColor.a *= documentFade;`);
         render();
         if (shouldAnimate()) frame = requestAnimationFrame(tick);
       };
-      restartRef.current = restart;
       const resize = () => {
         const { width, height } = host.getBoundingClientRect();
         if (!width || !height) return;
@@ -345,7 +338,7 @@ diffuseColor.a *= documentFade;`);
       resizeObserver.observe(host);
       const intersectionObserver = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; restart(); });
       intersectionObserver.observe(host);
-      const onMotionChange = () => { pausedRef.current = motion.matches; setPaused(motion.matches); restart(); };
+      const onMotionChange = () => restart();
       const onContextLost = (event: Event) => { event.preventDefault(); inView = false; restart(); setReady(false); };
       renderer.domElement.addEventListener('webglcontextlost', onContextLost);
       document.addEventListener('visibilitychange', restart);
@@ -370,7 +363,6 @@ diffuseColor.a *= documentFade;`);
         document.removeEventListener('visibilitychange', restart);
         motion.removeEventListener('change', onMotionChange);
         renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
-        restartRef.current = null;
         geometries.forEach((item) => item.dispose());
         materials.forEach((item) => item.dispose());
         textures.forEach((item) => item.dispose());
@@ -393,11 +385,7 @@ diffuseColor.a *= documentFade;`);
         </div>
         <div ref={hostRef} className={`strategy-documents-canvas ${ready ? 'is-ready' : ''}`} aria-hidden="true" />
       </div>
-      {ready && <button className="strategy-motion-toggle" type="button" aria-label={paused ? '기획서 애니메이션 재생' : '기획서 애니메이션 일시정지'} onClick={() => {
-        pausedRef.current = !pausedRef.current;
-        setPaused(pausedRef.current);
-        restartRef.current?.();
-      }}>{paused ? <Play size={14} /> : <Pause size={14} />}<span>{paused ? '재생' : '일시정지'}</span></button>}
+
     </>
   );
 }

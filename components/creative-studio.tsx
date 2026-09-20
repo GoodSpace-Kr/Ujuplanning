@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { Check, Crop, Film, Image as ImageIcon, Layers, Pause, Play, Volume2 } from 'lucide-react';
+import { Check, Crop, Film, Image as ImageIcon, Layers, Play, Volume2 } from 'lucide-react';
 import './creative-studio.css';
 
 const PHOTO = '/creative-product.png';
@@ -16,7 +16,6 @@ function ProductPhoto({ className = '' }: { className?: string }) {
 // All animations share one clock and pause together, including when offscreen.
 export function CreativeStudio() {
   const rootRef = useRef<HTMLElement>(null);
-  const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
   const [inView, setInView] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -25,7 +24,7 @@ export function CreativeStudio() {
     const root = rootRef.current;
     if (!root) return;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const onMotion = () => { setReduced(motion.matches); setPaused(motion.matches); };
+    const onMotion = () => setReduced(motion.matches);
     const onVisibility = () => setVisible(!document.hidden);
     const resize = () => {
       const { width, height } = root.getBoundingClientRect();
@@ -51,8 +50,8 @@ export function CreativeStudio() {
   }, []);
 
   return <>
-    <figure ref={rootRef} className="creative-studio" data-running={inView && visible && !paused} data-still={reduced && paused}
-      aria-label="영상의 클립과 자막을 편집하고, 제품 사진을 보정한 뒤 카드뉴스를 완성하는 우주기획의 콘텐츠 제작 애니메이션">
+    <figure ref={rootRef} className="creative-studio" data-running={inView && visible && !reduced} data-still={reduced}
+      aria-label="영상의 클립과 자막을 편집하고, 제품 사진을 보정한 뒤 카드뉴스 세 장을 완성해 위아래로 펼쳐 보여주는 우주기획의 콘텐츠 제작 애니메이션">
       <div className="creative-stage" aria-hidden="true">
         <div className="creative-panel creative-editor">
           <div className="creative-panel-heading"><span><Film /> 영상 편집</span><small>BRAND FILM · 00:15</small></div>
@@ -110,8 +109,6 @@ export function CreativeStudio() {
         <div className="creative-flow"><span className="creative-flow-video">01 영상 편집</span><i /><span className="creative-flow-photo">02 사진 보정</span><i /><span className="creative-flow-card">03 카드뉴스 제작</span></div>
       </div>
     </figure>
-    <button className="strategy-motion-toggle" type="button" aria-label={paused ? '콘텐츠 제작 애니메이션 재생' : '콘텐츠 제작 애니메이션 일시정지'} onClick={() => setPaused(value => !value)}>
-      {paused ? <Play size={14} /> : <Pause size={14} />}<span>{paused ? '재생' : '일시정지'}</span>
-    </button>
+
   </>;
 }
