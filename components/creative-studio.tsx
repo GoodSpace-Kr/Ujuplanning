@@ -70,7 +70,7 @@ export function CreativeStudio() {
               <div className="creative-playhead"><i /></div>
             </div>
           </div>
-          <div className="creative-panel-footer"><span>우주기획</span><span>기획의 문장을, 움직이는 장면으로</span></div>
+          <div className="creative-panel-footer"><span>우주기획</span></div>
         </div>
 
         <div className="creative-panel creative-retouch">
@@ -106,7 +106,6 @@ export function CreativeStudio() {
             <div className="creative-panel-footer"><span>우주기획</span><Check className="creative-complete" size={13} /></div>
           </div>
         </div>
-        <div className="creative-flow"><span className="creative-flow-video">01 영상 편집</span><i /><span className="creative-flow-photo">02 사진 보정</span><i /><span className="creative-flow-card">03 카드뉴스 제작</span></div>
       </div>
     </figure>
 
