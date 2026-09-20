@@ -789,7 +789,7 @@ body {
 }
 
 .service-section {
-  max-width: 1120px;
+  max-width: 1280px;
   margin: 0 auto;
   scroll-margin-top: 3rem;
 }
@@ -812,7 +812,7 @@ body {
 .service-image-link {
   position: relative;
   display: block;
-  aspect-ratio: 2 / 1;
+  aspect-ratio: 16 / 7;
   background: #f2f3f5;
   outline-offset: 6px;
 }
@@ -872,13 +872,22 @@ body {
 .service-card-copy ul {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem 1.5rem;
+  gap: 0.65rem;
   margin-top: 1.4rem;
   padding: 0;
   list-style: none;
   color: #666e79;
   font-size: 1rem;
   line-height: 1.6;
+}
+
+.service-card-copy li {
+  max-width: 100%;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  color: #535963;
+  background: #f2f3f5;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 600px) {
