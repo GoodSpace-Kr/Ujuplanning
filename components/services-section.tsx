@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowRight } from 'lucide-react';
+import { StrategyDocuments } from '@/components/strategy-documents';
 
 const SERVICES = [
   {
@@ -63,6 +64,8 @@ export function ServicesSection() {
             {service.headline}
           </h3>
           <div className="service-card">
+            <div className={`service-visual ${service.id === 'strategy' ? 'service-visual-strategy' : ''}`}>
+            {service.id === 'strategy' && <StrategyDocuments />}
             {/* Add the detail URL to href when the page is ready. */}
             <a
               className="service-image-link"
@@ -73,11 +76,12 @@ export function ServicesSection() {
                 if (!service.href) event.preventDefault();
               }}
             >
-              <span className="service-image-placeholder" aria-hidden="true" />
+              {service.id !== 'strategy' && <span className="service-image-placeholder" aria-hidden="true" />}
               <span className="service-card-arrow" aria-hidden="true">
                 <ArrowRight strokeWidth={1.6} />
               </span>
             </a>
+            </div>
             <div className="service-card-copy">
               <h4>{service.title}</h4>
               <p>{service.description}</p>

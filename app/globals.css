@@ -817,6 +817,116 @@ body {
   outline-offset: 6px;
 }
 
+.service-visual {
+  position: relative;
+}
+
+.service-visual-strategy {
+  background: radial-gradient(ellipse at 50% 35%, #f8fbff, #e8f0fc 75%, #e1ebfa);
+  isolation: isolate;
+}
+
+.service-visual-strategy .service-image-link {
+  background: transparent;
+}
+
+.strategy-documents,
+.strategy-documents-canvas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.strategy-documents-canvas {
+  opacity: 0;
+}
+
+.strategy-documents-canvas.is-ready {
+  opacity: 1;
+}
+
+.strategy-documents-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.strategy-motion-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 2rem;
+  background: rgb(255 255 255 / 80%);
+  color: #526782;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.strategy-motion-toggle:focus-visible {
+  outline: 2px solid #426798;
+  outline-offset: 3px;
+}
+
+.strategy-document-fallback {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(72%, 19rem);
+  padding: 1.5rem;
+  border-radius: 0.6rem;
+  background: white;
+  color: #283c59;
+  box-shadow: 0 15px 40px rgb(82 115 168 / 16%);
+  transform: translate(-50%, -50%);
+}
+
+.strategy-document-fallback.is-hidden {
+  display: none;
+}
+
+.strategy-document-fallback small {
+  color: #6a8bbf;
+  font-size: 0.7rem;
+}
+
+.strategy-document-fallback strong {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 1.5rem;
+}
+
+.strategy-document-fallback p,
+.strategy-document-fallback dl {
+  font-size: 0.875rem;
+}
+
+.strategy-document-fallback dt {
+  margin-top: 1rem;
+  color: #5479b6;
+}
+
+.strategy-document-fallback dd {
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 808px) {
+  .service-visual-strategy .service-image-link {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (max-width: 600px) {
+  .service-visual-strategy .service-image-link {
+    aspect-ratio: 4 / 5;
+  }
+}
+
 .service-image-placeholder {
   position: absolute;
   inset: 0;
