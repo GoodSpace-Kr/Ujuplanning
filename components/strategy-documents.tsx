@@ -6,19 +6,8 @@ import type * as Three from 'three';
 const DOCUMENTS = [
   { title: '브랜드 분석', label: '01 · RESEARCH', subtitle: '시장에서 우리의 위치를 찾다' },
   { title: '마케팅 전략', label: '02 · STRATEGY', subtitle: '브랜드가 나아갈 방향을 정하다' },
-  { title: '캠페인 실행 계획', label: '03 · ACTION PLAN', subtitle: '4주 캠페인 운영 흐름 예시' },
+  { title: '캠페인 실행 계획', label: '03 · ACTION PLAN', subtitle: '생각을 구체적인 실행으로' },
 ];
-
-const STRATEGY_ITEMS = [
-  { title: '01  브랜드 목표', body: '우리가 선택받는 이유를 명확하게', detail: '인지도·신뢰·전환을 잇는 목표 설정' },
-  { title: '02  핵심 고객', body: '우리의 이야기가 필요한 사람', detail: '관심사와 구매 여정별 고객 정의' },
-  { title: '03  브랜드 메시지', body: '고객에게 전할 하나의 가치', detail: '핵심 문장과 채널별 표현 원칙 정리' },
-  { title: '04  채널 전략', body: '검색·SNS·콘텐츠를 하나의 흐름으로', detail: '접점마다 역할과 우선순위 구분' },
-  { title: '05  성과 기준', body: '실행 전에 정하는 측정 기준', detail: '유입·참여·전환 지표와 검토 주기 설정' },
-];
-
-const LOOP_SECONDS = 28;
-const RESET_START = 25;
 
 // High-resolution typeset textures keep Korean copy crisp on actual 3D sheets.
 function drawDocument(index: number) {
@@ -28,12 +17,12 @@ function drawDocument(index: number) {
   const ctx = base.getContext('2d')!;
   const lines: { value: string; x: number; y: number; size: number; color: string; weight: number; start: number }[] = [];
   let totalCharacters = 0;
-  const text = (value: string, x: number, y: number, size = 26, color = '#43546f', weight = 500) => {
+  const text = (value: string, x: number, y: number, size = 30, color = '#43546f', weight = 500) => {
     ctx.font = `${weight} ${size}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
     ctx.fillStyle = color;
     ctx.fillText(value, x, y);
   };
-  const typedText = (value: string, x: number, y: number, size = 26, color = '#43546f', weight = 500) => {
+  const typedText = (value: string, x: number, y: number, size = 30, color = '#43546f', weight = 500) => {
     lines.push({ value, x, y, size, color, weight, start: totalCharacters });
     totalCharacters += value.length + 9; // A short pause between sentences.
   };
@@ -42,8 +31,8 @@ function drawDocument(index: number) {
     ctx.fillRect(58, y, 652, 2);
   };
   const block = (y: number, title: string, body: string) => {
-    text(title, 60, y, 23, '#5479b6', 500);
-    typedText(body, 60, y + 38, 28, '#283c59', 500);
+    text(title, 60, y, 27, '#5479b6', 500);
+    typedText(body, 60, y + 51, 34, '#283c59', 500);
   };
 
   // Fade only the paper fill; all text and content are painted at full opacity.
@@ -52,61 +41,51 @@ function drawDocument(index: number) {
   paperGradient.addColorStop(1, 'rgba(255, 255, 255, 0.66)');
   ctx.fillStyle = paperGradient;
   ctx.fillRect(0, 0, 768, 1024);
-  text(DOCUMENTS[index].label, 58, 68, 20, '#6a8bbf', 500);
-  text(DOCUMENTS[index].title, 55, 133, index === 2 ? 40 : 48, '#243b5b', 550);
-  typedText(DOCUMENTS[index].subtitle, 58, 184, 24, '#6c7e97');
-  rule(218);
+  text(DOCUMENTS[index].label, 58, 76, 23, '#6a8bbf', 500);
+  text(DOCUMENTS[index].title, 55, 162, index === 2 ? 49 : 62, '#243b5b', 550);
+  typedText(DOCUMENTS[index].subtitle, 58, 221, 28, '#6c7e97');
+  rule(258);
 
   if (index === 0) {
-    block(263, '01  시장과 고객', '브랜드가 놓인 환경을 입체적으로 분석');
-    typedText('시장 흐름 · 고객의 니즈 · 경쟁 브랜드 비교', 60, 337, 24, '#6c7e97');
+    block(321, 'MARKET INSIGHT', '시장과 고객을 이해합니다');
     // Flat animated bars are rendered above this reserved chart area.
     ctx.fillStyle = '#edf2f8';
     [438, 516, 594].forEach((y) => ctx.fillRect(103, y, 545, 2));
-    text('시장', 131, 661, 22, '#6c7e97');
-    text('고객', 321, 661, 22, '#6c7e97');
-    text('브랜드', 501, 661, 22, '#6c7e97');
+    text('시장', 131, 665, 26, '#6c7e97');
+    text('고객', 321, 665, 26, '#6c7e97');
+    text('브랜드', 501, 665, 26, '#6c7e97');
     rule(708);
-    block(752, '02  브랜드 진단', '강점과 차별점을 고객의 언어로 정리');
-    typedText('현재 메시지와 콘텐츠의 일관성을 점검합니다.', 60, 828, 24, '#6c7e97');
-    text('03  기회 발견', 60, 881, 23, '#5479b6');
-    typedText('고객의 선택 기준에서 다음 전략의 단서를 찾습니다.', 60, 918, 24, '#43546f');
+    block(767, '핵심 발견', '우리만의 차별점 찾기');
+    typedText('고객의 니즈에서 기회를 발견합니다.', 60, 893, 27, '#6c7e97');
   } else if (index === 1) {
+    block(326, '01  브랜드 목표', '우리가 선택받는 이유');
+    rule(414);
+    block(479, '02  핵심 고객', '우리의 이야기가 필요한 사람');
+    rule(567);
+    block(632, '03  브랜드 메시지', '고객에게 전할 하나의 가치');
     ctx.fillStyle = '#eef4fd';
     ctx.beginPath();
-    ctx.roundRect(48, 770, 672, 154, 16);
+    ctx.roundRect(48, 756, 672, 168, 20);
     ctx.fill();
-    STRATEGY_ITEMS.forEach((item, i) => {
-      const y = 262 + i * 134;
-      block(y, item.title, item.body);
-      typedText(item.detail, 60, y + 76, 24, '#6c7e97');
-      if (i < STRATEGY_ITEMS.length - 1) rule(y + 100);
-    });
+    text('COMMUNICATION', 73, 802, 23, '#6084bc', 500);
+    typedText('일관된 방향, 명확한 메시지', 73, 855, 31, '#304f7c', 500);
   } else {
-    const steps = [
-      { title: '콘텐츠 기획', timing: '1주차 · 방향과 메시지 정리', lines: ['핵심 콘셉트와 콘텐츠 주제 도출', '제작 목록·일정·담당 역할 확정'] },
-      { title: '제작 및 채널 운영', timing: '2–3주차 · 고객과 만나는 접점 설계', lines: ['영상·이미지·카피를 채널별로 제작', '광고 소재 검토와 게시 일정 운영'] },
-      { title: '성과 분석 및 개선', timing: '4주차 · 데이터를 다음 실행으로', lines: ['유입·참여·전환 흐름을 함께 점검', '개선 과제와 다음 테스트 항목 정리'] },
-    ];
-    steps.forEach((step, i) => {
-      const y = 273 + i * 196;
+    ['콘텐츠 기획', '채널별 실행', '성과 측정 및 개선'].forEach((label, i) => {
+      const y = 337 + i * 161;
       ctx.fillStyle = '#edf3fc';
       ctx.beginPath();
-      ctx.roundRect(58, y - 28, 60, 60, 12);
+      ctx.roundRect(58, y - 36, 70, 70, 15);
       ctx.fill();
-      text(`0${i + 1}`, 73, y + 10, 24, '#5a80ba', 500);
-      text(step.title, 144, y + 7, 29, '#283c59', 500);
-      typedText(step.timing, 144, y + 47, 23, '#5479b6');
-      step.lines.forEach((line, lineIndex) => typedText(line, 144, y + 85 + lineIndex * 35, 24, '#6c7e97'));
-      if (i < steps.length - 1) rule(y + 155);
+      text(`0${i + 1}`, 73, y + 9, 29, '#5a80ba', 500);
+      text(label, 154, y + 7, 36, '#283c59', 500);
+      typedText(['메시지를 콘텐츠로 구체화', '고객과 만나는 접점 설계', '데이터로 다음 방향 결정'][i], 154, y + 62, 27, '#6c7e97');
     });
-    rule(833);
-    text('운영 원칙', 60, 874, 23, '#5479b6');
-    typedText('주간 공유 · 단계별 검토 · 결과 기반 개선', 60, 912, 24, '#43546f');
+    rule(790);
+    typedText('기획 → 실행 → 분석 → 개선', 58, 858, 31, '#5479b6', 500);
   }
   rule(960);
-  text('우주기획', 58, 997, 20, '#91a0b5', 600);
-  text(`0${index + 1}`, 671, 997, 19, '#91a0b5');
+  text('우주기획', 58, 997, 23, '#91a0b5', 600);
+  text(`0${index + 1}`, 671, 997, 22, '#91a0b5');
   const canvas = document.createElement('canvas');
   canvas.width = base.width;
   canvas.height = base.height;
@@ -115,14 +94,13 @@ function drawDocument(index: number) {
   const update = (seconds: number, still = false) => {
     // Cap texture changes at 12fps; the 3D motion remains independently smooth.
     const clock = Math.floor(seconds * 12) / 12;
-    const cycle = clock % LOOP_SECONDS;
+    const cycle = clock % 22;
     const delay = [1.2, 0.35, 2.1][index];
     // Type, hold the complete document, then erase before the seamless next loop.
-    const typingSpeed = Math.max(18, totalCharacters / 17);
-    const count = still ? totalCharacters : Math.floor(cycle < RESET_START
-      ? Math.max(0, Math.min(totalCharacters, (cycle - delay) * typingSpeed))
-      : totalCharacters * (LOOP_SECONDS - cycle) / (LOOP_SECONDS - RESET_START));
-    const cursor = !still && count < totalCharacters && cycle < RESET_START && Math.floor(clock * 2) % 2 === 0;
+    const count = still ? totalCharacters : Math.floor(cycle < 19
+      ? Math.max(0, Math.min(totalCharacters, (cycle - delay) * 18))
+      : totalCharacters * (22 - cycle) / 3);
+    const cursor = !still && count < totalCharacters && cycle < 19 && Math.floor(clock * 2) % 2 === 0;
     const signature = `${count}:${cursor}`;
     if (signature === lastFrame) return false;
     lastFrame = signature;
@@ -295,10 +273,10 @@ diffuseColor.a *= documentFade;`);
           if (documentArt[i].update(elapsed, reducedMotion)) textures[i].needsUpdate = true;
         });
         bars.forEach((bar, i) => {
-          const cycle = elapsed % LOOP_SECONDS;
+          const cycle = elapsed % 22;
           const progress = Math.max(0, Math.min(1, (cycle - 1.3 - i * 0.3) / 1.65));
           const rise = 1 - Math.pow(1 - progress, 3);
-          const resetProgress = Math.max(0, Math.min(1, (cycle - RESET_START) / 2.5));
+          const resetProgress = Math.max(0, Math.min(1, (cycle - 19) / 2.5));
           const reset = resetProgress * resetProgress * (3 - 2 * resetProgress);
           const scale = reducedMotion ? 1 : rise * (1 - reset);
           bar.visible = scale > 0.001;
@@ -381,7 +359,7 @@ diffuseColor.a *= documentFade;`);
           <small>우주기획 · 마케팅 전략</small>
           <strong>마케팅 전략</strong>
           <p>브랜드가 나아갈 방향을 정하다</p>
-          <dl>{STRATEGY_ITEMS.map((item) => <div key={item.title}><dt>{item.title}</dt><dd>{item.body}</dd></div>)}</dl>
+          <dl><dt>01 브랜드 목표</dt><dd>우리가 선택받는 이유</dd><dt>02 핵심 고객</dt><dd>우리의 이야기가 필요한 사람</dd><dt>03 브랜드 메시지</dt><dd>고객에게 전할 하나의 가치</dd></dl>
         </div>
         <div ref={hostRef} className={`strategy-documents-canvas ${ready ? 'is-ready' : ''}`} aria-hidden="true" />
       </div>
