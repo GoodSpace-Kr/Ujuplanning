@@ -899,17 +899,17 @@ body {
 .strategy-document-fallback strong {
   display: block;
   margin-top: 0.75rem;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 550;
 }
 
 .strategy-document-fallback p,
 .strategy-document-fallback dl {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 
 .strategy-document-fallback dt {
-  margin-top: 1rem;
+  margin-top: 0.6rem;
   color: #5479b6;
   font-weight: 500;
 }
