@@ -45,7 +45,7 @@ function drawDocument(index: number) {
 
   if (index === 0) {
     block(321, 'MARKET INSIGHT', '시장과 고객을 이해합니다');
-    // The dimensional bars are rendered above this reserved chart area.
+    // Flat animated bars are rendered above this reserved chart area.
     ctx.fillStyle = '#edf2f8';
     [438, 516, 594].forEach((y) => ctx.fillRect(103, y, 545, 2));
     text('시장', 131, 665, 26, '#6c7e97');
@@ -198,27 +198,14 @@ export function StrategyDocuments() {
       });
 
       const bars = [0.42, 0.7, 1.02].map((height, i) => {
-        const profile = new THREE.Shape();
-        profile.moveTo(0, 0);
-        profile.lineTo(0.44, 0);
-        profile.lineTo(0.44, height);
-        profile.lineTo(0, height);
-        profile.closePath();
-        const barGeometry = geometry(new THREE.ExtrudeGeometry(profile, {
-          depth: 0.34, steps: 1, bevelEnabled: true, bevelSegments: 4,
-          bevelSize: 0.025, bevelThickness: 0.025,
-        }));
+        const barGeometry = geometry(new THREE.PlaneGeometry(0.44, height));
         // Pivot at the bottom so each column grows upward from the same baseline.
-        barGeometry.translate(-0.22, 0.025, -0.17);
-        const front = material(new THREE.MeshStandardMaterial({
-          color: ['#b0c9ef', '#779fdc', '#4d79bf'][i], roughness: 0.3, metalness: 0.08,
+        barGeometry.translate(0, height / 2, 0);
+        const fill = material(new THREE.MeshBasicMaterial({
+          color: ['#b0c9ef', '#779fdc', '#4d79bf'][i],
         }));
-        const edges = material(new THREE.MeshStandardMaterial({
-          color: ['#89a9d7', '#567fb9', '#365b94'][i], roughness: 0.35, metalness: 0.12,
-        }));
-        const bar = new THREE.Mesh(barGeometry, [front, edges]);
-        bar.position.set(-0.91 + i * 0.81, -0.45, 0.34);
-        bar.rotation.set(0.16, -0.32, 0);
+        const bar = new THREE.Mesh(barGeometry, fill);
+        bar.position.set(-0.91 + i * 0.81, -0.45, 0.112);
         documents[0].add(bar);
         return bar;
       });
@@ -350,7 +337,7 @@ export function StrategyDocuments() {
 
   return (
     <>
-      <div className="strategy-documents" role="img" aria-label="은은한 블루 배경 위 우주기획의 3D 기획서에 문장이 타이핑되고 입체 막대그래프가 바닥에서 순서대로 올라오는 애니메이션">
+      <div className="strategy-documents" role="img" aria-label="은은한 블루 배경 위 우주기획의 3D 기획서에 문장이 타이핑되고 평면 막대그래프가 바닥에서 순서대로 올라오는 애니메이션">
         <div className={`strategy-document-fallback ${ready ? 'is-hidden' : ''}`} aria-hidden="true">
           <small>우주기획 · 마케팅 전략</small>
           <strong>마케팅 전략</strong>
