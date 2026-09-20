@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { StrategyDocuments } from '@/components/strategy-documents';
 import { CreativeStudio } from '@/components/creative-studio';
 import { PerformanceStudio } from '@/components/performance-studio';
+import { SocialStudio } from '@/components/social-studio';
 
 const SERVICES = [
   {
@@ -66,10 +67,11 @@ export function ServicesSection() {
             {service.headline}
           </h3>
           <div className="service-card">
-            <div className={`service-visual ${['strategy', 'creative', 'performance'].includes(service.id) ? `service-visual-${service.id}` : ''}`}>
+            <div className={`service-visual ${['strategy', 'creative', 'performance', 'social'].includes(service.id) ? `service-visual-${service.id}` : ''}`}>
             {service.id === 'strategy' && <StrategyDocuments />}
             {service.id === 'creative' && <CreativeStudio />}
             {service.id === 'performance' && <PerformanceStudio />}
+            {service.id === 'social' && <SocialStudio />}
             {/* Add the detail URL to href when the page is ready. */}
             <a
               className="service-image-link"
@@ -80,7 +82,7 @@ export function ServicesSection() {
                 if (!service.href) event.preventDefault();
               }}
             >
-              {!['strategy', 'creative', 'performance'].includes(service.id) && <span className="service-image-placeholder" aria-hidden="true" />}
+              {!['strategy', 'creative', 'performance', 'social'].includes(service.id) && <span className="service-image-placeholder" aria-hidden="true" />}
               <span className="service-card-arrow" aria-hidden="true">
                 <ArrowRight strokeWidth={1.6} />
               </span>
