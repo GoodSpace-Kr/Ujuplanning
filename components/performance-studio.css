@@ -42,9 +42,9 @@
 .performance-media { position: absolute; left: 358px; top: 119px; width: 151px; display: flex; flex-direction: column; gap: 26px; }
 .performance-medium { display: flex; align-items: center; gap: 10px; height: 62px; padding: 10px 13px; background: #f9fbfe; border: 1px solid #e0e8f3; border-radius: 9px; box-shadow: 0 6px 15px -10px #b0c9ef; animation: performance-media-active var(--performance-duration) infinite; }
 .performance-medium-icon { display: block; flex: 0 0 26px; width: 26px; height: 26px; object-fit: contain; }
+.performance-medium-1 .performance-medium-icon { transform: scale(1.16); }
+.performance-medium-2 .performance-medium-icon { transform: scale(.85); }
 .performance-medium-name { display: block; font-size: 16px; font-weight: 500; }
-.performance-medium-status { display: flex; align-items: center; gap: 5px; margin-top: 3px; font-size: 10px; color: #6c7e97; animation: performance-launch var(--performance-duration) infinite; }
-.performance-medium-status i { width: 4px; height: 4px; border-radius: 1px; background: #779fdc; }
 .performance-dashboard { left: 555px; top: 43px; width: 474px; transform: rotateY(-5deg) rotateX(2deg); animation: performance-dashboard var(--performance-duration) infinite; }
 .performance-dashboard-body { padding: 14px 20px 10px; }
 .performance-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
@@ -88,7 +88,6 @@
 @keyframes performance-improved { 0%, 63%, 100% { opacity: 0; } 65%, 94% { opacity: 1; } 97% { opacity: 0; } }
 @keyframes performance-type-improved { 0%, 64%, 100% { clip-path: inset(0 100% 0 0); } 76%, 95% { clip-path: inset(0); } }
 @keyframes performance-media-active { 0%, 15%, 100% { border-color: #e0e8f3; background: #f9fbfe; } 23%, 93% { border-color: #c0d3ef; background: #f1f6fc; } }
-@keyframes performance-launch { 0%, 16%, 100% { opacity: 0; } 23%, 93% { opacity: 1; } }
 @keyframes performance-signal { 0%, 16% { opacity: 0; stroke-dashoffset: 1; } 17% { opacity: 1; stroke-dashoffset: 1; } 31% { opacity: 1; stroke-dashoffset: -.12; } 32%, 100% { opacity: 0; stroke-dashoffset: -.12; } }
 @keyframes performance-signal-two { 0%, 20% { opacity: 0; stroke-dashoffset: 1; } 21% { opacity: 1; stroke-dashoffset: 1; } 35% { opacity: 1; stroke-dashoffset: -.12; } 36%, 100% { opacity: 0; stroke-dashoffset: -.12; } }
 @keyframes performance-signal-three { 0%, 24% { opacity: 0; stroke-dashoffset: 1; } 25% { opacity: 1; stroke-dashoffset: 1; } 39% { opacity: 1; stroke-dashoffset: -.12; } 40%, 100% { opacity: 0; stroke-dashoffset: -.12; } }

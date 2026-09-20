@@ -89,8 +89,7 @@ export function PerformanceStudio() {
       <div className="performance-media">
         {[{ name: '네이버', icon: 'naver.png' }, { name: '구글', icon: 'google.png' }, { name: '메타', icon: 'meta.svg' }].map(({ name, icon }, i) => <div className={`performance-medium performance-medium-${i}`} key={name}>
           <Image className="performance-medium-icon" src={`/brand-icons/${icon}`} alt="" width={26} height={26} unoptimized />
-          <div><span className="performance-medium-name">{name}</span>
-          <span className="performance-medium-status"><i />광고 집행</span></div>
+          <span className="performance-medium-name">{name}</span>
         </div>)}
       </div>
 
