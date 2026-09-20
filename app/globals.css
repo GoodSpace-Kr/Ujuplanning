@@ -881,7 +881,9 @@ body {
   width: min(72%, 19rem);
   padding: 1.5rem;
   border-radius: 0.6rem;
-  background: rgb(255 255 255 / 84%);
+  background: white;
+  -webkit-mask-image: linear-gradient(to bottom, rgb(0 0 0 / 94%), rgb(0 0 0 / 14%));
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 94%), rgb(0 0 0 / 14%));
   color: #283c59;
   box-shadow: 0 15px 40px rgb(82 115 168 / 16%);
   transform: translate(-50%, -50%);

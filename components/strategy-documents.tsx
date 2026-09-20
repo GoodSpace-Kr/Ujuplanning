@@ -36,8 +36,8 @@ function drawDocument(index: number) {
     typedText(body, 60, y + 51, 34, '#283c59', 500);
   };
 
-  // Translucent paper, with fully opaque typography for readability.
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+  // The material fades this entire surface, including its typography and panels.
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, 768, 1024);
   text(DOCUMENTS[index].label, 58, 76, 23, '#6a8bbf', 600);
   text(DOCUMENTS[index].title, 55, 162, index === 2 ? 49 : 62, '#243b5b', 650);
@@ -161,6 +161,27 @@ export function StrategyDocuments() {
       const textures: Three.Texture[] = [];
       const geometry = <T extends Three.BufferGeometry>(value: T) => { geometries.push(value); return value; };
       const material = <T extends Three.Material>(value: T) => { materials.push(value); return value; };
+      const fadeMaterial = <T extends Three.Material>(value: T, offsetY = 0) => {
+        const scaleY = { value: 1 };
+        value.transparent = true;
+        value.depthWrite = false;
+        // Use document coordinates so text, paper, and growing bars share one fade.
+        value.onBeforeCompile = (shader) => {
+          shader.uniforms.uDocumentScaleY = scaleY;
+          shader.uniforms.uDocumentOffsetY = { value: offsetY };
+          shader.vertexShader = `varying float vDocumentY;
+uniform float uDocumentScaleY;
+uniform float uDocumentOffsetY;
+${shader.vertexShader}`.replace('#include <begin_vertex>', `#include <begin_vertex>
+vDocumentY = transformed.y * uDocumentScaleY + uDocumentOffsetY;`);
+          shader.fragmentShader = `varying float vDocumentY;
+${shader.fragmentShader}`.replace('#include <color_fragment>', `#include <color_fragment>
+float documentFade = mix(0.14, 0.94, smoothstep(-2.25, 2.25, vDocumentY));
+diffuseColor.a *= documentFade;`);
+        };
+        value.customProgramCacheKey = () => 'document-gradient-opacity-v1';
+        return { material: material(value), scaleY };
+      };
 
       const shape = new THREE.Shape();
       const w = 3.38, h = 4.5, r = 0.13;
@@ -176,8 +197,8 @@ export function StrategyDocuments() {
       const paperGeometry = geometry(new THREE.ExtrudeGeometry(shape, {
         depth: 0.075, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.025, bevelThickness: 0.025,
       }));
-      const paperMaterial = material(new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4, transparent: true, opacity: 0.3, depthWrite: false }));
-      const backingMaterial = material(new THREE.MeshStandardMaterial({ color: '#e2edff', roughness: 0.55, transparent: true, opacity: 0.15, depthWrite: false }));
+      const paperMaterial = fadeMaterial(new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4, opacity: 0.18 })).material;
+      const backingMaterial = fadeMaterial(new THREE.MeshStandardMaterial({ color: '#e2edff', roughness: 0.55, opacity: 0.12 }), -0.1).material;
       let documentArt = DOCUMENTS.map((_, index) => drawDocument(index));
 
       const documents = DOCUMENTS.map((_, index) => {
@@ -193,7 +214,7 @@ export function StrategyDocuments() {
         texture.minFilter = THREE.LinearFilter;
         texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
         textures.push(texture);
-        const face = new THREE.Mesh(geometry(new THREE.PlaneGeometry(3.24, 4.32)), material(new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false })));
+        const face = new THREE.Mesh(geometry(new THREE.PlaneGeometry(3.24, 4.32)), fadeMaterial(new THREE.MeshBasicMaterial({ map: texture })).material);
         face.position.z = 0.106;
         group.add(face);
         scene.add(group);
@@ -204,13 +225,13 @@ export function StrategyDocuments() {
         const barGeometry = geometry(new THREE.PlaneGeometry(0.44, height));
         // Pivot at the bottom so each column grows upward from the same baseline.
         barGeometry.translate(0, height / 2, 0);
-        const fill = material(new THREE.MeshBasicMaterial({
+        const fill = fadeMaterial(new THREE.MeshBasicMaterial({
           color: ['#b0c9ef', '#779fdc', '#4d79bf'][i],
-        }));
-        const bar = new THREE.Mesh(barGeometry, fill);
+        }), -0.45);
+        const bar = new THREE.Mesh(barGeometry, fill.material);
         bar.position.set(-0.91 + i * 0.81, -0.45, 0.112);
         documents[0].add(bar);
-        return bar;
+        return { mesh: bar, fadeScaleY: fill.scaleY };
       });
 
       // A soft studio shadow makes the floating depth visible without heavy shadow maps.
@@ -256,7 +277,7 @@ export function StrategyDocuments() {
           group.rotation.set(-0.035, side * -0.13, side * -0.025);
           if (documentArt[i].update(elapsed, reducedMotion)) textures[i].needsUpdate = true;
         });
-        bars.forEach((bar, i) => {
+        bars.forEach(({ mesh: bar, fadeScaleY }, i) => {
           const cycle = elapsed % 22;
           const progress = Math.max(0, Math.min(1, (cycle - 1.3 - i * 0.3) / 1.65));
           const rise = 1 - Math.pow(1 - progress, 3);
@@ -265,6 +286,7 @@ export function StrategyDocuments() {
           const scale = reducedMotion ? 1 : rise * (1 - reset);
           bar.visible = scale > 0.001;
           bar.scale.y = Math.max(0.001, scale);
+          fadeScaleY.value = bar.scale.y;
         });
         renderer.render(scene, camera);
       };
