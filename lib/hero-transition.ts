@@ -19,7 +19,7 @@ export function getHeroTimeline(progress: number, projectCount: number, reducedM
     phoneOpacity: range(intro, .3, .36),
     projectOpacity: range(intro, .36, .44),
     projectCopyOpacity: range(intro, .36, .44) * (1 - smooth(range(p, .72, .77))),
-    headingOpacity: reducedMotion ? reducedExit : smooth(range(p, .81, .9)),
+    headingOpacity: reducedMotion ? reducedExit : smooth(range(p, .9, .965)),
     projectIndex: Math.min(Math.max(0, projectCount - 1), Math.floor(range(intro, .36, 1) * projectCount)),
   };
 }
@@ -32,13 +32,9 @@ export function getHeroFrame(width: number, height: number, focus: number, expan
     phoneWidth = width * .62;
     phoneHeight = phoneWidth / aspect;
   }
-  // Enlarge the actual phone uniformly until its inset screen covers the viewport.
-  const coverScale = Math.max(
-    Math.max(width / (phoneWidth * .884), height / (phoneHeight * .943)) * 1.03,
-    // Even phone-shaped viewports must finish the white dissolve.
-    Math.min(width / phoneWidth, height / phoneHeight) * 1.71,
-  );
-  const scale = 1 + (coverScale - 1) * expansion;
+  // Travel into the screen, then continue beyond full viewport coverage.
+  const coverScale = Math.max(width / (phoneWidth * .884), height / (phoneHeight * .943)) * 1.4;
+  const scale = Math.pow(coverScale, expansion);
   const frameWidth = expansion > 0 ? phoneWidth * scale : width + (phoneWidth - width) * focus;
   const frameHeight = expansion > 0 ? phoneHeight * scale : height + (phoneHeight - height) * focus;
   return {
@@ -48,8 +44,8 @@ export function getHeroFrame(width: number, height: number, focus: number, expan
     top: (height - frameHeight) / 2,
     radiusX: frameWidth * .135 * focus * (1 - expansion),
     radiusY: frameHeight * .065 * focus * (1 - expansion),
-    // Start dissolving after the phone has grown beyond a viewport edge. Using
-    // rendered size instead of scroll time keeps this consistent on mobile.
-    dissolve: expansion > 0 ? smooth(range(Math.max(frameWidth / width, frameHeight / height), 1.12, 1.7)) : 0,
+    // Wait until the actual inset screen nearly covers BOTH viewport axes.
+    // The bezel can move well offscreen before the white dissolve begins.
+    dissolve: expansion > 0 ? smooth(range(Math.min(frameWidth * .884 / width, frameHeight * .943 / height), .95, 1.35)) : 0,
   };
 }

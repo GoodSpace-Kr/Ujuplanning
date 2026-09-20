@@ -33,7 +33,7 @@ test('expanded inset screen covers portrait, landscape, and desktop viewports', 
 });
 
 test('the service heading is fully presented before sticky scrolling ends', () => {
-  for (const p of [.94, .97, 1, 1.1]) {
+  for (const p of [.97, 1, 1.1]) {
     const state = getHeroTimeline(p, 5);
     assert.equal(state.expansion, 1);
     assert.equal(state.headingOpacity, 1);
@@ -52,19 +52,25 @@ test('reduced motion switches directly between complete scenes', () => {
   }
 });
 
-test('phone remains visible beyond the viewport edge before dissolving', () => {
+test('phone stays opaque until its screen nearly fills both viewport axes', () => {
   for (const [width, height] of [[320, 568], [390, 844], [768, 1024], [844, 390], [1440, 900], [2560, 1440]]) {
     let previous = 0;
     for (let i = 0; i <= 100; i++) {
       const frame = getHeroFrame(width, height, 1, i / 100);
-      const ratio = Math.max(frame.width / width, frame.height / height);
+      const coverage = Math.min(frame.width * .884 / width, frame.height * .943 / height);
       assert.ok(frame.dissolve >= previous);
-      if (ratio <= 1.12) assert.equal(frame.dissolve, 0);
-      if (ratio >= 1.7) assert.equal(frame.dissolve, 1);
+      if (coverage <= .95) assert.equal(frame.dissolve, 0);
+      if (coverage >= 1.35) assert.equal(frame.dissolve, 1);
       previous = frame.dissolve;
     }
     assert.equal(previous, 1);
     // Reverse scrolling restores exactly the same intermediate appearance.
     assert.equal(getHeroFrame(width, height, 1, 0).dissolve, 0);
   }
+});
+
+test('desktop phone stays opaque even after its top and bottom leave the viewport', () => {
+  const frame = getHeroFrame(1440, 900, 1, .6);
+  assert.ok(frame.height > 900 * 1.7);
+  assert.equal(frame.dissolve, 0);
 });
