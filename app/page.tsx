@@ -7,7 +7,7 @@ import {
   type CSSProperties,
   type MutableRefObject,
 } from 'react';
-import { BrandSystemSection } from '@/components/brand-system-section';
+// import { BrandSystemSection } from '@/components/brand-system-section';
 import { ServicesSection } from '@/components/services-section';
 
 type GlobeNode = {
@@ -683,7 +683,8 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <BrandSystemSection />
+      {/* 7단계 브랜드 소개 및 3D 캔버스: 추후 복구를 위해 보관 */}
+      {/* <BrandSystemSection /> */}
       <ServicesSection />
     </main>
   );
