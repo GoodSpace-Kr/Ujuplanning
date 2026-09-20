@@ -47,10 +47,6 @@ const SERVICES = [
 export function ServicesSection() {
   return (
     <div className="services" id="services">
-      <header className="services-heading">
-        <h2>고객의 브랜드의<br />빈 우주를 발견하기 위해</h2>
-      </header>
-
       {SERVICES.map((service) => (
         <section
           className="service-section"

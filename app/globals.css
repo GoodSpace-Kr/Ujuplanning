@@ -227,9 +227,34 @@ body {
   align-items: center;
   gap: clamp(2.5rem, 7vw, 7.5rem);
   padding: 5rem clamp(2rem, 7vw, 8rem);
-  opacity: var(--hero-project-opacity, 0);
+  opacity: var(--hero-project-copy-opacity, 0);
   pointer-events: none;
-  transition: opacity 520ms ease;
+}
+
+.hero-services-surface {
+  position: absolute;
+  left: 5.8%;
+  top: 2.8%;
+  z-index: 36;
+  width: 88.4%;
+  height: 94.3%;
+  border-radius: var(--hero-services-radius, 12.5% / 5.8%);
+  background: #fff;
+  opacity: var(--hero-services-surface-opacity, 0);
+  pointer-events: none;
+}
+
+.hero-services-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 0 1.5rem;
+  color: #202329;
+  text-align: center;
+  opacity: var(--hero-services-heading-opacity, 0);
+  pointer-events: none;
 }
 
 .project-stage {
@@ -775,12 +800,7 @@ body {
   background: #fff;
 }
 
-.services-heading {
-  margin: 0 auto clamp(5rem, 8vw, 8rem);
-  text-align: center;
-}
-
-.services-heading h2 {
+.hero-services-copy h2 {
   font-size: clamp(2rem, 4.3vw, 4rem);
   font-weight: 650;
   line-height: 1.35;

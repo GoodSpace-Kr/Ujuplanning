@@ -9,6 +9,7 @@ import {
 } from 'react';
 // import { BrandSystemSection } from '@/components/brand-system-section';
 import { ServicesSection } from '@/components/services-section';
+import { getHeroFrame, getHeroTimeline } from '@/lib/hero-transition';
 
 type GlobeNode = {
   x: number;
@@ -392,6 +393,7 @@ export default function Home() {
   const heroPanelRef = useRef<HTMLDivElement | null>(null);
   const heroFrameRef = useRef<HTMLDivElement | null>(null);
   const heroWorldRef = useRef<HTMLDivElement | null>(null);
+  const servicesIntroRef = useRef<HTMLElement | null>(null);
   const heroProgressRef = useRef(0);
   const activeIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -405,43 +407,16 @@ export default function Home() {
     let styleFrameId = 0;
     let targetHeroProgress = 0;
     let renderedHeroProgress = 0;
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const applyHeroStyles = (progress: number) => {
-      const frameProgress = Math.min(progress / 0.28, 1);
-      const worldProgress = Math.min(
-        Math.max((frameProgress - 0.38) / 0.42, 0),
-        1,
-      );
-      const heroShadow = frameProgress * 0.18;
-      const worldScale = 1 + worldProgress * 5.2;
-      const phoneAspectRatio = 434 / 883;
+      const timeline = getHeroTimeline(progress, projects.length, motionQuery.matches);
+      const frameProgress = timeline.focus;
+      const heroShadow = frameProgress * .18 * (1 - timeline.expansion);
       const panelBounds = heroPanelRef.current?.getBoundingClientRect();
       const panelWidth = panelBounds?.width ?? window.innerWidth;
       const panelHeight = panelBounds?.height ?? window.innerHeight;
-      let phoneHeight = Math.min(panelHeight * 0.74, 660);
-      let phoneWidth = phoneHeight * phoneAspectRatio;
-
-      if (phoneWidth > panelWidth * 0.62) {
-        phoneWidth = panelWidth * 0.62;
-        phoneHeight = phoneWidth / phoneAspectRatio;
-      }
-
-      const finalLeft = (panelWidth - phoneWidth) / 2;
-      const finalTop = (panelHeight - phoneHeight) / 2;
-      const currentWidth =
-        panelWidth + (phoneWidth - panelWidth) * frameProgress;
-      const currentHeight =
-        panelHeight + (phoneHeight - panelHeight) * frameProgress;
-      const currentLeft = finalLeft * frameProgress;
-      const currentTop = finalTop * frameProgress;
-      const heroRadiusX = currentWidth * 0.135 * frameProgress;
-      const heroRadiusY = currentHeight * 0.065 * frameProgress;
-      const blackOpacity = Math.min(
-        Math.max((frameProgress - 0.62) / 0.14, 0),
-        1,
-      );
-      const phoneOpacity = Math.min(Math.max((progress - 0.3) / 0.06, 0), 1);
-      const projectOpacity = Math.min(Math.max((progress - 0.36) / 0.08, 0), 1);
+      const frame = getHeroFrame(panelWidth, panelHeight, frameProgress, timeline.expansion);
 
       heroProgressRef.current = frameProgress;
 
@@ -452,35 +427,51 @@ export default function Home() {
         );
         heroPanelRef.current.style.setProperty(
           '--hero-screen-black-opacity',
-          String(blackOpacity),
+          String(timeline.blackOpacity),
         );
         heroPanelRef.current.style.setProperty(
           '--hero-phone-opacity',
-          String(phoneOpacity),
+          String(timeline.phoneOpacity),
         );
         heroPanelRef.current.style.setProperty(
           '--hero-project-opacity',
-          String(projectOpacity),
+          String(timeline.projectOpacity),
         );
+        heroPanelRef.current.style.setProperty('--hero-project-copy-opacity', String(timeline.projectCopyOpacity));
+        heroPanelRef.current.style.setProperty('--hero-services-surface-opacity', String(timeline.surfaceOpacity));
+        heroPanelRef.current.style.setProperty('--hero-services-heading-opacity', String(timeline.headingOpacity));
+        heroPanelRef.current.style.setProperty('--hero-services-radius', `${12.5 * (1 - timeline.expansion)}% / ${5.8 * (1 - timeline.expansion)}%`);
       }
 
       if (heroFrameRef.current) {
         heroFrameRef.current.classList.toggle(
           'is-phone-shaped',
-          phoneOpacity > 0.001,
+          timeline.phoneOpacity > 0.001,
         );
-        heroFrameRef.current.style.left = `${currentLeft}px`;
-        heroFrameRef.current.style.top = `${currentTop}px`;
-        heroFrameRef.current.style.width = `${currentWidth}px`;
-        heroFrameRef.current.style.height = `${currentHeight}px`;
-        heroFrameRef.current.style.borderRadius = `${heroRadiusX}px / ${heroRadiusY}px`;
+        heroFrameRef.current.style.left = `${frame.left}px`;
+        heroFrameRef.current.style.top = `${frame.top}px`;
+        heroFrameRef.current.style.width = `${frame.width}px`;
+        heroFrameRef.current.style.height = `${frame.height}px`;
+        heroFrameRef.current.style.borderRadius = `${frame.radiusX}px / ${frame.radiusY}px`;
         heroFrameRef.current.style.boxShadow = `0 30px 90px rgba(15, 23, 42, ${heroShadow})`;
       }
 
       if (heroWorldRef.current) {
         heroWorldRef.current.style.width = `${panelWidth}px`;
         heroWorldRef.current.style.height = `${panelHeight}px`;
-        heroWorldRef.current.style.transform = `translate3d(${-currentLeft}px, ${-currentTop}px, 0) scale(${worldScale})`;
+        heroWorldRef.current.style.transform = `translate3d(${-frame.left}px, ${-frame.top}px, 0) scale(${timeline.worldScale})`;
+      }
+
+      if (servicesIntroRef.current) {
+        // Keep the copy at reading size while the surrounding phone expands.
+        servicesIntroRef.current.style.left = `${-frame.left}px`;
+        servicesIntroRef.current.style.top = `${-frame.top}px`;
+        servicesIntroRef.current.style.width = `${panelWidth}px`;
+        servicesIntroRef.current.style.height = `${panelHeight}px`;
+      }
+      if (activeIndexRef.current !== timeline.projectIndex) {
+        activeIndexRef.current = timeline.projectIndex;
+        setActiveIndex(timeline.projectIndex);
       }
     };
 
@@ -499,6 +490,13 @@ export default function Home() {
     };
 
     const requestStyleUpdate = () => {
+      if (motionQuery.matches || targetHeroProgress === 1 || targetHeroProgress === 0) {
+        window.cancelAnimationFrame(styleFrameId);
+        styleFrameId = 0;
+        renderedHeroProgress = targetHeroProgress;
+        applyHeroStyles(renderedHeroProgress);
+        return;
+      }
       if (!styleFrameId) {
         styleFrameId = window.requestAnimationFrame(animateHeroStyles);
       }
@@ -508,7 +506,7 @@ export default function Home() {
       if (heroRef.current) {
         const heroBounds = heroRef.current.getBoundingClientRect();
         const heroScrollableDistance =
-          heroBounds.height - window.innerHeight;
+          heroBounds.height - (heroPanelRef.current?.offsetHeight ?? window.innerHeight);
         const rawHeroProgress = Math.min(
           Math.max(
             Math.abs(Math.min(heroBounds.top, 0)) /
@@ -518,20 +516,6 @@ export default function Home() {
           1,
         );
         targetHeroProgress = rawHeroProgress;
-
-        const rawProgress = Math.min(
-          Math.max((rawHeroProgress - 0.36) / 0.64, 0),
-          1,
-        );
-        const nextIndex = Math.min(
-          projects.length - 1,
-          Math.floor(rawProgress * projects.length),
-        );
-
-        if (activeIndexRef.current !== nextIndex) {
-          activeIndexRef.current = nextIndex;
-          setActiveIndex(nextIndex);
-        }
 
         requestStyleUpdate();
       }
@@ -546,19 +530,21 @@ export default function Home() {
     updateOnScroll();
     window.addEventListener('scroll', requestUpdate, { passive: true });
     window.addEventListener('resize', requestUpdate);
+    motionQuery.addEventListener('change', requestUpdate);
 
     return () => {
       window.cancelAnimationFrame(scrollFrameId);
       window.cancelAnimationFrame(styleFrameId);
       window.removeEventListener('scroll', requestUpdate);
       window.removeEventListener('resize', requestUpdate);
+      motionQuery.removeEventListener('change', requestUpdate);
       window.history.scrollRestoration = previousScrollRestoration;
     };
   }, []);
 
   return (
     <main className="bg-white text-[#151922]">
-      <section ref={heroRef} className="relative h-[620svh] bg-white">
+      <section ref={heroRef} className="relative h-[840svh] bg-white">
         <div
           ref={heroPanelRef}
           className="sticky top-0 grid min-h-svh place-items-center overflow-hidden bg-white px-6 text-center text-white"
@@ -641,6 +627,10 @@ export default function Home() {
               className="hero-phone-shell"
               aria-hidden="true"
             />
+            <div className="hero-services-surface" aria-hidden="true" />
+            <header ref={servicesIntroRef} className="hero-services-copy">
+              <h2>고객의 브랜드의<br />빈 우주를 발견하기 위해</h2>
+            </header>
           </div>
 
           <div className="hero-project-copy-stage" aria-hidden="true">
