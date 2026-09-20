@@ -809,6 +809,44 @@ body {
   text-wrap: balance;
 }
 
+.service-headline-keyword {
+  display: inline-block;
+  color: #2f67bf;
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .service-headline-keyword {
+    background-image: linear-gradient(110deg, #2f67bf 0%, #2f67bf 35%, #4280ce 43%, #5f96de 50%, #4280ce 57%, #2f67bf 65%, #2f67bf 100%);
+    background-size: 280% 100%;
+    background-position: 100% 50%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: service-keyword-shimmer 8s ease-in-out infinite;
+  }
+}
+
+@keyframes service-keyword-shimmer {
+  0%, 18% { background-position: 100% 50%; }
+  62%, 100% { background-position: 0% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-headline-keyword {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
+@media (forced-colors: active) {
+  .service-headline-keyword {
+    animation: none;
+    background-image: none;
+    color: LinkText;
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
 .service-image-link {
   position: relative;
   display: block;

@@ -6,6 +6,9 @@ import { CreativeStudio } from '@/components/creative-studio';
 import { PerformanceStudio } from '@/components/performance-studio';
 import { SocialStudio } from '@/components/social-studio';
 
+const HEADLINE_KEYWORDS = ['브랜드', '마케팅', '콘텐츠', '광고 성과', '고객 전환', 'SNS', '온라인 채널'];
+const HEADLINE_PATTERN = new RegExp(`(${HEADLINE_KEYWORDS.join('|')})`, 'g');
+
 const SERVICES = [
   {
     id: 'strategy',
@@ -56,7 +59,11 @@ export function ServicesSection() {
           aria-labelledby={`service-heading-${service.id}`}
         >
           <h3 id={`service-heading-${service.id}`} className="service-headline">
-            {service.headline}
+            {service.headline.split(HEADLINE_PATTERN).map((part, index) => (
+              HEADLINE_KEYWORDS.includes(part)
+                ? <span className="service-headline-keyword" key={index}>{part}</span>
+                : part
+            ))}
           </h3>
           <div className="service-card">
             <div className={`service-visual service-visual-${service.id}`}>
