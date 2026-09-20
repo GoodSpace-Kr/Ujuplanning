@@ -5,7 +5,6 @@ import { StrategyDocuments } from '@/components/strategy-documents';
 import { CreativeStudio } from '@/components/creative-studio';
 import { PerformanceStudio } from '@/components/performance-studio';
 import { SocialStudio } from '@/components/social-studio';
-import { ExperienceStudio } from '@/components/experience-studio';
 
 const SERVICES = [
   {
@@ -40,14 +39,6 @@ const SERVICES = [
     items: ['SNS 채널 기획 및 운영', '블로그 콘텐츠', '숏폼 콘텐츠', '인플루언서 협업', '체험단 운영', '바이럴 및 확산 콘텐츠'],
     href: '',
   },
-  {
-    id: 'experience',
-    headline: '오프라인 행사와 브랜드 경험을 만들고',
-    title: '브랜드 경험·BTL·행사',
-    description: '온라인에서 전달한 브랜드 메시지를 실제 공간과 고객 경험으로 확장합니다.',
-    items: ['전시', '팝업스토어', '프로모션', '브랜드 행사', '공간 디자인 및 제작', '현장 운영', '행사 영상 및 사진 기록'],
-    href: '',
-  },
 ];
 
 export function ServicesSection() {
@@ -73,7 +64,6 @@ export function ServicesSection() {
             {service.id === 'creative' && <CreativeStudio />}
             {service.id === 'performance' && <PerformanceStudio />}
             {service.id === 'social' && <SocialStudio />}
-            {service.id === 'experience' && <ExperienceStudio />}
             {/* Add the detail URL to href when the page is ready. */}
             <a
               className="service-image-link"
