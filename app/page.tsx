@@ -7,6 +7,8 @@ import {
   type CSSProperties,
   type MutableRefObject,
 } from 'react';
+import { BrandSystemSection } from '@/components/brand-system-section';
+import { ServicesSection } from '@/components/services-section';
 
 type GlobeNode = {
   x: number;
@@ -410,7 +412,6 @@ export default function Home() {
         Math.max((frameProgress - 0.38) / 0.42, 0),
         1,
       );
-      const heroRadius = frameProgress * 48;
       const heroShadow = frameProgress * 0.18;
       const worldScale = 1 + worldProgress * 5.2;
       const phoneAspectRatio = 434 / 883;
@@ -433,6 +434,8 @@ export default function Home() {
         panelHeight + (phoneHeight - panelHeight) * frameProgress;
       const currentLeft = finalLeft * frameProgress;
       const currentTop = finalTop * frameProgress;
+      const heroRadiusX = currentWidth * 0.135 * frameProgress;
+      const heroRadiusY = currentHeight * 0.065 * frameProgress;
       const blackOpacity = Math.min(
         Math.max((frameProgress - 0.62) / 0.14, 0),
         1,
@@ -462,11 +465,15 @@ export default function Home() {
       }
 
       if (heroFrameRef.current) {
+        heroFrameRef.current.classList.toggle(
+          'is-phone-shaped',
+          phoneOpacity > 0.001,
+        );
         heroFrameRef.current.style.left = `${currentLeft}px`;
         heroFrameRef.current.style.top = `${currentTop}px`;
         heroFrameRef.current.style.width = `${currentWidth}px`;
         heroFrameRef.current.style.height = `${currentHeight}px`;
-        heroFrameRef.current.style.borderRadius = `${heroRadius}px`;
+        heroFrameRef.current.style.borderRadius = `${heroRadiusX}px / ${heroRadiusY}px`;
         heroFrameRef.current.style.boxShadow = `0 30px 90px rgba(15, 23, 42, ${heroShadow})`;
       }
 
@@ -676,6 +683,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <BrandSystemSection />
+      <ServicesSection />
     </main>
   );
 }
