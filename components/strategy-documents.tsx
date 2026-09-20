@@ -46,6 +46,8 @@ function drawDocument(index: number) {
   if (index === 0) {
     block(321, 'MARKET INSIGHT', '시장과 고객을 이해합니다');
     // The dimensional bars are rendered above this reserved chart area.
+    ctx.fillStyle = '#edf2f8';
+    [438, 516, 594].forEach((y) => ctx.fillRect(103, y, 545, 2));
     text('시장', 131, 665, 26, '#6c7e97');
     text('고객', 321, 665, 26, '#6c7e97');
     text('브랜드', 501, 665, 26, '#6c7e97');
@@ -79,7 +81,7 @@ function drawDocument(index: number) {
     typedText('기획 → 실행 → 분석 → 개선', 58, 858, 31, '#5479b6', 600);
   }
   rule(960);
-  text('UJU PLANNING', 58, 997, 21, '#91a0b5', 600);
+  text('우주기획', 58, 997, 23, '#91a0b5', 600);
   text(`0${index + 1}`, 671, 997, 22, '#91a0b5');
   const canvas = document.createElement('canvas');
   canvas.width = base.width;
@@ -172,7 +174,6 @@ export function StrategyDocuments() {
         depth: 0.075, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.025, bevelThickness: 0.025,
       }));
       const paperMaterial = material(new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4 }));
-      const blueMaterial = material(new THREE.MeshStandardMaterial({ color: '#8ab4ef', roughness: 0.3, metalness: 0.08 }));
       const backingMaterial = material(new THREE.MeshStandardMaterial({ color: '#e2edff', roughness: 0.55 }));
       let documentArt = DOCUMENTS.map((_, index) => drawDocument(index));
 
@@ -197,10 +198,29 @@ export function StrategyDocuments() {
       });
 
       const bars = [0.42, 0.7, 1.02].map((height, i) => {
-        const bar = new THREE.Mesh(geometry(new THREE.BoxGeometry(0.48, height, 0.18)), blueMaterial);
-        bar.position.set(-0.91 + i * 0.81, -0.45 + height / 2, 0.18);
+        const profile = new THREE.Shape();
+        profile.moveTo(0, 0);
+        profile.lineTo(0.44, 0);
+        profile.lineTo(0.44, height);
+        profile.lineTo(0, height);
+        profile.closePath();
+        const barGeometry = geometry(new THREE.ExtrudeGeometry(profile, {
+          depth: 0.34, steps: 1, bevelEnabled: true, bevelSegments: 4,
+          bevelSize: 0.025, bevelThickness: 0.025,
+        }));
+        // Pivot at the bottom so each column grows upward from the same baseline.
+        barGeometry.translate(-0.22, 0.025, -0.17);
+        const front = material(new THREE.MeshStandardMaterial({
+          color: ['#b0c9ef', '#779fdc', '#4d79bf'][i], roughness: 0.3, metalness: 0.08,
+        }));
+        const edges = material(new THREE.MeshStandardMaterial({
+          color: ['#89a9d7', '#567fb9', '#365b94'][i], roughness: 0.35, metalness: 0.12,
+        }));
+        const bar = new THREE.Mesh(barGeometry, [front, edges]);
+        bar.position.set(-0.91 + i * 0.81, -0.45, 0.34);
+        bar.rotation.set(0.16, -0.32, 0);
         documents[0].add(bar);
-        return { mesh: bar, height };
+        return bar;
       });
 
       // A soft studio shadow makes the floating depth visible without heavy shadow maps.
@@ -246,10 +266,15 @@ export function StrategyDocuments() {
           group.rotation.set(-0.035, side * -0.13, side * -0.025);
           if (documentArt[i].update(elapsed, reducedMotion)) textures[i].needsUpdate = true;
         });
-        bars.forEach(({ mesh, height }, i) => {
-          const scale = 0.8 + settle(0.4 + i * 0.12, 1) * 0.2;
-          mesh.scale.y = scale;
-          mesh.position.y = -0.45 + height * scale / 2;
+        bars.forEach((bar, i) => {
+          const cycle = elapsed % 22;
+          const progress = Math.max(0, Math.min(1, (cycle - 1.3 - i * 0.3) / 1.65));
+          const rise = 1 - Math.pow(1 - progress, 3);
+          const resetProgress = Math.max(0, Math.min(1, (cycle - 19) / 2.5));
+          const reset = resetProgress * resetProgress * (3 - 2 * resetProgress);
+          const scale = reducedMotion ? 1 : rise * (1 - reset);
+          bar.visible = scale > 0.001;
+          bar.scale.y = Math.max(0.001, scale);
         });
         renderer.render(scene, camera);
       };
@@ -325,9 +350,9 @@ export function StrategyDocuments() {
 
   return (
     <>
-      <div className="strategy-documents" role="img" aria-label="은은한 블루 그라데이션 위에 놓인 브랜드 분석, 마케팅 전략, 캠페인 실행 계획 3D 문서에 문장이 한 줄씩 타이핑되는 기획서">
+      <div className="strategy-documents" role="img" aria-label="은은한 블루 배경 위 우주기획의 3D 기획서에 문장이 타이핑되고 입체 막대그래프가 바닥에서 순서대로 올라오는 애니메이션">
         <div className={`strategy-document-fallback ${ready ? 'is-hidden' : ''}`} aria-hidden="true">
-          <small>UJU PLANNING · STRATEGY</small>
+          <small>우주기획 · 마케팅 전략</small>
           <strong>마케팅 전략</strong>
           <p>브랜드가 나아갈 방향을 정하다</p>
           <dl><dt>01 브랜드 목표</dt><dd>우리가 선택받는 이유</dd><dt>02 핵심 고객</dt><dd>우리의 이야기가 필요한 사람</dd><dt>03 브랜드 메시지</dt><dd>고객에게 전할 하나의 가치</dd></dl>
