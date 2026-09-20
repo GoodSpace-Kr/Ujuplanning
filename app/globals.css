@@ -799,7 +799,7 @@ body {
 }
 
 .service-headline {
-  margin-bottom: clamp(2rem, 4vw, 4rem);
+  margin-bottom: clamp(1rem, 2vw, 2rem);
   font-size: clamp(1.5rem, 2.8vw, 2.65rem);
   font-weight: 600;
   line-height: 1.45;
