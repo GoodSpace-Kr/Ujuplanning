@@ -12,15 +12,20 @@ const DOCUMENTS = [
 
 // High-resolution typeset textures keep Korean copy crisp on actual 3D sheets.
 function drawDocument(index: number) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1152;
-  canvas.height = 1536;
-  const ctx = canvas.getContext('2d')!;
-  ctx.scale(1.5, 1.5);
+  const base = document.createElement('canvas');
+  base.width = 768;
+  base.height = 1024;
+  const ctx = base.getContext('2d')!;
+  const lines: { value: string; x: number; y: number; size: number; color: string; weight: number; start: number }[] = [];
+  let totalCharacters = 0;
   const text = (value: string, x: number, y: number, size = 30, color = '#43546f', weight = 500) => {
     ctx.font = `${weight} ${size}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
     ctx.fillStyle = color;
     ctx.fillText(value, x, y);
+  };
+  const typedText = (value: string, x: number, y: number, size = 30, color = '#43546f', weight = 500) => {
+    lines.push({ value, x, y, size, color, weight, start: totalCharacters });
+    totalCharacters += value.length + 9; // A short pause between sentences.
   };
   const rule = (y: number) => {
     ctx.fillStyle = '#e8eef6';
@@ -28,14 +33,14 @@ function drawDocument(index: number) {
   };
   const block = (y: number, title: string, body: string) => {
     text(title, 60, y, 27, '#5479b6', 600);
-    text(body, 60, y + 51, 34, '#283c59', 500);
+    typedText(body, 60, y + 51, 34, '#283c59', 500);
   };
 
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, 768, 1024);
   text(DOCUMENTS[index].label, 58, 76, 23, '#6a8bbf', 600);
   text(DOCUMENTS[index].title, 55, 162, index === 2 ? 49 : 62, '#243b5b', 650);
-  text(DOCUMENTS[index].subtitle, 58, 221, 28, '#6c7e97');
+  typedText(DOCUMENTS[index].subtitle, 58, 221, 28, '#6c7e97');
   rule(258);
 
   if (index === 0) {
@@ -46,7 +51,7 @@ function drawDocument(index: number) {
     text('브랜드', 501, 665, 26, '#6c7e97');
     rule(708);
     block(767, '핵심 발견', '우리만의 차별점 찾기');
-    text('고객의 니즈에서 기회를 발견합니다.', 60, 893, 27, '#6c7e97');
+    typedText('고객의 니즈에서 기회를 발견합니다.', 60, 893, 27, '#6c7e97');
   } else if (index === 1) {
     block(326, '01  브랜드 목표', '우리가 선택받는 이유');
     rule(414);
@@ -58,7 +63,7 @@ function drawDocument(index: number) {
     ctx.roundRect(48, 756, 672, 168, 20);
     ctx.fill();
     text('COMMUNICATION', 73, 802, 23, '#6084bc', 600);
-    text('일관된 방향, 명확한 메시지', 73, 855, 31, '#304f7c', 600);
+    typedText('일관된 방향, 명확한 메시지', 73, 855, 31, '#304f7c', 600);
   } else {
     ['콘텐츠 기획', '채널별 실행', '성과 측정 및 개선'].forEach((label, i) => {
       const y = 337 + i * 161;
@@ -68,15 +73,49 @@ function drawDocument(index: number) {
       ctx.fill();
       text(`0${i + 1}`, 73, y + 9, 29, '#5a80ba', 600);
       text(label, 154, y + 7, 36, '#283c59', 600);
-      text(['메시지를 콘텐츠로 구체화', '고객과 만나는 접점 설계', '데이터로 다음 방향 결정'][i], 154, y + 62, 27, '#6c7e97');
+      typedText(['메시지를 콘텐츠로 구체화', '고객과 만나는 접점 설계', '데이터로 다음 방향 결정'][i], 154, y + 62, 27, '#6c7e97');
     });
     rule(790);
-    text('기획 → 실행 → 분석 → 개선', 58, 858, 31, '#5479b6', 600);
+    typedText('기획 → 실행 → 분석 → 개선', 58, 858, 31, '#5479b6', 600);
   }
   rule(960);
   text('UJU PLANNING', 58, 997, 21, '#91a0b5', 600);
   text(`0${index + 1}`, 671, 997, 22, '#91a0b5');
-  return canvas;
+  const canvas = document.createElement('canvas');
+  canvas.width = base.width;
+  canvas.height = base.height;
+  const output = canvas.getContext('2d')!;
+  let lastFrame = '';
+  const update = (seconds: number, still = false) => {
+    // Cap texture changes at 12fps; the 3D motion remains independently smooth.
+    const clock = Math.floor(seconds * 12) / 12;
+    const cycle = clock % 22;
+    const delay = [1.2, 0.35, 2.1][index];
+    // Type, hold the complete document, then erase before the seamless next loop.
+    const count = still ? totalCharacters : Math.floor(cycle < 19
+      ? Math.max(0, Math.min(totalCharacters, (cycle - delay) * 18))
+      : totalCharacters * (22 - cycle) / 3);
+    const cursor = !still && count < totalCharacters && cycle < 19 && Math.floor(clock * 2) % 2 === 0;
+    const signature = `${count}:${cursor}`;
+    if (signature === lastFrame) return false;
+    lastFrame = signature;
+    output.setTransform(1, 0, 0, 1, 0, 0);
+    output.drawImage(base, 0, 0);
+    for (const line of lines) {
+      const length = Math.max(0, Math.min(line.value.length, count - line.start));
+      output.font = `${line.weight} ${line.size}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
+      output.fillStyle = line.color;
+      const visibleText = line.value.slice(0, length);
+      output.fillText(visibleText, line.x, line.y);
+      if (cursor && count >= line.start && count < line.start + line.value.length) {
+        output.fillStyle = '#5e8cdb';
+        output.fillRect(line.x + output.measureText(visibleText).width + 4, line.y - line.size * 0.8, 2, line.size);
+      }
+    }
+    return true;
+  };
+  update(0);
+  return { canvas, update };
 }
 
 export function StrategyDocuments() {
@@ -106,8 +145,8 @@ export function StrategyDocuments() {
       host.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
-      const camera = new THREE.OrthographicCamera(-6.3, 6.3, 2.76, -2.76, 0.1, 40);
-      camera.position.set(0, 0, 15);
+      const camera = new THREE.PerspectiveCamera(30, 16 / 7, 0.1, 60);
+      camera.position.set(0, 0, 13);
       scene.add(new THREE.HemisphereLight(0xffffff, 0xa4b9db, 2.4));
       const light = new THREE.DirectionalLight(0xffffff, 3.2);
       light.position.set(-4, 7, 10);
@@ -130,21 +169,28 @@ export function StrategyDocuments() {
       shape.lineTo(-w / 2, -h / 2 + r);
       shape.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
       const paperGeometry = geometry(new THREE.ExtrudeGeometry(shape, {
-        depth: 0.045, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.025, bevelThickness: 0.025,
+        depth: 0.075, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.025, bevelThickness: 0.025,
       }));
       const paperMaterial = material(new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4 }));
       const blueMaterial = material(new THREE.MeshStandardMaterial({ color: '#8ab4ef', roughness: 0.3, metalness: 0.08 }));
-      const inkMaterial = material(new THREE.MeshStandardMaterial({ color: '#456ca9', roughness: 0.35 }));
+      const backingMaterial = material(new THREE.MeshStandardMaterial({ color: '#e2edff', roughness: 0.55 }));
+      let documentArt = DOCUMENTS.map((_, index) => drawDocument(index));
 
       const documents = DOCUMENTS.map((_, index) => {
         const group = new THREE.Group();
+        const backing = new THREE.Mesh(paperGeometry, backingMaterial);
+        backing.position.set(0.1, -0.1, -0.16);
+        backing.rotation.z = -0.018;
+        group.add(backing);
         group.add(new THREE.Mesh(paperGeometry, paperMaterial));
-        const texture = new THREE.CanvasTexture(drawDocument(index));
+        const texture = new THREE.CanvasTexture(documentArt[index].canvas);
         texture.colorSpace = THREE.SRGBColorSpace;
+        texture.generateMipmaps = false;
+        texture.minFilter = THREE.LinearFilter;
         texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
         textures.push(texture);
         const face = new THREE.Mesh(geometry(new THREE.PlaneGeometry(3.24, 4.32)), material(new THREE.MeshBasicMaterial({ map: texture })));
-        face.position.z = 0.075;
+        face.position.z = 0.106;
         group.add(face);
         scene.add(group);
         return group;
@@ -157,23 +203,15 @@ export function StrategyDocuments() {
         return { mesh: bar, height };
       });
 
-      const pen = new THREE.Group();
-      const barrel = new THREE.Mesh(geometry(new THREE.CylinderGeometry(0.07, 0.055, 1.05, 24)), paperMaterial);
-      barrel.position.y = 0.7;
-      pen.add(barrel);
-      const cap = new THREE.Mesh(geometry(new THREE.CylinderGeometry(0.076, 0.076, 0.42, 24)), blueMaterial);
-      cap.position.y = 1.4;
-      pen.add(cap);
-      const nib = new THREE.Mesh(geometry(new THREE.ConeGeometry(0.055, 0.22, 24)), inkMaterial);
-      nib.rotation.z = Math.PI;
-      nib.position.y = 0.07;
-      pen.add(nib);
-      pen.rotation.z = -0.62;
-      documents[1].add(pen);
-
-      const underline = new THREE.Mesh(geometry(new THREE.PlaneGeometry(0.8, 0.018)), material(new THREE.MeshBasicMaterial({ color: '#799cd0' })));
-      underline.position.set(0.72, -1.65, 0.085);
-      documents[1].add(underline);
+      const backdropMaterial = material(new THREE.MeshBasicMaterial({ color: '#f1fbff', transparent: true, opacity: 0.46, depthWrite: false }));
+      const disc = new THREE.Mesh(geometry(new THREE.CircleGeometry(2.7, 80)), backdropMaterial);
+      disc.position.set(-3.4, -0.35, -3.8);
+      scene.add(disc);
+      const ring = new THREE.Mesh(geometry(new THREE.TorusGeometry(1.5, 0.2, 20, 80)), material(new THREE.MeshStandardMaterial({ color: '#d8f5ff', roughness: 0.28, transparent: true, opacity: 0.55, depthWrite: false })));
+      ring.position.set(4.2, 1.4, -3.3);
+      scene.add(ring);
+      const orb = new THREE.Mesh(geometry(new THREE.SphereGeometry(0.2, 24, 16)), blueMaterial);
+      scene.add(orb);
 
       // A soft studio shadow makes the floating depth visible without heavy shadow maps.
       const shadowCanvas = document.createElement('canvas');
@@ -200,20 +238,30 @@ export function StrategyDocuments() {
       setPaused(motion.matches);
 
       const render = () => {
-        const phase = elapsed * Math.PI * 2 / 14;
+        const phase = elapsed * Math.PI * 2 / 11;
         documents.forEach((group, i) => {
           const side = i - 1;
-          group.position.set(side * (compact ? 1.45 : 3.67), (i === 1 ? 0 : 0.07) + Math.sin(phase + i * 1.3) * 0.09, i === 1 ? 0.7 : -0.3);
+          group.position.set(
+            side * (compact ? 1.45 : 3.6) + Math.sin(phase + i * 1.2) * (i === 1 ? 0.09 : 0.16),
+            (i === 1 ? 0 : 0.07) + Math.sin(phase + i * 1.3) * 0.21,
+            (i === 1 ? 0.7 : -0.3) + Math.cos(phase + i * 1.1) * 0.26,
+          );
           group.scale.setScalar(compact && i !== 1 ? 0.87 : 1);
-          group.rotation.set(-0.035 + Math.sin(phase + i) * 0.012, side * -0.12 + Math.sin(phase + i) * 0.025, side * -0.035 + Math.cos(phase + i) * 0.012);
+          group.rotation.set(
+            -0.07 + Math.sin(phase + i) * 0.07,
+            side * -0.2 + Math.sin(phase + i) * 0.14,
+            side * -0.055 + Math.cos(phase + i) * 0.045,
+          );
+          if (documentArt[i].update(elapsed, motion.matches && pausedRef.current)) textures[i].needsUpdate = true;
         });
         bars.forEach(({ mesh, height }, i) => {
-          const scale = 1 + Math.sin(phase + i * 0.7) * 0.055;
+          const scale = 0.87 + Math.sin(phase + i * 0.7) * 0.13;
           mesh.scale.y = scale;
           mesh.position.y = -0.45 + height * scale / 2;
         });
-        pen.position.set(1.02 + Math.sin(phase * 2) * 0.2, -1.64 + Math.sin(phase * 4) * 0.018, 0.2);
-        underline.scale.x = 0.8 + Math.sin(phase * 2) * 0.25;
+        disc.position.y = -0.35 + Math.sin(phase) * 0.15;
+        ring.rotation.set(0.2 + Math.sin(phase) * 0.15, -0.32 + Math.cos(phase) * 0.15, phase * 0.12);
+        orb.position.set(-5.1 + Math.sin(phase) * 0.15, 1.95 + Math.cos(phase) * 0.23, -1.2);
         renderer.render(scene, camera);
       };
       const shouldAnimate = () => inView && !pausedRef.current && !document.hidden;
@@ -238,11 +286,9 @@ export function StrategyDocuments() {
         if (!width || !height) return;
         compact = width < 760;
         const aspect = width / height;
-        const viewHeight = Math.max(5.55, (compact ? 4.7 : 11.8) / aspect);
-        camera.left = -viewHeight * aspect / 2;
-        camera.right = viewHeight * aspect / 2;
-        camera.top = viewHeight / 2;
-        camera.bottom = -viewHeight / 2;
+        const viewHeight = Math.max(5.9, (compact ? 4.7 : 11.8) / aspect);
+        camera.aspect = aspect;
+        camera.position.z = viewHeight / (2 * Math.tan(Math.PI / 12)) + 0.9;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
         render();
@@ -262,8 +308,9 @@ export function StrategyDocuments() {
       // Replace fallback font textures when the site's Korean font finishes loading.
       void document.fonts.ready.then(() => {
         if (disposed) return;
+        documentArt = DOCUMENTS.map((_, index) => drawDocument(index));
         for (let i = 0; i < DOCUMENTS.length; i++) {
-          textures[i].image = drawDocument(i);
+          textures[i].image = documentArt[i].canvas;
           textures[i].needsUpdate = true;
         }
         render();
@@ -289,7 +336,7 @@ export function StrategyDocuments() {
 
   return (
     <>
-      <div className="strategy-documents" role="img" aria-label="브랜드 분석, 마케팅 전략, 캠페인 실행 계획 문서와 펜이 천천히 떠 움직이는 3D 기획서">
+      <div className="strategy-documents" role="img" aria-label="블루와 민트 그라데이션 위에서 브랜드 분석, 마케팅 전략, 캠페인 실행 계획 문서가 입체적으로 움직이며 문장이 한 줄씩 타이핑되는 3D 기획서">
         <div className={`strategy-document-fallback ${ready ? 'is-hidden' : ''}`} aria-hidden="true">
           <small>UJU PLANNING · STRATEGY</small>
           <strong>마케팅 전략</strong>

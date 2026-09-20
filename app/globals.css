@@ -822,7 +822,11 @@ body {
 }
 
 .service-visual-strategy {
-  background: radial-gradient(ellipse at 50% 35%, #f8fbff, #e8f0fc 75%, #e1ebfa);
+  background:
+    radial-gradient(ellipse at 12% 94%, rgb(107 153 242 / 68%), transparent 52%),
+    radial-gradient(ellipse at 88% 85%, rgb(195 246 244 / 90%), transparent 58%),
+    radial-gradient(ellipse at 78% 4%, rgb(177 193 245 / 68%), transparent 52%),
+    linear-gradient(135deg, #c8dcf5 0%, #b9d3f5 44%, #d5effa 100%);
   isolation: isolate;
 }
 
