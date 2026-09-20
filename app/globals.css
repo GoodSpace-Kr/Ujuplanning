@@ -900,6 +900,7 @@ body {
   display: block;
   margin-top: 0.75rem;
   font-size: 1.5rem;
+  font-weight: 550;
 }
 
 .strategy-document-fallback p,
@@ -910,6 +911,7 @@ body {
 .strategy-document-fallback dt {
   margin-top: 1rem;
   color: #5479b6;
+  font-weight: 500;
 }
 
 .strategy-document-fallback dd {

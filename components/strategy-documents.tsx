@@ -32,7 +32,7 @@ function drawDocument(index: number) {
     ctx.fillRect(58, y, 652, 2);
   };
   const block = (y: number, title: string, body: string) => {
-    text(title, 60, y, 27, '#5479b6', 600);
+    text(title, 60, y, 27, '#5479b6', 500);
     typedText(body, 60, y + 51, 34, '#283c59', 500);
   };
 
@@ -42,8 +42,8 @@ function drawDocument(index: number) {
   paperGradient.addColorStop(1, 'rgba(255, 255, 255, 0.66)');
   ctx.fillStyle = paperGradient;
   ctx.fillRect(0, 0, 768, 1024);
-  text(DOCUMENTS[index].label, 58, 76, 23, '#6a8bbf', 600);
-  text(DOCUMENTS[index].title, 55, 162, index === 2 ? 49 : 62, '#243b5b', 650);
+  text(DOCUMENTS[index].label, 58, 76, 23, '#6a8bbf', 500);
+  text(DOCUMENTS[index].title, 55, 162, index === 2 ? 49 : 62, '#243b5b', 550);
   typedText(DOCUMENTS[index].subtitle, 58, 221, 28, '#6c7e97');
   rule(258);
 
@@ -68,8 +68,8 @@ function drawDocument(index: number) {
     ctx.beginPath();
     ctx.roundRect(48, 756, 672, 168, 20);
     ctx.fill();
-    text('COMMUNICATION', 73, 802, 23, '#6084bc', 600);
-    typedText('일관된 방향, 명확한 메시지', 73, 855, 31, '#304f7c', 600);
+    text('COMMUNICATION', 73, 802, 23, '#6084bc', 500);
+    typedText('일관된 방향, 명확한 메시지', 73, 855, 31, '#304f7c', 500);
   } else {
     ['콘텐츠 기획', '채널별 실행', '성과 측정 및 개선'].forEach((label, i) => {
       const y = 337 + i * 161;
@@ -77,12 +77,12 @@ function drawDocument(index: number) {
       ctx.beginPath();
       ctx.roundRect(58, y - 36, 70, 70, 15);
       ctx.fill();
-      text(`0${i + 1}`, 73, y + 9, 29, '#5a80ba', 600);
-      text(label, 154, y + 7, 36, '#283c59', 600);
+      text(`0${i + 1}`, 73, y + 9, 29, '#5a80ba', 500);
+      text(label, 154, y + 7, 36, '#283c59', 500);
       typedText(['메시지를 콘텐츠로 구체화', '고객과 만나는 접점 설계', '데이터로 다음 방향 결정'][i], 154, y + 62, 27, '#6c7e97');
     });
     rule(790);
-    typedText('기획 → 실행 → 분석 → 개선', 58, 858, 31, '#5479b6', 600);
+    typedText('기획 → 실행 → 분석 → 개선', 58, 858, 31, '#5479b6', 500);
   }
   rule(960);
   text('우주기획', 58, 997, 23, '#91a0b5', 600);
