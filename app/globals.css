@@ -782,7 +782,7 @@ body {
 
 .services-heading h2 {
   font-size: clamp(2rem, 4.3vw, 4rem);
-  font-weight: 750;
+  font-weight: 650;
   line-height: 1.35;
   letter-spacing: -0.045em;
   word-break: keep-all;
@@ -801,7 +801,7 @@ body {
 .service-headline {
   margin-bottom: clamp(2rem, 4vw, 4rem);
   font-size: clamp(1.5rem, 2.8vw, 2.65rem);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.45;
   letter-spacing: -0.04em;
   text-align: center;
@@ -856,7 +856,7 @@ body {
 
 .service-card-copy h4 {
   font-size: clamp(1.35rem, 2vw, 1.85rem);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.4;
   letter-spacing: -0.03em;
 }
