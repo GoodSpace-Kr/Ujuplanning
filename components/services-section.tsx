@@ -2,6 +2,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import { StrategyDocuments } from '@/components/strategy-documents';
+import { CreativeStudio } from '@/components/creative-studio';
 
 const SERVICES = [
   {
@@ -64,8 +65,9 @@ export function ServicesSection() {
             {service.headline}
           </h3>
           <div className="service-card">
-            <div className={`service-visual ${service.id === 'strategy' ? 'service-visual-strategy' : ''}`}>
+            <div className={`service-visual ${['strategy', 'creative'].includes(service.id) ? `service-visual-${service.id}` : ''}`}>
             {service.id === 'strategy' && <StrategyDocuments />}
+            {service.id === 'creative' && <CreativeStudio />}
             {/* Add the detail URL to href when the page is ready. */}
             <a
               className="service-image-link"
@@ -76,7 +78,7 @@ export function ServicesSection() {
                 if (!service.href) event.preventDefault();
               }}
             >
-              {service.id !== 'strategy' && <span className="service-image-placeholder" aria-hidden="true" />}
+              {!['strategy', 'creative'].includes(service.id) && <span className="service-image-placeholder" aria-hidden="true" />}
               <span className="service-card-arrow" aria-hidden="true">
                 <ArrowRight strokeWidth={1.6} />
               </span>
