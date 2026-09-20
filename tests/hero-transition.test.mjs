@@ -36,9 +36,8 @@ test('the service heading is fully presented before sticky scrolling ends', () =
   for (const p of [.94, .97, 1, 1.1]) {
     const state = getHeroTimeline(p, 5);
     assert.equal(state.expansion, 1);
-    assert.equal(state.surfaceOpacity, 1);
     assert.equal(state.headingOpacity, 1);
-    assert.equal(state.phoneOpacity, 0);
+    assert.equal(state.phoneOpacity, 1, 'mask stays stable underneath the white overlay');
     assert.equal(state.projectCopyOpacity, 0);
     assert.equal(state.projectIndex, 4);
   }
@@ -49,7 +48,23 @@ test('reduced motion switches directly between complete scenes', () => {
     const state = getHeroTimeline(p, 5, true);
     const expected = p < .855 ? 0 : 1;
     assert.equal(state.expansion, expected);
-    assert.equal(state.surfaceOpacity, expected);
     assert.equal(state.headingOpacity, expected);
+  }
+});
+
+test('phone fades near the viewport edge and is hidden before extreme enlargement', () => {
+  for (const [width, height] of [[320, 568], [390, 844], [768, 1024], [844, 390], [1440, 900], [2560, 1440]]) {
+    let previous = 0;
+    for (let i = 0; i <= 100; i++) {
+      const frame = getHeroFrame(width, height, 1, i / 100);
+      const ratio = Math.max(frame.width / width, frame.height / height);
+      assert.ok(frame.dissolve >= previous);
+      if (ratio <= .92) assert.equal(frame.dissolve, 0);
+      if (ratio >= 1.5) assert.equal(frame.dissolve, 1);
+      previous = frame.dissolve;
+    }
+    assert.equal(previous, 1);
+    // Reverse scrolling restores exactly the same intermediate appearance.
+    assert.equal(getHeroFrame(width, height, 1, 0).dissolve, 0);
   }
 });

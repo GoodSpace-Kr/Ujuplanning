@@ -150,7 +150,8 @@ body {
   z-index: 1;
   overflow: hidden;
   isolation: isolate;
-  will-change: left, top, width, height, border-radius, box-shadow;
+  transform-origin: center;
+  will-change: transform;
 }
 
 .hero-transition-frame.is-phone-shaped {
@@ -233,21 +234,18 @@ body {
 
 .hero-services-surface {
   position: absolute;
-  left: 5.8%;
-  top: 2.8%;
-  z-index: 36;
-  width: 88.4%;
-  height: 94.3%;
-  border-radius: var(--hero-services-radius, 12.5% / 5.8%);
+  inset: 0;
+  z-index: 3;
   background: #fff;
   opacity: var(--hero-services-surface-opacity, 0);
+  will-change: opacity;
   pointer-events: none;
 }
 
 .hero-services-copy {
   position: absolute;
   inset: 0;
-  z-index: 40;
+  z-index: 4;
   display: grid;
   place-items: center;
   padding: 0 1.5rem;

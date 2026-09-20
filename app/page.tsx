@@ -393,7 +393,6 @@ export default function Home() {
   const heroPanelRef = useRef<HTMLDivElement | null>(null);
   const heroFrameRef = useRef<HTMLDivElement | null>(null);
   const heroWorldRef = useRef<HTMLDivElement | null>(null);
-  const servicesIntroRef = useRef<HTMLElement | null>(null);
   const heroProgressRef = useRef(0);
   const activeIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -412,11 +411,15 @@ export default function Home() {
     const applyHeroStyles = (progress: number) => {
       const timeline = getHeroTimeline(progress, projects.length, motionQuery.matches);
       const frameProgress = timeline.focus;
-      const heroShadow = frameProgress * .18 * (1 - timeline.expansion);
+      const heroShadow = frameProgress * .18;
       const panelBounds = heroPanelRef.current?.getBoundingClientRect();
       const panelWidth = panelBounds?.width ?? window.innerWidth;
       const panelHeight = panelBounds?.height ?? window.innerHeight;
-      const frame = getHeroFrame(panelWidth, panelHeight, frameProgress, timeline.expansion);
+      // Keep layout and the raster mask at phone size during the exit zoom.
+      // Only the compositor transform changes, avoiding repeated mask resampling.
+      const frame = getHeroFrame(panelWidth, panelHeight, frameProgress, 0);
+      const expandedFrame = getHeroFrame(panelWidth, panelHeight, frameProgress, timeline.expansion);
+      const dissolve = motionQuery.matches ? timeline.expansion : expandedFrame.dissolve;
 
       heroProgressRef.current = frameProgress;
 
@@ -438,9 +441,8 @@ export default function Home() {
           String(timeline.projectOpacity),
         );
         heroPanelRef.current.style.setProperty('--hero-project-copy-opacity', String(timeline.projectCopyOpacity));
-        heroPanelRef.current.style.setProperty('--hero-services-surface-opacity', String(timeline.surfaceOpacity));
-        heroPanelRef.current.style.setProperty('--hero-services-heading-opacity', String(timeline.headingOpacity));
-        heroPanelRef.current.style.setProperty('--hero-services-radius', `${12.5 * (1 - timeline.expansion)}% / ${5.8 * (1 - timeline.expansion)}%`);
+        heroPanelRef.current.style.setProperty('--hero-services-surface-opacity', String(dissolve));
+        heroPanelRef.current.style.setProperty('--hero-services-heading-opacity', String(timeline.headingOpacity * dissolve));
       }
 
       if (heroFrameRef.current) {
@@ -454,6 +456,8 @@ export default function Home() {
         heroFrameRef.current.style.height = `${frame.height}px`;
         heroFrameRef.current.style.borderRadius = `${frame.radiusX}px / ${frame.radiusY}px`;
         heroFrameRef.current.style.boxShadow = `0 30px 90px rgba(15, 23, 42, ${heroShadow})`;
+        heroFrameRef.current.style.transform = `scale(${expandedFrame.width / frame.width})`;
+        heroFrameRef.current.style.visibility = dissolve === 1 ? 'hidden' : 'visible';
       }
 
       if (heroWorldRef.current) {
@@ -462,13 +466,6 @@ export default function Home() {
         heroWorldRef.current.style.transform = `translate3d(${-frame.left}px, ${-frame.top}px, 0) scale(${timeline.worldScale})`;
       }
 
-      if (servicesIntroRef.current) {
-        // Keep the copy at reading size while the surrounding phone expands.
-        servicesIntroRef.current.style.left = `${-frame.left}px`;
-        servicesIntroRef.current.style.top = `${-frame.top}px`;
-        servicesIntroRef.current.style.width = `${panelWidth}px`;
-        servicesIntroRef.current.style.height = `${panelHeight}px`;
-      }
       if (activeIndexRef.current !== timeline.projectIndex) {
         activeIndexRef.current = timeline.projectIndex;
         setActiveIndex(timeline.projectIndex);
@@ -627,11 +624,12 @@ export default function Home() {
               className="hero-phone-shell"
               aria-hidden="true"
             />
-            <div className="hero-services-surface" aria-hidden="true" />
-            <header ref={servicesIntroRef} className="hero-services-copy">
-              <h2>고객의 브랜드의<br />빈 우주를 발견하기 위해</h2>
-            </header>
           </div>
+
+          <div className="hero-services-surface" aria-hidden="true" />
+          <header className="hero-services-copy">
+            <h2>고객의 브랜드의<br />빈 우주를 발견하기 위해</h2>
+          </header>
 
           <div className="hero-project-copy-stage" aria-hidden="true">
             <div className="project-side project-side-left">

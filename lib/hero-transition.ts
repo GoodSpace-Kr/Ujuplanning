@@ -15,11 +15,11 @@ export function getHeroTimeline(progress: number, projectCount: number, reducedM
     expansion: reducedMotion ? reducedExit : exit,
     worldScale: 1 + clamp((focus - .38) / .42) * 5.2,
     blackOpacity: clamp((focus - .62) / .14),
-    phoneOpacity: range(intro, .3, .36) * (1 - (reducedMotion ? reducedExit : smooth(range(p, .89, .94)))),
+    // Keep the phone mask stable; a separate viewport layer handles the exit.
+    phoneOpacity: range(intro, .3, .36),
     projectOpacity: range(intro, .36, .44),
     projectCopyOpacity: range(intro, .36, .44) * (1 - smooth(range(p, .72, .77))),
-    surfaceOpacity: reducedMotion ? reducedExit : smooth(range(p, .76, .87)),
-    headingOpacity: reducedMotion ? reducedExit : smooth(range(p, .865, .94)),
+    headingOpacity: reducedMotion ? reducedExit : smooth(range(p, .81, .9)),
     projectIndex: Math.min(Math.max(0, projectCount - 1), Math.floor(range(intro, .36, 1) * projectCount)),
   };
 }
@@ -33,7 +33,11 @@ export function getHeroFrame(width: number, height: number, focus: number, expan
     phoneHeight = phoneWidth / aspect;
   }
   // Enlarge the actual phone uniformly until its inset screen covers the viewport.
-  const coverScale = Math.max(width / (phoneWidth * .884), height / (phoneHeight * .943)) * 1.03;
+  const coverScale = Math.max(
+    Math.max(width / (phoneWidth * .884), height / (phoneHeight * .943)) * 1.03,
+    // Even phone-shaped viewports must finish the white dissolve.
+    Math.min(width / phoneWidth, height / phoneHeight) * 1.51,
+  );
   const scale = 1 + (coverScale - 1) * expansion;
   const frameWidth = expansion > 0 ? phoneWidth * scale : width + (phoneWidth - width) * focus;
   const frameHeight = expansion > 0 ? phoneHeight * scale : height + (phoneHeight - height) * focus;
@@ -44,5 +48,8 @@ export function getHeroFrame(width: number, height: number, focus: number, expan
     top: (height - frameHeight) / 2,
     radiusX: frameWidth * .135 * focus * (1 - expansion),
     radiusY: frameHeight * .065 * focus * (1 - expansion),
+    // Start dissolving just before the phone reaches a viewport edge. Using
+    // rendered size instead of scroll time keeps this consistent on mobile.
+    dissolve: expansion > 0 ? smooth(range(Math.max(frameWidth / width, frameHeight / height), .92, 1.5)) : 0,
   };
 }
