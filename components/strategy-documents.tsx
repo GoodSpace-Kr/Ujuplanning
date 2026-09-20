@@ -36,7 +36,8 @@ function drawDocument(index: number) {
     typedText(body, 60, y + 51, 34, '#283c59', 500);
   };
 
-  ctx.fillStyle = '#ffffff';
+  // Translucent paper, with fully opaque typography for readability.
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
   ctx.fillRect(0, 0, 768, 1024);
   text(DOCUMENTS[index].label, 58, 76, 23, '#6a8bbf', 600);
   text(DOCUMENTS[index].title, 55, 162, index === 2 ? 49 : 62, '#243b5b', 650);
@@ -102,6 +103,8 @@ function drawDocument(index: number) {
     if (signature === lastFrame) return false;
     lastFrame = signature;
     output.setTransform(1, 0, 0, 1, 0, 0);
+    // Clear every update so translucency and erased text do not accumulate.
+    output.clearRect(0, 0, canvas.width, canvas.height);
     output.drawImage(base, 0, 0);
     for (const line of lines) {
       const length = Math.max(0, Math.min(line.value.length, count - line.start));
@@ -173,8 +176,8 @@ export function StrategyDocuments() {
       const paperGeometry = geometry(new THREE.ExtrudeGeometry(shape, {
         depth: 0.075, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.025, bevelThickness: 0.025,
       }));
-      const paperMaterial = material(new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4 }));
-      const backingMaterial = material(new THREE.MeshStandardMaterial({ color: '#e2edff', roughness: 0.55 }));
+      const paperMaterial = material(new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4, transparent: true, opacity: 0.3, depthWrite: false }));
+      const backingMaterial = material(new THREE.MeshStandardMaterial({ color: '#e2edff', roughness: 0.55, transparent: true, opacity: 0.15, depthWrite: false }));
       let documentArt = DOCUMENTS.map((_, index) => drawDocument(index));
 
       const documents = DOCUMENTS.map((_, index) => {
@@ -190,7 +193,7 @@ export function StrategyDocuments() {
         texture.minFilter = THREE.LinearFilter;
         texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
         textures.push(texture);
-        const face = new THREE.Mesh(geometry(new THREE.PlaneGeometry(3.24, 4.32)), material(new THREE.MeshBasicMaterial({ map: texture })));
+        const face = new THREE.Mesh(geometry(new THREE.PlaneGeometry(3.24, 4.32)), material(new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false })));
         face.position.z = 0.106;
         group.add(face);
         scene.add(group);
