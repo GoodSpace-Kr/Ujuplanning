@@ -203,16 +203,6 @@ export function StrategyDocuments() {
         return { mesh: bar, height };
       });
 
-      const backdropMaterial = material(new THREE.MeshBasicMaterial({ color: '#f1fbff', transparent: true, opacity: 0.46, depthWrite: false }));
-      const disc = new THREE.Mesh(geometry(new THREE.CircleGeometry(2.7, 80)), backdropMaterial);
-      disc.position.set(-3.4, -0.35, -3.8);
-      scene.add(disc);
-      const ring = new THREE.Mesh(geometry(new THREE.TorusGeometry(1.5, 0.2, 20, 80)), material(new THREE.MeshStandardMaterial({ color: '#d8f5ff', roughness: 0.28, transparent: true, opacity: 0.55, depthWrite: false })));
-      ring.position.set(4.2, 1.4, -3.3);
-      scene.add(ring);
-      const orb = new THREE.Mesh(geometry(new THREE.SphereGeometry(0.2, 24, 16)), blueMaterial);
-      scene.add(orb);
-
       // A soft studio shadow makes the floating depth visible without heavy shadow maps.
       const shadowCanvas = document.createElement('canvas');
       shadowCanvas.width = shadowCanvas.height = 128;
@@ -238,30 +228,29 @@ export function StrategyDocuments() {
       setPaused(motion.matches);
 
       const render = () => {
-        const phase = elapsed * Math.PI * 2 / 11;
+        const reducedMotion = motion.matches && pausedRef.current;
+        const settle = (delay: number, duration: number) => {
+          const progress = reducedMotion ? 1 : Math.max(0, Math.min(1, (elapsed - delay) / duration));
+          return 1 - Math.pow(1 - progress, 3);
+        };
         documents.forEach((group, i) => {
           const side = i - 1;
+          // One small entrance, then a stable reading surface instead of perpetual bobbing.
+          const entrance = settle(i * 0.12, 1.4);
           group.position.set(
-            side * (compact ? 1.45 : 3.6) + Math.sin(phase + i * 1.2) * (i === 1 ? 0.09 : 0.16),
-            (i === 1 ? 0 : 0.07) + Math.sin(phase + i * 1.3) * 0.21,
-            (i === 1 ? 0.7 : -0.3) + Math.cos(phase + i * 1.1) * 0.26,
+            side * (compact ? 1.45 : 3.6),
+            (i === 1 ? 0 : 0.07) - (1 - entrance) * 0.14,
+            i === 1 ? 0.7 : -0.3,
           );
           group.scale.setScalar(compact && i !== 1 ? 0.87 : 1);
-          group.rotation.set(
-            -0.07 + Math.sin(phase + i) * 0.07,
-            side * -0.2 + Math.sin(phase + i) * 0.14,
-            side * -0.055 + Math.cos(phase + i) * 0.045,
-          );
-          if (documentArt[i].update(elapsed, motion.matches && pausedRef.current)) textures[i].needsUpdate = true;
+          group.rotation.set(-0.035, side * -0.13, side * -0.025);
+          if (documentArt[i].update(elapsed, reducedMotion)) textures[i].needsUpdate = true;
         });
         bars.forEach(({ mesh, height }, i) => {
-          const scale = 0.87 + Math.sin(phase + i * 0.7) * 0.13;
+          const scale = 0.8 + settle(0.4 + i * 0.12, 1) * 0.2;
           mesh.scale.y = scale;
           mesh.position.y = -0.45 + height * scale / 2;
         });
-        disc.position.y = -0.35 + Math.sin(phase) * 0.15;
-        ring.rotation.set(0.2 + Math.sin(phase) * 0.15, -0.32 + Math.cos(phase) * 0.15, phase * 0.12);
-        orb.position.set(-5.1 + Math.sin(phase) * 0.15, 1.95 + Math.cos(phase) * 0.23, -1.2);
         renderer.render(scene, camera);
       };
       const shouldAnimate = () => inView && !pausedRef.current && !document.hidden;
@@ -336,7 +325,7 @@ export function StrategyDocuments() {
 
   return (
     <>
-      <div className="strategy-documents" role="img" aria-label="블루와 민트 그라데이션 위에서 브랜드 분석, 마케팅 전략, 캠페인 실행 계획 문서가 입체적으로 움직이며 문장이 한 줄씩 타이핑되는 3D 기획서">
+      <div className="strategy-documents" role="img" aria-label="은은한 블루 그라데이션 위에 놓인 브랜드 분석, 마케팅 전략, 캠페인 실행 계획 3D 문서에 문장이 한 줄씩 타이핑되는 기획서">
         <div className={`strategy-document-fallback ${ready ? 'is-hidden' : ''}`} aria-hidden="true">
           <small>UJU PLANNING · STRATEGY</small>
           <strong>마케팅 전략</strong>
