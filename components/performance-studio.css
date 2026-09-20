@@ -21,7 +21,7 @@
 .performance-ad-main { left: 0; top: 74px; width: 246px; animation: performance-main var(--performance-duration) infinite; }
 .performance-ad-image { position: relative; margin: 12px 12px 0; height: 124px; overflow: hidden; border-radius: 4px; }
 .performance-ad-image img { object-position: 58% center; }
-.performance-ad-badge { position: absolute; top: 8px; left: 8px; display: flex; align-items: center; gap: 4px; padding: 3px 6px; border-radius: 3px; color: #5479b6; background: #fff; font-size: 10px; animation: performance-selected var(--performance-duration) infinite; }
+.performance-product-caption { position: absolute; left: 10px; bottom: 9px; color: #43546f; font-size: 10px; font-weight: 500; letter-spacing: -.02em; }
 .performance-ad-copy { padding: 13px 16px 12px; }
 .performance-ad-copy > small { font-size: 9px; color: #6a8bbf; letter-spacing: .08em; }
 .performance-copy-slot { position: relative; height: 60px; margin: 6px 0 8px; }
@@ -40,7 +40,8 @@
 .performance-route-1 .performance-route-signal { animation-name: performance-signal-two; }
 .performance-route-2 .performance-route-signal { animation-name: performance-signal-three; }
 .performance-media { position: absolute; left: 358px; top: 119px; width: 151px; display: flex; flex-direction: column; gap: 26px; }
-.performance-medium { height: 62px; padding: 11px 15px; background: #f9fbfe; border: 1px solid #e0e8f3; border-radius: 9px; box-shadow: 0 6px 15px -10px #b0c9ef; animation: performance-media-active var(--performance-duration) infinite; }
+.performance-medium { display: flex; align-items: center; gap: 10px; height: 62px; padding: 10px 13px; background: #f9fbfe; border: 1px solid #e0e8f3; border-radius: 9px; box-shadow: 0 6px 15px -10px #b0c9ef; animation: performance-media-active var(--performance-duration) infinite; }
+.performance-medium-icon { display: block; flex: 0 0 26px; width: 26px; height: 26px; object-fit: contain; }
 .performance-medium-name { display: block; font-size: 16px; font-weight: 500; }
 .performance-medium-status { display: flex; align-items: center; gap: 5px; margin-top: 3px; font-size: 10px; color: #6c7e97; animation: performance-launch var(--performance-duration) infinite; }
 .performance-medium-status i { width: 4px; height: 4px; border-radius: 1px; background: #779fdc; }

@@ -72,29 +72,30 @@ export function PerformanceStudio() {
           <p>나를 닮은<br />새로운 일상</p>
         </div>
         <div className="performance-paper performance-ad-main">
-          <div className="performance-heading"><span>광고 소재</span><small>1:1</small></div>
-          <div className="performance-ad-image"><AdPhoto /><span className="performance-ad-badge">소재 B <Check size={11} /></span></div>
+          <div className="performance-heading"><span>우주기획</span><small>FRAGRANCE</small></div>
+          <div className="performance-ad-image"><AdPhoto /><span className="performance-product-caption">시그니처 향기</span></div>
           <div className="performance-ad-copy">
-            <small>BRAND CAMPAIGN</small>
+            <small>SCENT OF YOUR DAY</small>
             <div className="performance-copy-slot">
               <p className="performance-copy-original"><span>일상을 채우는</span><br /><span>새로운 시선</span></p>
               <p className="performance-copy-improved"><span>당신의 일상에</span><br /><span>어울리는 향</span></p>
             </div>
-            <div className="performance-ad-cta">브랜드 만나보기 <ArrowRight size={13} /></div>
+            <div className="performance-ad-cta">나에게 맞는 향 만나보기 <ArrowRight size={13} /></div>
           </div>
           <div className="performance-footer"><span>우주기획</span><span className="performance-copy-status">메시지 개선 완료</span></div>
         </div>
       </div>
 
       <div className="performance-media">
-        {['네이버', '구글', '메타'].map((name, i) => <div className={`performance-medium performance-medium-${i}`} key={name}>
-          <span className="performance-medium-name">{name}</span>
-          <span className="performance-medium-status"><i />광고 집행</span>
+        {[{ name: '네이버', icon: 'naver.png' }, { name: '구글', icon: 'google.png' }, { name: '메타', icon: 'meta.svg' }].map(({ name, icon }, i) => <div className={`performance-medium performance-medium-${i}`} key={name}>
+          <Image className="performance-medium-icon" src={`/brand-icons/${icon}`} alt="" width={26} height={26} unoptimized />
+          <div><span className="performance-medium-name">{name}</span>
+          <span className="performance-medium-status"><i />광고 집행</span></div>
         </div>)}
       </div>
 
       <div className="performance-paper performance-dashboard">
-        <div className="performance-heading"><span><BarChart3 size={16} /> 캠페인 성과</span><small>캠페인 예시</small></div>
+        <div className="performance-heading"><span><BarChart3 size={16} /> 캠페인 성과</span></div>
         <div className="performance-dashboard-body">
           <div className="performance-metrics">
             {[{ label: '유입', value: '12,480', unit: '방문', Icon: MousePointer2 }, { label: '관심', value: '836', unit: '참여', Icon: Users }, { label: '전환', value: '64', unit: '문의', Icon: Target }].map(({ label, value, unit, Icon }, i) => <div className={`performance-metric performance-metric-${i}`} key={label}>
