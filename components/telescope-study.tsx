@@ -33,7 +33,7 @@ export function TelescopeStudy() {
     <section className={`telescope-study${status === 'failed' ? ' is-unavailable' : ''}`} id="telescope-study" aria-labelledby="telescope-study-heading">
       <div className="telescope-study-sticky">
         <div ref={hostRef} className="telescope-study-stage" role="img"
-          aria-label="해 질 무렵 산 정상의 야외 관측 데크. 스크롤하면 무광 망원경의 접안렌즈로 다가가고, 렌즈 속 별들이 화면 전체의 우주로 이어집니다." />
+          aria-label="파스텔 하늘과 산 능선이 보이는 야외 관측 공간. 스크롤하면 아이보리와 연한 블루의 무광 망원경 접안렌즈로 다가가고, 렌즈 속 별들이 화면 전체의 우주로 이어집니다." />
         <header className="telescope-study-heading">
           <p>우주기획</p>
           <h2 id="telescope-study-heading">우주를 보는 시선.</h2>

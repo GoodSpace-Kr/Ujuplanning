@@ -28,12 +28,11 @@ export function addNaturalSurface(material: THREE.MeshStandardMaterial, kind: 's
 }
 
 /** Geometric outdoor landscape and procedural atmospheric sky; no background picture. */
-export function addTelescopeLandscape(scene: THREE.Scene, onUpdate: () => void) {
+export function addTelescopeLandscape(scene: THREE.Scene) {
   const group=new THREE.Group(); scene.add(group);
   const geometries:THREE.BufferGeometry[]=[], materials:THREE.Material[]=[];
-  const textures:THREE.Texture[]=[]; let alive=true;
   const put=(g:THREE.BufferGeometry,m:THREE.Material)=>{geometries.push(g);materials.push(m);const mesh=new THREE.Mesh(g,m);group.add(mesh);return mesh;};
-  scene.fog=new THREE.FogExp2('#9d9290',.011);
+  scene.fog=new THREE.FogExp2('#d2dff0',.019);
   const sky=put(new THREE.SphereGeometry(150,48,24),new THREE.ShaderMaterial({
     side:THREE.BackSide,depthWrite:false,toneMapped:false,
     uniforms:{sun:{value:new THREE.Vector3(1,.16,-.35).normalize()}},
@@ -42,18 +41,11 @@ export function addTelescopeLandscape(scene: THREE.Scene, onUpdate: () => void) 
       ${surfaceNoise}
       float fbm(vec3 p){float sum=0.,weight=.55;for(int i=0;i<5;i++){sum+=weight*ujuNoise(p);p=p*2.03+7.1;weight*=.47;}return sum;}
       void main(){vec3 d=normalize(vDirection);float h=max(0.,d.y);
-        vec3 sky=mix(vec3(.44,.29,.215),vec3(.10,.145,.215),smoothstep(.0,.55,h));
-        sky=mix(sky,vec3(.027,.05,.086),smoothstep(.45,1.,h));
-        float facing=max(0.,dot(d,sun));
-        float glow=pow(facing,9.);sky+=vec3(.52,.24,.075)*glow;
-        sky+=vec3(2.1,1.0,.35)*pow(facing,720.);
-        vec3 cloudPoint=d/(max(.065,h+.14));cloudPoint.xz*=vec2(1.,2.3);
-        float cloud=fbm(cloudPoint*2.4+vec3(4.,0.,18.));
-        float veil=smoothstep(.33,.68,cloud)*smoothstep(-.04,.10,d.y)*(1.-smoothstep(.55,.85,h));
-        vec3 cloudColor=mix(vec3(.09,.105,.14),vec3(.66,.34,.18),pow(facing,3.));
-        sky=mix(sky,cloudColor,veil*.68);
-        float wisps=fbm(vec3(d.x*11.,d.y*45.,d.z*12.)+31.);
-        sky+=vec3(.1,.065,.048)*smoothstep(.52,.70,wisps)*exp(-pow((h-.12)*4.,2.));
+        vec3 sky=mix(vec3(.64,.73,.87),vec3(.31,.49,.76),smoothstep(.0,.7,h));
+        float warmth=pow(max(0.,dot(d,sun)),3.)*exp(-pow(h*3.,2.));
+        sky=mix(sky,vec3(.91,.79,.75),warmth*.38);
+        float cloud=fbm(vec3(d.x*3.,d.y*8.,d.z*3.)+18.);
+        sky=mix(sky,vec3(.84,.89,.95),smoothstep(.40,.68,cloud)*.15);
         gl_FragColor=vec4(sky,1.);
         #include <colorspace_fragment>
       }`,
@@ -63,7 +55,7 @@ export function addTelescopeLandscape(scene: THREE.Scene, onUpdate: () => void) 
   // One continuous terrain field avoids the concentric, folded-paper mountain bands.
   const terrain=new THREE.PlaneGeometry(300,300,256,256);terrain.rotateX(-Math.PI/2);
   const terrainPoints=terrain.attributes.position,terrainColors:number[]=[];
-  const earth=new THREE.Color('#555a55');
+  const earth=new THREE.Color('#a5b8d6');
   for(let i=0;i<terrainPoints.count;i++){
     const x=terrainPoints.getX(i),z=terrainPoints.getZ(i),r=Math.hypot(x,z);
     const warp=relief(x*.011+8,z*.011)*13;
@@ -71,7 +63,7 @@ export function addTelescopeLandscape(scene: THREE.Scene, onUpdate: () => void) 
     const near=THREE.MathUtils.smoothstep(r,22,75);
     const height=-5+near*(8+18*broad+relief(x*.10,z*.10)*.45);
     terrainPoints.setY(i,height);
-    const variation=.8+relief(x*.04,z*.04)*.27;
+    const variation=.96+relief(x*.04,z*.04)*.06;
     terrainColors.push(earth.r*variation,earth.g*variation,earth.b*variation);
   }
   terrain.setAttribute('color',new THREE.Float32BufferAttribute(terrainColors,3));terrain.computeVertexNormals();
@@ -85,32 +77,30 @@ export function addTelescopeLandscape(scene: THREE.Scene, onUpdate: () => void) 
     points.setY(i,-1.406-edge*6+relief(x*.55,z*.55)*.035*(1-edge));
   }
   groundGeometry.computeVertexNormals();
-  const groundMaterial=addNaturalSurface(new THREE.MeshStandardMaterial({color:'#696355',roughness:.92,metalness:0,envMapIntensity:.35}),'stone');
+  const groundMaterial=new THREE.MeshStandardMaterial({color:'#dce4f0',roughness:.98,metalness:0,envMapIntensity:.15});
   const ground=put(groundGeometry,groundMaterial);
   ground.receiveShadow=true;
-  const loader=new THREE.TextureLoader();
-  for(const [slot,file] of [['map','ground-color.jpg'],['normalMap','ground-normal.jpg'],['roughnessMap','ground-roughness.jpg']] as const){
-    loader.loadAsync(`/assets/telescope/${file}`).then(texture=>{
-      if(!alive){texture.dispose();return;}
-      texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.set(40,40);texture.anisotropy=8;
-      if(slot==='map'){texture.colorSpace=THREE.SRGBColorSpace;groundMaterial.color.set('#b4b0a8');}
-      textures.push(texture);groundMaterial[slot]=texture;groundMaterial.normalScale.set(.65,.65);groundMaterial.needsUpdate=true;onUpdate();
-    }).catch(()=>{/* Keep the procedural ground when a material map is unavailable. */});
-  }
-  return {sky,dispose:()=>{alive=false;scene.remove(group);scene.fog=null;textures.forEach(t=>t.dispose());geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}};
+  // A broad contact penumbra anchors the pier without a hard directional silhouette.
+  const contact=put(new THREE.PlaneGeometry(2.5,2.5),new THREE.ShaderMaterial({
+    transparent:true,depthWrite:false,
+    vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`varying vec2 vUv;void main(){float r=length((vUv-.5)*2.);float a=exp(-r*r*7.)*.18;gl_FragColor=vec4(.32,.43,.61,a);}`,
+  }));contact.rotation.x=-Math.PI/2;contact.position.set(-.16,-1.377,0);
+
+  return {sky,dispose:()=>{scene.remove(group);scene.fog=null;geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());}};
 }
 
 export const TelescopeFilmShader={
-  uniforms:{tDiffuse:{value:null},strength:{value:1}},
+  uniforms:{tDiffuse:{value:null},strength:{value:.35}},
   vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
   fragmentShader:`uniform sampler2D tDiffuse;uniform float strength;varying vec2 vUv;
     void main(){vec3 color=texture2D(tDiffuse,vUv).rgb;
       float luminance=dot(color,vec3(.2126,.7152,.0722));
       vec3 graded=mix(vec3(luminance),color,.90);
       graded=mix(graded*vec3(.94,.98,1.035),graded*vec3(1.035,1.01,.965),smoothstep(.12,.70,luminance));
-      float vignette=1.-.19*smoothstep(.18,.76,length((vUv-.5)*vec2(1.,.9)));
+      float vignette=1.-.04*smoothstep(.18,.76,length((vUv-.5)*vec2(1.,.9)));
       float grain=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453)-.5;
-      graded=graded*vignette+grain*.0045;
+      graded=graded*vignette+grain*.0015;
       gl_FragColor=vec4(mix(color,graded,strength),1.);
     }`,
 };
