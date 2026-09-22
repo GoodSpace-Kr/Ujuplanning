@@ -6,19 +6,21 @@ import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+import { addTelescopeLandscape, TelescopeUniverseShader } from './telescope-landscape';
+import { getTelescopeJourney } from './telescope-journey';
 
-// A purpose-built refractor assembly. Studio cards exist only in the reflection
-// environment: there is no room, floor, image backdrop, or prerecorded video.
+// Real geometry, procedural materials and a scroll-driven optical journey.
+// No generated image, photograph or video is used as a background or telescope.
 export function mountTelescopeScene(host: HTMLDivElement) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   const dpr = Math.min(window.devicePixelRatio, 2);
   renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.12;
+  renderer.toneMappingExposure = 1.02;
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#ffffff');
-  const camera = new THREE.OrthographicCamera(-3, 3, 2, -2, .1, 35);
+  scene.background = new THREE.Color('#24364b');
+  const camera = new THREE.PerspectiveCamera(39, 1, .012, 190);
   const root = new THREE.Group(); scene.add(root);
   const geometries = new Set<THREE.BufferGeometry>();
   const materials = new Set<THREE.Material>();
@@ -45,25 +47,13 @@ export function mountTelescopeScene(host: HTMLDivElement) {
     ctx.fillStyle = '#888'; ctx.fillRect(0, 0, 1024, 256);
     for (let y = 0; y < 256; y++) { const v = 110 + random() * 40; ctx.fillStyle = `rgb(${v},${v},${v})`; ctx.fillRect(0, y, 1024, 1); }
   }, false);
-  const carbonMap = texture(256, 256, ctx => {
-    ctx.fillStyle = '#24282e'; ctx.fillRect(0, 0, 256, 256);
-    for (let y = 0; y < 256; y += 16) for (let x = 0; x < 256; x += 16) {
-      const odd = (x / 16 + y / 16) % 2;
-      const g = ctx.createLinearGradient(x, y, x + (odd ? 16 : 0), y + (odd ? 0 : 16));
-      g.addColorStop(0, '#15181e'); g.addColorStop(.45, '#3b4048'); g.addColorStop(1, '#1b1e25');
-      ctx.fillStyle = g; ctx.fillRect(x, y, 16, 16);
-      ctx.strokeStyle = '#ffffff08'; ctx.lineWidth = .6;
-      for (let n = 2; n < 16; n += 3) { ctx.beginPath(); ctx.moveTo(x + (odd ? n : 0), y + (odd ? 0 : n)); ctx.lineTo(x + (odd ? n : 16), y + (odd ? 16 : n)); ctx.stroke(); }
-    }
-  }); carbonMap.wrapS = carbonMap.wrapT = THREE.RepeatWrapping; carbonMap.repeat.set(2, 5);
-  const enamel = mat(new THREE.MeshPhysicalMaterial({ color: '#e9edf0', metalness: .13, roughness: .26, clearcoat: .65, clearcoatRoughness: .20, bumpMap: microGrain, bumpScale: .0011 }));
-  const graphite = mat(new THREE.MeshStandardMaterial({ color: '#242a32', metalness: .72, roughness: .29, bumpMap: microGrain, bumpScale: .0015 }));
-  const black = mat(new THREE.MeshStandardMaterial({ color: '#11161d', metalness: .35, roughness: .43 }));
-  const anodized = mat(new THREE.MeshPhysicalMaterial({ color: '#344c70', metalness: .88, roughness: .25, clearcoat: .24, bumpMap: brushedMap, bumpScale: .0006 }));
-  const aluminum = mat(new THREE.MeshPhysicalMaterial({ color: '#c0c8d2', metalness: 1, roughness: .23, anisotropy: .7, bumpMap: brushedMap, bumpScale: .0008 }));
-  const polished = mat(new THREE.MeshStandardMaterial({ color: '#dce4ee', metalness: 1, roughness: .13 }));
-  const rubber = mat(new THREE.MeshStandardMaterial({ color: '#11151b', roughness: .86, bumpMap: microGrain, bumpScale: .003 }));
-  const carbon = mat(new THREE.MeshPhysicalMaterial({ map: carbonMap, metalness: .4, roughness: .3, clearcoat: .6, clearcoatRoughness: .3 }));
+  const enamel = mat(new THREE.MeshPhysicalMaterial({ color: '#d7d0c2', metalness: .04, roughness: .48, clearcoat: .16, clearcoatRoughness: .45, bumpMap: microGrain, bumpScale: .0011 }));
+  const graphite = mat(new THREE.MeshStandardMaterial({ color: '#353735', metalness: .20, roughness: .53, bumpMap: microGrain, bumpScale: .0015 }));
+  const black = mat(new THREE.MeshStandardMaterial({ color: '#191d20', metalness: .12, roughness: .64 }));
+  const anodized = mat(new THREE.MeshPhysicalMaterial({ color: '#4a5054', metalness: .48, roughness: .43, clearcoat: .1, bumpMap: brushedMap, bumpScale: .0006 }));
+  const aluminum = mat(new THREE.MeshPhysicalMaterial({ color: '#a6a6a1', metalness: .75, roughness: .38, anisotropy: .35, bumpMap: brushedMap, bumpScale: .0008 }));
+  const polished = mat(new THREE.MeshStandardMaterial({ color: '#bebfb9', metalness: .78, roughness: .31 }));
+  const rubber = mat(new THREE.MeshStandardMaterial({ color: '#11151b', roughness: .86, bumpMap: microGrain, bumpScale: .001 }));
   const cavity = mat(new THREE.MeshStandardMaterial({ color: '#030710', roughness: .9 }));
 
   // High-dynamic-range reflection cards make metal and coated glass legible.
@@ -72,18 +62,17 @@ export function mountTelescopeScene(host: HTMLDivElement) {
     const m = mat(new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(strength), side: THREE.DoubleSide }));
     const p = mesh(studio, geo(new THREE.PlaneGeometry(w, h)), m, position[0], position[1], position[2]); p.lookAt(0, 0, 0);
   }
-  card(4, 7, [-4, 4, 3], '#fff5e5', 7);
-  card(1.2, 6, [4, 2, 1], '#d3e4ff', 5);
-  card(7, 3, [0, 6, -1], '#ffffff', 4);
-  card(3, 4, [-2, 1, -5], '#8cacde', 2);
-  card(.6, 4, [1, -.5, 5], '#ffffff', 3);
+  card(8, 9, [-4, 4, -4], '#ffe0ba', 4);
+  card(6, 7, [4, 3, 1], '#bdcee7', 2);
+  card(9, 6, [0, 7, -1], '#d4def0', 2);
+  card(5, 5, [-2, 1, -5], '#849fbe', .9);
   const pmrem = new THREE.PMREMGenerator(renderer);
   const environment = pmrem.fromScene(studio, .025, .1, 30);
-  scene.environment = environment.texture; scene.environmentIntensity = .85; pmrem.dispose();
-  scene.add(new THREE.HemisphereLight('#edf3ff', '#8c97a6', .65));
-  const key = new THREE.DirectionalLight('#fff4e5', 3.1); key.position.set(-3, 6, 5); scene.add(key);
-  const rim = new THREE.DirectionalLight('#c9dcff', 1.8); rim.position.set(3, 3, -5); scene.add(rim);
-  const fill = new THREE.DirectionalLight('#ffffff', .4); fill.position.set(4, 1, 5); scene.add(fill);
+  scene.environment = environment.texture; scene.environmentIntensity = .55; pmrem.dispose();
+  scene.add(new THREE.HemisphereLight('#bccde6', '#555548', .75));
+  const key = new THREE.DirectionalLight('#ffcc97', 1.9); key.position.set(-5, 4, -5); scene.add(key);
+  const rim = new THREE.DirectionalLight('#c9dcff', .45); rim.position.set(3, 3, -5); scene.add(rim);
+  const fill = new THREE.DirectionalLight('#dce4ef', .18); fill.position.set(4, 1, 5); scene.add(fill);
 
   function cylinder(parent: THREE.Object3D, radius: number, length: number, m: THREE.Material, z: number, radiusBack = radius) {
     const g = geo(new THREE.CylinderGeometry(radius, radiusBack, length, 96)); g.rotateX(Math.PI / 2);
@@ -202,18 +191,9 @@ export function mountTelescopeScene(host: HTMLDivElement) {
   const head=new THREE.Group();root.add(head);head.position.set(-.16,.06,0);head.rotation.x=Math.PI/2;
   cylinder(head,.285,.35,graphite,0);ring(head,.281,.008,anodized,.10);ring(head,.281,.008,aluminum,-.13);
   mesh(root,geo(new THREE.CylinderGeometry(.30,.37,.22,64)),graphite,-.16,-.21,0);
-  function rod(a:THREE.Vector3,b:THREE.Vector3,r1:number,r2:number,m:THREE.Material){const direction=b.clone().sub(a);const p=mesh(root,geo(new THREE.CylinderGeometry(r2,r1,direction.length(),48)),m);p.position.copy(a).add(b).multiplyScalar(.5);p.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.normalize());return p;}
-  for(let i=0;i<3;i++){
-    const a=i*Math.PI*2/3+.38;
-    const start=new THREE.Vector3(-.16+Math.cos(a)*.27,-.22,Math.sin(a)*.27);
-    const end=new THREE.Vector3(-.16+Math.cos(a)*1.08,-1.37,Math.sin(a)*1.08);
-    const mid=start.clone().lerp(end,.57);
-    rod(start,mid,.085,.071,carbon);rod(mid,end,.055,.043,graphite);
-    rod(start.clone().lerp(end,.54),start.clone().lerp(end,.63),.080,.075,anodized);
-    rod(start.clone().lerp(end,.91),end,.062,.056,rubber);
-    rod(new THREE.Vector3(-.16,-.75,0),start.clone().lerp(end,.58),.019,.019,aluminum);
-  }
-  mesh(root,geo(new THREE.CylinderGeometry(.13,.13,.07,48)),anodized,-.16,-.75,0);
+  mesh(root,geo(new THREE.CylinderGeometry(.225,.245,1.03,96)),graphite,-.16,-.815,0);
+  mesh(root,geo(new THREE.CylinderGeometry(.40,.44,.10,96)),black,-.16,-1.355,0);
+  const disposeLandscape = addTelescopeLandscape(scene);
 
   const target=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:4});
   const composer=new EffectComposer(renderer,target);
@@ -221,27 +201,42 @@ export function mountTelescopeScene(host: HTMLDivElement) {
   const ao=new SSAOPass(scene,camera,1,1,24);ao.kernelRadius=9;ao.minDistance=.001;ao.maxDistance=.025;composer.addPass(ao);
   const output=new OutputPass();composer.addPass(output);
   const fxaa=new ShaderPass(FXAAShader);composer.addPass(fxaa);
+  const universe=new ShaderPass(TelescopeUniverseShader);composer.addPass(universe);
   host.appendChild(renderer.domElement);
-  let frame=0,visible=true,alive=true;
-  let yaw=.62,pitch=1.22,targetYaw=yaw,targetPitch=pitch;
-  let drag:{x:number;y:number;id:number}|null=null;
+  const section=host.closest('section')!;
+  const sticky=host.parentElement!;
   const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  let frame=0,visible=true,alive=true,current=0,requested=0;
+  scope.updateWorldMatrix(true,false);
+  const eyeLocal=new THREE.Vector3(0,0,-2.306);
+  const eyeWorld=scope.localToWorld(eyeLocal.clone());
+  const eyeRimWorld=scope.localToWorld(eyeLocal.clone().add(new THREE.Vector3(0,.145,0)));
+  const projectedEye=new THREE.Vector3(),projectedRim=new THREE.Vector3();
+  function progress(){const bounds=section.getBoundingClientRect();requested=THREE.MathUtils.clamp(-bounds.top/Math.max(1,bounds.height-sticky.clientHeight),0,1);}
   function draw(){
     frame=0;if(!alive||!visible||document.hidden)return;
-    const ease=motion.matches?1:.18;yaw+=(targetYaw-yaw)*ease;pitch+=(targetPitch-pitch)*ease;
-    camera.position.set(10*Math.sin(pitch)*Math.sin(yaw),.28+10*Math.cos(pitch),10*Math.sin(pitch)*Math.cos(yaw));camera.lookAt(0,.28,0);
+    progress();
+    current=motion.matches||requested===0||requested===1?requested:current+(requested-current)*.14;
+    const state=getTelescopeJourney(current,motion.matches);
+    const portrait=camera.aspect<1?1.35:1;
+    const distance=state.distance*(1+(portrait-1)*(1-state.approach));
+    const cameraLocal=eyeLocal.clone().add(new THREE.Vector3(-3.2*(1-state.alignment),1.25*(1-state.alignment),-distance));
+    const aimLocal=eyeLocal.clone().add(new THREE.Vector3(0,.10*(1-state.alignment),1.10*(1-state.alignment)));
+    camera.position.copy(scope.localToWorld(cameraLocal));camera.lookAt(scope.localToWorld(aimLocal));camera.updateMatrixWorld();
+    projectedEye.copy(eyeWorld).project(camera);projectedRim.copy(eyeRimWorld).project(camera);
+    const radius=.5*Math.hypot((projectedRim.x-projectedEye.x)*camera.aspect,projectedRim.y-projectedEye.y);
+    universe.uniforms.aperture.value.set(projectedEye.x*.5+.5,projectedEye.y*.5+.5);
+    universe.uniforms.radius.value=radius;universe.uniforms.aspect.value=camera.aspect;
+    universe.uniforms.portal.value=state.portal;universe.uniforms.fullUniverse.value=state.fullUniverse;universe.uniforms.zoom.value=state.approach;
+    section.style.setProperty('--journey-opening',String(state.openingOpacity));section.style.setProperty('--journey-ending',String(state.endingOpacity));
     composer.render();
-    if(Math.abs(yaw-targetYaw)+Math.abs(pitch-targetPitch)>.0001)requestDraw();
+    if(Math.abs(current-requested)>.00015)requestDraw();
   }
   function requestDraw(){if(alive&&visible&&!document.hidden&&!frame)frame=requestAnimationFrame(draw);}
-  const resize=new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;const aspect=w/h;const height=Math.max(3.9,5.25/aspect);camera.left=-height*aspect/2;camera.right=height*aspect/2;camera.top=height/2;camera.bottom=-height/2;camera.updateProjectionMatrix();renderer.setSize(w,h);composer.setSize(w,h);fxaa.uniforms.resolution.value.set(1/(w*dpr),1/(h*dpr));requestDraw();});resize.observe(host);
+  const resize=new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);composer.setSize(w,h);fxaa.uniforms.resolution.value.set(1/(w*dpr),1/(h*dpr));requestDraw();});resize.observe(host);
   const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;if(!visible){cancelAnimationFrame(frame);frame=0;}else requestDraw();});observer.observe(host);
-  const down=(e:PointerEvent)=>{if(e.button!==0)return;drag={x:e.clientX,y:e.clientY,id:e.pointerId};host.setPointerCapture(e.pointerId);host.classList.add('is-dragging');};
-  const move=(e:PointerEvent)=>{if(!drag||drag.id!==e.pointerId)return;targetYaw-=(e.clientX-drag.x)*.006;targetPitch=THREE.MathUtils.clamp(targetPitch+(e.clientY-drag.y)*.004,.55,1.7);drag.x=e.clientX;drag.y=e.clientY;requestDraw();};
-  const up=()=>{if(drag&&host.hasPointerCapture(drag.id))host.releasePointerCapture(drag.id);drag=null;host.classList.remove('is-dragging');};
-  const keyDown=(e:KeyboardEvent)=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home'].includes(e.key))return;e.preventDefault();if(e.key==='Home'){targetYaw=.62;targetPitch=1.22;}else{targetYaw+=e.key==='ArrowLeft'?-.12:e.key==='ArrowRight'?.12:0;targetPitch=THREE.MathUtils.clamp(targetPitch+(e.key==='ArrowUp'?-.08:e.key==='ArrowDown'?.08:0),.55,1.7);}requestDraw();};
   const visibilityChange=()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;}else requestDraw();};
-  host.addEventListener('pointerdown',down);host.addEventListener('pointermove',move);host.addEventListener('pointerup',up);host.addEventListener('pointercancel',up);host.addEventListener('keydown',keyDown);document.addEventListener('visibilitychange',visibilityChange);motion.addEventListener('change',requestDraw);
-  requestDraw();
-  return()=>{alive=false;cancelAnimationFrame(frame);resize.disconnect();observer.disconnect();up();host.removeEventListener('pointerdown',down);host.removeEventListener('pointermove',move);host.removeEventListener('pointerup',up);host.removeEventListener('pointercancel',up);host.removeEventListener('keydown',keyDown);document.removeEventListener('visibilitychange',visibilityChange);motion.removeEventListener('change',requestDraw);composer.passes.forEach(p=>p.dispose());composer.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());environment.dispose();renderer.dispose();renderer.domElement.remove();};
+  window.addEventListener('scroll',requestDraw,{passive:true});document.addEventListener('visibilitychange',visibilityChange);motion.addEventListener('change',requestDraw);
+  progress();current=requested;requestDraw();
+  return()=>{alive=false;cancelAnimationFrame(frame);resize.disconnect();observer.disconnect();window.removeEventListener('scroll',requestDraw);document.removeEventListener('visibilitychange',visibilityChange);motion.removeEventListener('change',requestDraw);composer.passes.forEach(p=>p.dispose());composer.dispose();disposeLandscape();root.traverse(o=>{if(o instanceof THREE.InstancedMesh)o.dispose();});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());environment.dispose();renderer.dispose();renderer.domElement.remove();};
 }

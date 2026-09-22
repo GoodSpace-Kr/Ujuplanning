@@ -12,14 +12,13 @@ export function TelescopeStudy() {
     if (!host) return;
     let disposed = false;
     let teardown = () => {};
-    // The material study is loaded only as it approaches the viewport.
     const observer = new IntersectionObserver(async ([entry]) => {
       if (!entry.isIntersecting) return;
       observer.disconnect();
       try {
         const { mountTelescopeScene } = await import('@/lib/telescope-scene');
         if (disposed) return;
-        teardown = await mountTelescopeScene(host);
+        teardown = mountTelescopeScene(host);
         if (disposed) teardown();
         else setStatus('ready');
       } catch {
@@ -31,15 +30,21 @@ export function TelescopeStudy() {
   }, []);
 
   return (
-    <section className="telescope-study" id="telescope-study" aria-labelledby="telescope-study-heading">
-      <div className="telescope-study-heading">
-        <div><p>OPTICAL STUDY · 02</p><h2 id="telescope-study-heading">우주를 보는 시선.</h2></div>
-        <span>3D 테스트</span>
-      </div>
-      <div ref={hostRef} className="telescope-study-stage" tabIndex={0} role="img"
-        aria-label="흰색 경통과 코팅 렌즈, 금속 초점 조절부를 갖춘 천체망원경. 드래그 또는 방향키로 회전할 수 있습니다.">
+    <section className={`telescope-study${status === 'failed' ? ' is-unavailable' : ''}`} id="telescope-study" aria-labelledby="telescope-study-heading">
+      <div className="telescope-study-sticky">
+        <div ref={hostRef} className="telescope-study-stage" role="img"
+          aria-label="해 질 무렵 산 정상의 야외 관측 데크. 스크롤하면 무광 망원경의 접안렌즈로 다가가고, 렌즈 속 별들이 화면 전체의 우주로 이어집니다." />
+        <header className="telescope-study-heading">
+          <p>우주기획</p>
+          <h2 id="telescope-study-heading">우주를 보는 시선.</h2>
+          <span>스크롤하며 더 가까이 들여다보세요</span>
+        </header>
+        <div className="telescope-study-ending">
+          <p>당신의 브랜드에는,</p>
+          <h3>아직 발견하지 못한<br />우주가 있습니다.</h3>
+        </div>
         {status !== 'ready' && <p className="telescope-study-status" role="status">{status === 'failed' ? '이 환경에서는 3D 화면을 표시할 수 없습니다.' : '빛과 질감을 준비하고 있어요.'}</p>}
-        <div className="telescope-study-caption" aria-hidden="true"><span>우주기획</span><span>드래그 · 방향키로 돌려보세요</span></div>
+        <div className="telescope-study-scroll" aria-hidden="true"><span />SCROLL TO DISCOVER</div>
       </div>
     </section>
   );
