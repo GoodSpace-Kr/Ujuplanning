@@ -9,7 +9,7 @@ import {
 } from 'react';
 // import { BrandSystemSection } from '@/components/brand-system-section';
 import { ServicesSection } from '@/components/services-section';
-import { ParcelStudy } from '@/components/parcel-study';
+import { TelescopeStudy } from '@/components/telescope-study';
 import { getHeroFrame, getHeroTimeline } from '@/lib/hero-transition';
 
 type GlobeNode = {
@@ -674,7 +674,7 @@ export default function Home() {
       {/* 7단계 브랜드 소개 및 3D 캔버스: 추후 복구를 위해 보관 */}
       {/* <BrandSystemSection /> */}
       <ServicesSection />
-      <ParcelStudy />
+      <TelescopeStudy />
     </main>
   );
 }
