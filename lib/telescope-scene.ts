@@ -3,21 +3,25 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
-import { addTelescopeLandscape, TelescopeUniverseShader } from './telescope-landscape';
+import { addTelescopeLandscape, addNaturalSurface, TelescopeFilmShader, TelescopeUniverseShader } from './telescope-landscape';
 import { getTelescopeJourney } from './telescope-journey';
 
 // Real geometry, procedural materials and a scroll-driven optical journey.
-// No generated image, photograph or video is used as a background or telescope.
+// The telescope is real geometry. A photographed HDR sky supplies outdoor light and reflections.
 export function mountTelescopeScene(host: HTMLDivElement) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   const dpr = Math.min(window.devicePixelRatio, 2);
   renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.02;
+  renderer.toneMappingExposure = .92;
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.shadowMap.autoUpdate=false;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#24364b');
   const camera = new THREE.PerspectiveCamera(39, 1, .012, 190);
@@ -28,7 +32,7 @@ export function mountTelescopeScene(host: HTMLDivElement) {
   const geo = <T extends THREE.BufferGeometry>(g: T): T => { geometries.add(g); return g; };
   const mat = <T extends THREE.Material>(m: T): T => { materials.add(m); return m; };
   const mesh = (parent: THREE.Object3D, g: THREE.BufferGeometry, m: THREE.Material, x = 0, y = 0, z = 0) => {
-    const object = new THREE.Mesh(g, m); object.position.set(x, y, z); parent.add(object); return object;
+    const object = new THREE.Mesh(g, m); object.position.set(x, y, z); object.castShadow=true; object.receiveShadow=true; parent.add(object); return object;
   };
   let seed = 8029;
   const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
@@ -47,32 +51,24 @@ export function mountTelescopeScene(host: HTMLDivElement) {
     ctx.fillStyle = '#888'; ctx.fillRect(0, 0, 1024, 256);
     for (let y = 0; y < 256; y++) { const v = 110 + random() * 40; ctx.fillStyle = `rgb(${v},${v},${v})`; ctx.fillRect(0, y, 1024, 1); }
   }, false);
-  const enamel = mat(new THREE.MeshPhysicalMaterial({ color: '#d7d0c2', metalness: .04, roughness: .48, clearcoat: .16, clearcoatRoughness: .45, bumpMap: microGrain, bumpScale: .0011 }));
-  const graphite = mat(new THREE.MeshStandardMaterial({ color: '#353735', metalness: .20, roughness: .53, bumpMap: microGrain, bumpScale: .0015 }));
+  const enamel = mat(new THREE.MeshPhysicalMaterial({ color: '#cac3b2', metalness: .02, roughness: .57, clearcoat: .08, clearcoatRoughness: .55, bumpMap: microGrain, bumpScale: .0025 }));
+  const graphite = mat(new THREE.MeshStandardMaterial({ color: '#272a29', metalness: .12, roughness: .59, bumpMap: microGrain, bumpScale: .0015 }));
   const black = mat(new THREE.MeshStandardMaterial({ color: '#191d20', metalness: .12, roughness: .64 }));
   const anodized = mat(new THREE.MeshPhysicalMaterial({ color: '#4a5054', metalness: .48, roughness: .43, clearcoat: .1, bumpMap: brushedMap, bumpScale: .0006 }));
-  const aluminum = mat(new THREE.MeshPhysicalMaterial({ color: '#a6a6a1', metalness: .75, roughness: .38, anisotropy: .35, bumpMap: brushedMap, bumpScale: .0008 }));
-  const polished = mat(new THREE.MeshStandardMaterial({ color: '#bebfb9', metalness: .78, roughness: .31 }));
+  const aluminum = mat(new THREE.MeshPhysicalMaterial({ color: '#8c8c86', metalness: .72, roughness: .45, anisotropy: .35, bumpMap: brushedMap, bumpScale: .0008 }));
+  const polished = mat(new THREE.MeshStandardMaterial({ color: '#a8aaa4', metalness: .76, roughness: .38 }));
   const rubber = mat(new THREE.MeshStandardMaterial({ color: '#11151b', roughness: .86, bumpMap: microGrain, bumpScale: .001 }));
   const cavity = mat(new THREE.MeshStandardMaterial({ color: '#030710', roughness: .9 }));
 
-  // High-dynamic-range reflection cards make metal and coated glass legible.
-  const studio = new THREE.Scene(); studio.background = new THREE.Color('#161c28');
-  function card(w: number, h: number, position: number[], color: string, strength: number) {
-    const m = mat(new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(strength), side: THREE.DoubleSide }));
-    const p = mesh(studio, geo(new THREE.PlaneGeometry(w, h)), m, position[0], position[1], position[2]); p.lookAt(0, 0, 0);
-  }
-  card(8, 9, [-4, 4, -4], '#ffe0ba', 4);
-  card(6, 7, [4, 3, 1], '#bdcee7', 2);
-  card(9, 6, [0, 7, -1], '#d4def0', 2);
-  card(5, 5, [-2, 1, -5], '#849fbe', .9);
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const environment = pmrem.fromScene(studio, .025, .1, 30);
-  scene.environment = environment.texture; scene.environmentIntensity = .55; pmrem.dispose();
-  scene.add(new THREE.HemisphereLight('#bccde6', '#555548', .75));
-  const key = new THREE.DirectionalLight('#ffcc97', 1.9); key.position.set(-5, 4, -5); scene.add(key);
-  const rim = new THREE.DirectionalLight('#c9dcff', .45); rim.position.set(3, 3, -5); scene.add(rim);
-  const fill = new THREE.DirectionalLight('#dce4ef', .18); fill.position.set(4, 1, 5); scene.add(fill);
+  addNaturalSurface(enamel,'paint'); addNaturalSurface(graphite,'paint');
+  addNaturalSurface(anodized,'metal'); addNaturalSurface(aluminum,'metal');
+  scene.add(new THREE.HemisphereLight('#aebad0','#393129',.35));
+  const key=new THREE.DirectionalLight('#ffd3a3',3.4);
+  key.position.set(12,4.8,-4.2); key.target.position.set(0,.2,0); scene.add(key,key.target);
+  key.castShadow=true; key.shadow.mapSize.set(2048,2048);
+  Object.assign(key.shadow.camera,{left:-5,right:5,top:5,bottom:-5,near:1,far:30});
+  key.shadow.bias=-.00008; key.shadow.normalBias=.008; key.shadow.radius=3;
+  const fill=new THREE.DirectionalLight('#bbc6d9',.40);fill.position.set(-4,3,5);scene.add(fill);
 
   function cylinder(parent: THREE.Object3D, radius: number, length: number, m: THREE.Material, z: number, radiusBack = radius) {
     const g = geo(new THREE.CylinderGeometry(radius, radiusBack, length, 96)); g.rotateX(Math.PI / 2);
@@ -193,14 +189,23 @@ export function mountTelescopeScene(host: HTMLDivElement) {
   mesh(root,geo(new THREE.CylinderGeometry(.30,.37,.22,64)),graphite,-.16,-.21,0);
   mesh(root,geo(new THREE.CylinderGeometry(.225,.245,1.03,96)),graphite,-.16,-.815,0);
   mesh(root,geo(new THREE.CylinderGeometry(.40,.44,.10,96)),black,-.16,-1.355,0);
-  const disposeLandscape = addTelescopeLandscape(scene);
+  const landscape = addTelescopeLandscape(scene,()=>requestDraw());
+  // The actual sunset and ground provide reflections, instead of studio light rectangles.
+  root.visible=false;
+  const pmrem=new THREE.PMREMGenerator(renderer);
+  let environment=pmrem.fromScene(scene,.05,.1,190);pmrem.dispose();
+  scene.environment=environment.texture;scene.environmentIntensity=.8;
+  root.visible=true;renderer.shadowMap.needsUpdate=true;
 
   const target=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:4});
   const composer=new EffectComposer(renderer,target);
   const renderPass=new RenderPass(scene,camera);composer.addPass(renderPass);
-  const ao=new SSAOPass(scene,camera,1,1,24);ao.kernelRadius=9;ao.minDistance=.001;ao.maxDistance=.025;composer.addPass(ao);
+  const ao=new SSAOPass(scene,camera,1,1,24);ao.kernelRadius=6;ao.minDistance=.0004;ao.maxDistance=.009;composer.addPass(ao);
+  const bokeh=new BokehPass(scene,camera,{focus:7,aperture:.0006,maxblur:.007});composer.addPass(bokeh);
+  const bokehUniforms=bokeh.uniforms as Record<string,THREE.IUniform>;
   const output=new OutputPass();composer.addPass(output);
   const fxaa=new ShaderPass(FXAAShader);composer.addPass(fxaa);
+  const film=new ShaderPass(TelescopeFilmShader);composer.addPass(film);
   const universe=new ShaderPass(TelescopeUniverseShader);composer.addPass(universe);
   host.appendChild(renderer.domElement);
   const section=host.closest('section')!;
@@ -218,11 +223,14 @@ export function mountTelescopeScene(host: HTMLDivElement) {
     progress();
     current=motion.matches||requested===0||requested===1?requested:current+(requested-current)*.14;
     const state=getTelescopeJourney(current,motion.matches);
-    const portrait=camera.aspect<1?1.35:1;
+    const portrait=camera.aspect<1?1.12:1;
     const distance=state.distance*(1+(portrait-1)*(1-state.approach));
-    const cameraLocal=eyeLocal.clone().add(new THREE.Vector3(-3.2*(1-state.alignment),1.25*(1-state.alignment),-distance));
+    const cameraLocal=eyeLocal.clone().add(new THREE.Vector3(-3.7*(1-state.alignment),.95*(1-state.alignment),-distance));
     const aimLocal=eyeLocal.clone().add(new THREE.Vector3(0,.10*(1-state.alignment),1.10*(1-state.alignment)));
     camera.position.copy(scope.localToWorld(cameraLocal));camera.lookAt(scope.localToWorld(aimLocal));camera.updateMatrixWorld();
+    bokehUniforms.focus.value=camera.position.distanceTo(eyeWorld)+.30*(1-state.approach);
+    bokehUniforms.aperture.value=.0006*(1-state.portal);
+    bokeh.enabled=state.portal<.98;
     projectedEye.copy(eyeWorld).project(camera);projectedRim.copy(eyeRimWorld).project(camera);
     const radius=.5*Math.hypot((projectedRim.x-projectedEye.x)*camera.aspect,projectedRim.y-projectedEye.y);
     universe.uniforms.aperture.value.set(projectedEye.x*.5+.5,projectedEye.y*.5+.5);
@@ -238,5 +246,16 @@ export function mountTelescopeScene(host: HTMLDivElement) {
   const visibilityChange=()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;}else requestDraw();};
   window.addEventListener('scroll',requestDraw,{passive:true});document.addEventListener('visibilitychange',visibilityChange);motion.addEventListener('change',requestDraw);
   progress();current=requested;requestDraw();
-  return()=>{alive=false;cancelAnimationFrame(frame);resize.disconnect();observer.disconnect();window.removeEventListener('scroll',requestDraw);document.removeEventListener('visibilitychange',visibilityChange);motion.removeEventListener('change',requestDraw);composer.passes.forEach(p=>p.dispose());composer.dispose();disposeLandscape();root.traverse(o=>{if(o instanceof THREE.InstancedMesh)o.dispose();});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());environment.dispose();renderer.dispose();renderer.domElement.remove();};
+  new HDRLoader().loadAsync('/assets/telescope/sunset.hdr').then(hdr=>{
+    if(!alive){hdr.dispose();return;}
+    hdr.mapping=THREE.EquirectangularReflectionMapping;textures.add(hdr);
+    const generator=new THREE.PMREMGenerator(renderer);
+    const realEnvironment=generator.fromEquirectangular(hdr);generator.dispose();
+    environment.dispose();environment=realEnvironment;
+    scene.environment=environment.texture;scene.environmentIntensity=.30;
+    scene.background=hdr;scene.backgroundIntensity=.10;scene.backgroundBlurriness=.015;
+    scene.backgroundRotation.y=.96;scene.environmentRotation.y=.96;
+    landscape.sky.visible=false;renderer.shadowMap.needsUpdate=true;requestDraw();
+  }).catch(()=>{/* The procedural sky remains available if the environment asset fails. */});
+  return()=>{alive=false;cancelAnimationFrame(frame);resize.disconnect();observer.disconnect();window.removeEventListener('scroll',requestDraw);document.removeEventListener('visibilitychange',visibilityChange);motion.removeEventListener('change',requestDraw);composer.passes.forEach(p=>p.dispose());composer.dispose();landscape.dispose();root.traverse(o=>{if(o instanceof THREE.InstancedMesh)o.dispose();});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());environment.dispose();key.shadow.dispose();renderer.dispose();renderer.domElement.remove();};
 }

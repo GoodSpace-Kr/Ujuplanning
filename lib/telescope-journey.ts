@@ -9,7 +9,7 @@ export function getTelescopeJourney(progress: number, reducedMotion = false) {
   return {
     approach,
     alignment,
-    distance: Math.exp(Math.log(7.2) * (1 - approach) + Math.log(.065) * approach),
+    distance: Math.exp(Math.log(5.5) * (1 - approach) + Math.log(.065) * approach),
     portal: reducedMotion ? between(p, .52, .72) : between(p, .53, .76),
     fullUniverse: reducedMotion ? between(p, .52, .72) : between(p, .80, .88),
     openingOpacity: 1 - between(p, .10, .28),

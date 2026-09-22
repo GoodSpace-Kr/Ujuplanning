@@ -1,0 +1,9 @@
+Qwantani Sunset (Pure Sky) — Poly Haven
+Source: https://polyhaven.com/a/qwantani_sunset_puresky
+License: CC0 https://polyhaven.com/license
+2K HDR environment used for sky, illumination, and reflections.
+
+Gravelly Sand — Dario Barresi / Poly Haven
+Source: https://polyhaven.com/a/gravelly_sand
+License: CC0 https://polyhaven.com/license
+1K color, normal and roughness maps used on the ground mesh.
