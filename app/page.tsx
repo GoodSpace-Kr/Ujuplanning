@@ -10,6 +10,7 @@ import {
 // import { BrandSystemSection } from '@/components/brand-system-section';
 import { ServicesSection } from '@/components/services-section';
 import { TelescopeStudy } from '@/components/telescope-study';
+import { SiteFooter } from '@/components/site-footer';
 import { getHeroFrame, getHeroTimeline } from '@/lib/hero-transition';
 
 type GlobeNode = {
@@ -541,7 +542,8 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="bg-white text-[#151922]">
+    <>
+    <main id="page-top" className="bg-white text-[#151922]">
       <section ref={heroRef} className="relative h-[840svh] bg-white">
         <div
           ref={heroPanelRef}
@@ -676,5 +678,7 @@ export default function Home() {
       <ServicesSection />
       <TelescopeStudy />
     </main>
+    <SiteFooter />
+    </>
   );
 }

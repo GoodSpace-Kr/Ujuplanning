@@ -4,12 +4,13 @@
 .telescope-study-poster, .telescope-study-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 55% center; }
 .telescope-study-stage canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; opacity: 0; }
 .telescope-study.is-ready .telescope-study-stage canvas { opacity: 1; }
+.telescope-study-stage::after { content: ''; position: absolute; z-index: 1; inset: auto 0 0; height: clamp(100px, 26svh, 300px); background: linear-gradient(transparent, #303a4c); opacity: var(--journey-ending); pointer-events: none; }
 .telescope-study-sticky::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(110deg, rgba(15,22,32,.32), transparent 58%); opacity: var(--journey-opening); }
 .telescope-study-heading { position: absolute; top: clamp(48px, 11vh, 120px); left: clamp(24px, 7vw, 120px); z-index: 2; color: #f6f4f0; opacity: var(--journey-opening); pointer-events: none; text-shadow: 0 2px 24px #18202b55; }
 .telescope-study-heading p { margin: 0 0 18px; font-size: 13px; letter-spacing: .04em; font-weight: 500; color: #e3e7ed; }
 .telescope-study-heading h2 { margin: 0 0 20px; font-size: clamp(28px, 3.8vw, 56px); font-weight: 500; letter-spacing: -.045em; line-height: 1.25; }
 .telescope-study-heading > span { font-size: 12px; font-weight: 400; color: #e0e1e6; }
-.telescope-study-ending { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 24px; opacity: var(--journey-ending); color: #edf1fb; pointer-events: none; background: #060c161a; }
+.telescope-study-ending { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 24px; opacity: var(--journey-ending); color: #edf1fb; pointer-events: none; }
 .telescope-study-ending p { margin: 0 0 22px; font-size: clamp(15px, 1.8vw, 22px); font-weight: 400; color: #cbd7e9; }
 .telescope-study-ending h3 { margin: 0; font-size: clamp(32px, 4.6vw, 64px); font-weight: 500; line-height: 1.4; letter-spacing: -.045em; word-break: keep-all; text-shadow: 0 2px 28px #050815; }
 .telescope-study-scroll { position: absolute; z-index: 2; bottom: max(35px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; white-space: nowrap; color: #edf0f6; font-size: 9px; letter-spacing: .16em; opacity: var(--journey-opening); pointer-events: none; text-shadow: 0 1px 8px #0008; }

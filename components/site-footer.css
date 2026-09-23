@@ -1,0 +1,51 @@
+.uju-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(100px, 11vw, 180px) 4vw 36px;
+  color: #f0f2f8;
+  background:
+    linear-gradient(180deg, #303a4c 0%, rgba(48, 58, 76, .94) 9%, rgba(48, 58, 76, 0) 43%),
+    radial-gradient(ellipse at 46% 49%, rgba(198, 174, 185, .43), transparent 69%),
+    radial-gradient(ellipse at 96% 88%, rgba(28, 73, 111, .72), transparent 63%),
+    linear-gradient(150deg, #6b7f9b 10%, #73758c 48%, #344f6d 100%);
+}
+.uju-footer-content { max-width: 1720px; margin-inline: auto; }
+.uju-footer-top { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 7%; }
+.uju-footer-name { display: inline-block; margin-bottom: 24px; font-size: 18px; font-weight: 500; letter-spacing: -.03em; }
+.uju-footer-brand p { margin: 0; font-size: clamp(21px, 2.1vw, 34px); font-weight: 450; line-height: 1.55; letter-spacing: -.04em; word-break: keep-all; }
+.uju-footer-directory { display: grid; grid-template-columns: 1.1fr .85fr 1.2fr; gap: clamp(20px, 2.5vw, 52px); }
+.uju-footer h2 { margin: 0 0 24px; font-size: 12px; font-weight: 400; color: #d9e0ed; letter-spacing: .01em; }
+.uju-footer ul { padding: 0; margin: 0; list-style: none; display: grid; gap: 15px; font-size: clamp(12px, 1vw, 15px); line-height: 1.65; font-weight: 450; word-break: keep-all; }
+.uju-footer a { color: inherit; text-decoration: none; transition: color .18s ease; }
+.uju-footer a:hover { color: #fff; text-decoration: underline; text-underline-offset: 5px; }
+.uju-footer a:focus-visible { outline: 2px solid #e2ebff; outline-offset: 6px; border-radius: 2px; }
+.uju-footer-placeholder { display: inline-block; margin-left: 6px; font-size: 10px; color: #cbd4e4; }
+.uju-footer-email { overflow-wrap: anywhere; word-break: normal; }
+.uju-footer-details { margin: clamp(64px, 7vw, 120px) 0 0 44.2%; color: #e0e4ed; font-size: 12px; line-height: 1.95; font-weight: 400; }
+.uju-footer-details p { margin: 0; }
+.uju-footer-company { margin-bottom: 5px !important; }
+.uju-footer-company span { padding-inline: 10px; color: #c6cfdf; }
+.uju-footer-details .uju-footer-disclaimer { margin-top: 16px; color: #cdd5e3; font-size: 10px; }
+.uju-footer-wordmark { margin: clamp(80px, 8vw, 140px) -1vw 38px; font-family: var(--font-geist-sans), 'Pretendard', sans-serif; font-size: clamp(42px, 14.5vw, 340px); font-weight: 500; letter-spacing: -.07em; line-height: .93; text-align: center; white-space: nowrap; color: rgba(233, 236, 248, .23); user-select: none; }
+.uju-footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 20px; color: #d6ddea; }
+.uju-footer-bottom small, .uju-footer-bottom a { font-size: 11px; line-height: 1.6; font-weight: 400; }
+.uju-footer-bottom a { white-space: nowrap; }
+.uju-footer-bottom a span { display: inline-block; margin-left: 8px; font-size: 15px; }
+@media (max-width: 1000px) {
+  .uju-footer-top { grid-template-columns: 1fr; gap: 64px; }
+  .uju-footer-details { margin-left: 0; }
+  .uju-footer-directory { grid-template-columns: 1.1fr .85fr 1.2fr; }
+}
+@media (max-width: 600px) {
+  .uju-footer { padding-inline: 24px; padding-bottom: max(26px, env(safe-area-inset-bottom)); }
+  .uju-footer-top { gap: 52px; }
+  .uju-footer-directory { grid-template-columns: 1fr 1fr; gap: 40px 24px; }
+  .uju-footer-contact { grid-column: 1 / -1; }
+  .uju-footer h2 { margin-bottom: 17px; }
+  .uju-footer ul { font-size: 13px; gap: 12px; }
+  .uju-footer-details { font-size: 11px; margin-top: 44px; }
+  .uju-footer-wordmark { margin: 68px -8px 32px; font-size: 13.5vw; }
+  .uju-footer-bottom small, .uju-footer-bottom a { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) { .uju-footer a { transition: none; } }
