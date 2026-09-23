@@ -544,7 +544,7 @@ export default function Home() {
       <section ref={heroRef} className="relative h-[840svh] bg-white">
         <div
           ref={heroPanelRef}
-          className="sticky top-0 grid min-h-svh place-items-center overflow-hidden bg-white px-6 text-center text-white"
+          className="sticky top-0 z-10 grid min-h-svh place-items-center overflow-hidden bg-white px-6 text-center text-white"
           style={{
             '--hero-focus-progress': 0,
           } as CSSProperties}
@@ -628,7 +628,9 @@ export default function Home() {
 
           <div className="hero-services-surface" aria-hidden="true" />
           <header className="hero-services-copy">
-            <h2>고객의 브랜드의<br />빈 우주를 발견하기 위해</h2>
+            <div className="hero-services-copy-inner">
+              <h2>고객의 브랜드의<br />빈 우주를 발견하기 위해</h2>
+            </div>
           </header>
 
           <div className="hero-project-copy-stage" aria-hidden="true">
