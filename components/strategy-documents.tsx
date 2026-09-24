@@ -1,369 +1,182 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import type * as Three from 'three';
+import { ChartNoAxesColumnIncreasing, CalendarDays, Target } from 'lucide-react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { createStrategySample, INITIAL_STRATEGY_SAMPLE, interpolateStrategySample, type StrategySample } from './strategy-demo-data';
+import './strategy-documents.css';
 
-const DOCUMENTS = [
-  { title: '브랜드 분석', label: '01 · RESEARCH', subtitle: '시장에서 우리의 위치를 찾다' },
-  { title: '마케팅 전략', label: '02 · STRATEGY', subtitle: '브랜드가 나아갈 방향을 정하다' },
-  { title: '캠페인 실행 계획', label: '03 · ACTION PLAN', subtitle: '생각을 구체적인 실행으로' },
-];
+export const STRATEGY_PAGES = [
+  { id: 'analysis', title: '브랜드 분석', icon: ChartNoAxesColumnIncreasing, number: '01' },
+  { id: 'marketing', title: '마케팅 전략', icon: Target, number: '02' },
+  { id: 'campaign', title: '캠페인 실행 계획', icon: CalendarDays, number: '03' },
+] as const;
 
-// High-resolution typeset textures keep Korean copy crisp on actual 3D sheets.
-function drawDocument(index: number) {
-  const base = document.createElement('canvas');
-  base.width = 768;
-  base.height = 1024;
-  const ctx = base.getContext('2d')!;
-  const lines: { value: string; x: number; y: number; size: number; color: string; weight: number; start: number }[] = [];
-  let totalCharacters = 0;
-  const text = (value: string, x: number, y: number, size = 30, color = '#43546f', weight = 500) => {
-    ctx.font = `${weight} ${size}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
-    ctx.fillStyle = color;
-    ctx.fillText(value, x, y);
-  };
-  const typedText = (value: string, x: number, y: number, size = 30, color = '#43546f', weight = 500) => {
-    lines.push({ value, x, y, size, color, weight, start: totalCharacters });
-    totalCharacters += value.length + 9; // A short pause between sentences.
-  };
-  const rule = (y: number) => {
-    ctx.fillStyle = '#e8eef6';
-    ctx.fillRect(58, y, 652, 2);
-  };
-  const block = (y: number, title: string, body: string) => {
-    text(title, 60, y, 27, '#5479b6', 500);
-    typedText(body, 60, y + 51, 34, '#283c59', 500);
-  };
+export type StrategyPageId = (typeof STRATEGY_PAGES)[number]['id'];
 
-  // Fade only the paper fill; all text and content are painted at full opacity.
-  const paperGradient = ctx.createLinearGradient(0, 0, 0, 1024);
-  paperGradient.addColorStop(0, 'rgba(255, 255, 255, 0.94)');
-  paperGradient.addColorStop(1, 'rgba(255, 255, 255, 0.66)');
-  ctx.fillStyle = paperGradient;
-  ctx.fillRect(0, 0, 768, 1024);
-  text(DOCUMENTS[index].label, 58, 76, 23, '#6a8bbf', 500);
-  text(DOCUMENTS[index].title, 55, 162, index === 2 ? 49 : 62, '#243b5b', 550);
-  typedText(DOCUMENTS[index].subtitle, 58, 221, 28, '#6c7e97');
-  rule(258);
+type Metric = { label: string; value: string; unit: string };
 
-  if (index === 0) {
-    block(321, 'MARKET INSIGHT', '시장과 고객을 이해합니다');
-    // Flat animated bars are rendered above this reserved chart area.
-    ctx.fillStyle = '#edf2f8';
-    [438, 516, 594].forEach((y) => ctx.fillRect(103, y, 545, 2));
-    text('시장', 131, 665, 26, '#6c7e97');
-    text('고객', 321, 665, 26, '#6c7e97');
-    text('브랜드', 501, 665, 26, '#6c7e97');
-    rule(708);
-    block(767, '핵심 발견', '우리만의 차별점 찾기');
-    typedText('고객의 니즈에서 기회를 발견합니다.', 60, 893, 27, '#6c7e97');
-  } else if (index === 1) {
-    block(326, '01  브랜드 목표', '우리가 선택받는 이유');
-    rule(414);
-    block(479, '02  핵심 고객', '우리의 이야기가 필요한 사람');
-    rule(567);
-    block(632, '03  브랜드 메시지', '고객에게 전할 하나의 가치');
-    ctx.fillStyle = '#eef4fd';
-    ctx.beginPath();
-    ctx.roundRect(48, 756, 672, 168, 20);
-    ctx.fill();
-    text('COMMUNICATION', 73, 802, 23, '#6084bc', 500);
-    typedText('일관된 방향, 명확한 메시지', 73, 855, 31, '#304f7c', 500);
-  } else {
-    ['콘텐츠 기획', '채널별 실행', '성과 측정 및 개선'].forEach((label, i) => {
-      const y = 337 + i * 161;
-      ctx.fillStyle = '#edf3fc';
-      ctx.beginPath();
-      ctx.roundRect(58, y - 36, 70, 70, 15);
-      ctx.fill();
-      text(`0${i + 1}`, 73, y + 9, 29, '#5a80ba', 500);
-      text(label, 154, y + 7, 36, '#283c59', 500);
-      typedText(['메시지를 콘텐츠로 구체화', '고객과 만나는 접점 설계', '데이터로 다음 방향 결정'][i], 154, y + 62, 27, '#6c7e97');
-    });
-    rule(790);
-    typedText('기획 → 실행 → 분석 → 개선', 58, 858, 31, '#5479b6', 500);
-  }
-  rule(960);
-  text('우주기획', 58, 997, 23, '#91a0b5', 600);
-  text(`0${index + 1}`, 671, 997, 22, '#91a0b5');
-  const canvas = document.createElement('canvas');
-  canvas.width = base.width;
-  canvas.height = base.height;
-  const output = canvas.getContext('2d')!;
-  let lastFrame = '';
-  const update = (seconds: number, still = false) => {
-    // Cap texture changes at 12fps; the 3D motion remains independently smooth.
-    const clock = Math.floor(seconds * 12) / 12;
-    const cycle = clock % 22;
-    const delay = [1.2, 0.35, 2.1][index];
-    // Type, hold the complete document, then erase before the seamless next loop.
-    const count = still ? totalCharacters : Math.floor(cycle < 19
-      ? Math.max(0, Math.min(totalCharacters, (cycle - delay) * 18))
-      : totalCharacters * (22 - cycle) / 3);
-    const cursor = !still && count < totalCharacters && cycle < 19 && Math.floor(clock * 2) % 2 === 0;
-    const signature = `${count}:${cursor}`;
-    if (signature === lastFrame) return false;
-    lastFrame = signature;
-    output.setTransform(1, 0, 0, 1, 0, 0);
-    // Clear every update so translucency and erased text do not accumulate.
-    output.clearRect(0, 0, canvas.width, canvas.height);
-    output.drawImage(base, 0, 0);
-    for (const line of lines) {
-      const length = Math.max(0, Math.min(line.value.length, count - line.start));
-      output.font = `${line.weight} ${line.size}px Pretendard, "Apple SD Gothic Neo", sans-serif`;
-      output.fillStyle = line.color;
-      const visibleText = line.value.slice(0, length);
-      output.fillText(visibleText, line.x, line.y);
-      if (cursor && count >= line.start && count < line.start + line.value.length) {
-        output.fillStyle = '#5e8cdb';
-        output.fillRect(line.x + output.measureText(visibleText).width + 4, line.y - line.size * 0.8, 2, line.size);
-      }
-    }
-    return true;
+function metricsFor(sample: StrategySample): Record<StrategyPageId, Metric[]> {
+  return {
+  analysis: [
+    { label: '분석 브랜드', value: String(sample.brands), unit: '개' },
+    { label: '고객 세그먼트', value: String(sample.segments), unit: '그룹' },
+    { label: '브랜드 적합도', value: String(sample.affinity), unit: '/ 100' },
+  ],
+  marketing: [
+    { label: '핵심 목표', value: String(sample.goals), unit: '개' },
+    { label: '우선 채널', value: '3', unit: '개' },
+    { label: '예산 배분', value: '100', unit: '%' },
+  ],
+  campaign: [
+    { label: '캠페인 기간', value: '4', unit: '주' },
+    { label: '콘텐츠 계획', value: String(sample.contentTotal), unit: '건' },
+    { label: '운영 채널', value: '3', unit: '개' },
+  ],
   };
-  update(0);
-  return { canvas, update };
 }
 
-export function StrategyDocuments() {
-  const hostRef = useRef<HTMLDivElement>(null);
-  const [ready, setReady] = useState(false);
+const SCORE_LABELS = ['인지도', '선호도', '재구매', '추천'];
 
-  useEffect(() => {
-    const host = hostRef.current;
-    if (!host) return;
-    let disposed = false;
-    let cleanup: (() => void) | undefined;
+const CHANNELS = [
+  { label: '검색', goal: '신규 유입', tone: 'blue' },
+  { label: '콘텐츠', goal: '브랜드 이해', tone: 'teal' },
+  { label: 'SNS', goal: '고객 관계', tone: 'gray' },
+];
 
-    const initialize = async () => {
-      const THREE = await import('three');
-      if (disposed) return;
-      let renderer: Three.WebGLRenderer;
-      try {
-        renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-      } catch {
-        return; // The readable HTML document remains available without WebGL.
-      }
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      host.appendChild(renderer.domElement);
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(30, 16 / 7, 0.1, 60);
-      camera.position.set(0, 0, 13);
-      scene.add(new THREE.HemisphereLight(0xffffff, 0xa4b9db, 2.4));
-      const light = new THREE.DirectionalLight(0xffffff, 3.2);
-      light.position.set(-4, 7, 10);
-      scene.add(light);
-      const materials: Three.Material[] = [];
-      const geometries: Three.BufferGeometry[] = [];
-      const textures: Three.Texture[] = [];
-      const geometry = <T extends Three.BufferGeometry>(value: T) => { geometries.push(value); return value; };
-      const material = <T extends Three.Material>(value: T) => { materials.push(value); return value; };
-      const paperGradientMaterial = <T extends Three.Material>(value: T, offsetY = 0) => {
-        value.transparent = true;
-        value.depthWrite = false;
-        // Only the paper thickness and backing use this shader, never the content.
-        value.onBeforeCompile = (shader) => {
-          shader.uniforms.uDocumentOffsetY = { value: offsetY };
-          shader.vertexShader = `varying float vDocumentY;
-uniform float uDocumentOffsetY;
-${shader.vertexShader}`.replace('#include <begin_vertex>', `#include <begin_vertex>
-vDocumentY = transformed.y + uDocumentOffsetY;`);
-          shader.fragmentShader = `varying float vDocumentY;
-${shader.fragmentShader}`.replace('#include <color_fragment>', `#include <color_fragment>
-float documentFade = mix(0.66, 0.94, smoothstep(-2.25, 2.25, vDocumentY));
-diffuseColor.a *= documentFade;`);
-        };
-        value.customProgramCacheKey = () => 'paper-only-gradient-opacity-v2';
-        return material(value);
-      };
-
-      const shape = new THREE.Shape();
-      const w = 3.38, h = 4.5, r = 0.13;
-      shape.moveTo(-w / 2 + r, -h / 2);
-      shape.lineTo(w / 2 - r, -h / 2);
-      shape.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
-      shape.lineTo(w / 2, h / 2 - r);
-      shape.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
-      shape.lineTo(-w / 2 + r, h / 2);
-      shape.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r);
-      shape.lineTo(-w / 2, -h / 2 + r);
-      shape.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
-      const paperGeometry = geometry(new THREE.ExtrudeGeometry(shape, {
-        depth: 0.075, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.025, bevelThickness: 0.025,
-      }));
-      const paperMaterial = paperGradientMaterial(new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4, opacity: 0.18 }));
-      const backingMaterial = paperGradientMaterial(new THREE.MeshStandardMaterial({ color: '#e2edff', roughness: 0.55, opacity: 0.12 }), -0.1);
-      let documentArt = DOCUMENTS.map((_, index) => drawDocument(index));
-
-      const documents = DOCUMENTS.map((_, index) => {
-        const group = new THREE.Group();
-        const backing = new THREE.Mesh(paperGeometry, backingMaterial);
-        backing.position.set(0.1, -0.1, -0.16);
-        backing.rotation.z = -0.018;
-        group.add(backing);
-        group.add(new THREE.Mesh(paperGeometry, paperMaterial));
-        const texture = new THREE.CanvasTexture(documentArt[index].canvas);
-        texture.colorSpace = THREE.SRGBColorSpace;
-        texture.generateMipmaps = false;
-        texture.minFilter = THREE.LinearFilter;
-        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        textures.push(texture);
-        const face = new THREE.Mesh(geometry(new THREE.PlaneGeometry(3.24, 4.32)), material(new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false })));
-        face.position.z = 0.106;
-        group.add(face);
-        scene.add(group);
-        return group;
-      });
-
-      const bars = [0.42, 0.7, 1.02].map((height, i) => {
-        const barGeometry = geometry(new THREE.PlaneGeometry(0.44, height));
-        // Pivot at the bottom so each column grows upward from the same baseline.
-        barGeometry.translate(0, height / 2, 0);
-        const fill = material(new THREE.MeshBasicMaterial({
-          color: ['#b0c9ef', '#779fdc', '#4d79bf'][i],
-          transparent: true, depthWrite: false,
-        }));
-        const bar = new THREE.Mesh(barGeometry, fill);
-        bar.position.set(-0.91 + i * 0.81, -0.45, 0.112);
-        documents[0].add(bar);
-        return bar;
-      });
-
-      // A soft studio shadow makes the floating depth visible without heavy shadow maps.
-      const shadowCanvas = document.createElement('canvas');
-      shadowCanvas.width = shadowCanvas.height = 128;
-      const shadowContext = shadowCanvas.getContext('2d')!;
-      const gradient = shadowContext.createRadialGradient(64, 64, 1, 64, 64, 64);
-      gradient.addColorStop(0, 'rgba(65, 101, 159, 0.19)');
-      gradient.addColorStop(1, 'rgba(65, 101, 159, 0)');
-      shadowContext.fillStyle = gradient;
-      shadowContext.fillRect(0, 0, 128, 128);
-      const shadowTexture = new THREE.CanvasTexture(shadowCanvas);
-      textures.push(shadowTexture);
-      const shadow = new THREE.Mesh(geometry(new THREE.PlaneGeometry(11, 1)), material(new THREE.MeshBasicMaterial({ map: shadowTexture, transparent: true, depthWrite: false })));
-      shadow.position.set(0, -2.45, -1.2);
-      scene.add(shadow);
-
-      let compact = false;
-      let inView = false;
-      let frame = 0;
-      let lastTime = 0;
-      let elapsed = 0;
-      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-      const render = () => {
-        const reducedMotion = motion.matches;
-        const settle = (delay: number, duration: number) => {
-          const progress = reducedMotion ? 1 : Math.max(0, Math.min(1, (elapsed - delay) / duration));
-          return 1 - Math.pow(1 - progress, 3);
-        };
-        documents.forEach((group, i) => {
-          const side = i - 1;
-          // One small entrance, then a stable reading surface instead of perpetual bobbing.
-          const entrance = settle(i * 0.12, 1.4);
-          group.position.set(
-            side * (compact ? 1.45 : 3.6),
-            (i === 1 ? 0 : 0.07) - (1 - entrance) * 0.14,
-            i === 1 ? 0.7 : -0.3,
-          );
-          group.scale.setScalar(compact && i !== 1 ? 0.87 : 1);
-          group.rotation.set(-0.035, side * -0.13, side * -0.025);
-          if (documentArt[i].update(elapsed, reducedMotion)) textures[i].needsUpdate = true;
-        });
-        bars.forEach((bar, i) => {
-          const cycle = elapsed % 22;
-          const progress = Math.max(0, Math.min(1, (cycle - 1.3 - i * 0.3) / 1.65));
-          const rise = 1 - Math.pow(1 - progress, 3);
-          const resetProgress = Math.max(0, Math.min(1, (cycle - 19) / 2.5));
-          const reset = resetProgress * resetProgress * (3 - 2 * resetProgress);
-          const scale = reducedMotion ? 1 : rise * (1 - reset);
-          bar.visible = scale > 0.001;
-          bar.scale.y = Math.max(0.001, scale);
-        });
-        renderer.render(scene, camera);
-      };
-      const shouldAnimate = () => inView && !motion.matches && !document.hidden;
-      const tick = (time: number) => {
-        frame = 0;
-        if (!shouldAnimate()) { lastTime = 0; return; }
-        if (lastTime) elapsed += Math.min((time - lastTime) / 1000, 0.05);
-        lastTime = time;
-        render();
-        frame = requestAnimationFrame(tick);
-      };
-      const restart = () => {
-        if (frame) cancelAnimationFrame(frame);
-        frame = 0;
-        lastTime = 0;
-        render();
-        if (shouldAnimate()) frame = requestAnimationFrame(tick);
-      };
-      const resize = () => {
-        const { width, height } = host.getBoundingClientRect();
-        if (!width || !height) return;
-        compact = width < 760;
-        const aspect = width / height;
-        const viewHeight = Math.max(5.9, (compact ? 4.7 : 11.8) / aspect);
-        camera.aspect = aspect;
-        camera.position.z = viewHeight / (2 * Math.tan(Math.PI / 12)) + 0.9;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
-        render();
-      };
-      const resizeObserver = new ResizeObserver(resize);
-      resizeObserver.observe(host);
-      const intersectionObserver = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; restart(); });
-      intersectionObserver.observe(host);
-      const onMotionChange = () => restart();
-      const onContextLost = (event: Event) => { event.preventDefault(); inView = false; restart(); setReady(false); };
-      renderer.domElement.addEventListener('webglcontextlost', onContextLost);
-      document.addEventListener('visibilitychange', restart);
-      motion.addEventListener('change', onMotionChange);
-      resize();
-      setReady(true);
-
-      // Replace fallback font textures when the site's Korean font finishes loading.
-      void document.fonts.ready.then(() => {
-        if (disposed) return;
-        documentArt = DOCUMENTS.map((_, index) => drawDocument(index));
-        for (let i = 0; i < DOCUMENTS.length; i++) {
-          textures[i].image = documentArt[i].canvas;
-          textures[i].needsUpdate = true;
-        }
-        render();
-      });
-      cleanup = () => {
-        cancelAnimationFrame(frame);
-        resizeObserver.disconnect();
-        intersectionObserver.disconnect();
-        document.removeEventListener('visibilitychange', restart);
-        motion.removeEventListener('change', onMotionChange);
-        renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
-        geometries.forEach((item) => item.dispose());
-        materials.forEach((item) => item.dispose());
-        textures.forEach((item) => item.dispose());
-        renderer.dispose();
-        renderer.domElement.remove();
-      };
-    };
-    void initialize().catch(() => { cleanup?.(); if (!disposed) setReady(false); });
-    return () => { disposed = true; cleanup?.(); };
-  }, []);
-
+function BrandAnalysis({ sample }: { sample: StrategySample }) {
   return (
     <>
-      <div className="strategy-documents" role="img" aria-label="은은한 블루 배경 위 우주기획의 3D 기획서에 문장이 타이핑되고 평면 막대그래프가 바닥에서 순서대로 올라오는 애니메이션">
-        <div className={`strategy-document-fallback ${ready ? 'is-hidden' : ''}`} aria-hidden="true">
-          <small>우주기획 · 마케팅 전략</small>
-          <strong>마케팅 전략</strong>
-          <p>브랜드가 나아갈 방향을 정하다</p>
-          <dl><dt>01 브랜드 목표</dt><dd>우리가 선택받는 이유</dd><dt>02 핵심 고객</dt><dd>우리의 이야기가 필요한 사람</dd><dt>03 브랜드 메시지</dt><dd>고객에게 전할 하나의 가치</dd></dl>
+      <section className="strategy-report-section" aria-labelledby="strategy-brand-chart-title">
+        <div className="strategy-report-section-heading">
+          <h5 id="strategy-brand-chart-title">브랜드 경쟁력</h5>
+          <span>100점 기준</span>
         </div>
-        <div ref={hostRef} className={`strategy-documents-canvas ${ready ? 'is-ready' : ''}`} aria-hidden="true" />
-      </div>
-
+        <div className="strategy-chart-legend" aria-hidden="true">
+          <span><i className="strategy-color-gray" />시장 평균</span>
+          <span><i className="strategy-color-blue" />브랜드</span>
+        </div>
+        <div className="strategy-score-chart">
+          <div className="strategy-score-axis" aria-hidden="true"><span>100</span><span>50</span><span>0</span></div>
+          {sample.scores.map(({ market, brand }, index) => {
+            const label = SCORE_LABELS[index];
+            return (
+            <figure className="strategy-score-group" key={label} aria-label={`${label}: 시장 평균 ${market}점, 브랜드 ${brand}점`}>
+              <div className="strategy-score-columns" aria-hidden="true">
+                <div className="strategy-score-bar strategy-color-gray" style={{ height: `${market}%`, '--bar-delay': `${index * 65}ms` } as CSSProperties} />
+                <div className="strategy-score-bar strategy-color-blue" style={{ height: `${brand}%`, '--bar-delay': `${index * 65 + 80}ms` } as CSSProperties}><b>{brand}</b></div>
+              </div>
+              <figcaption aria-hidden="true">{label}</figcaption>
+            </figure>
+          ); })}
+        </div>
+      </section>
+      <div className="strategy-report-summary"><span>추천 지표</span><strong>추천 의향</strong><span className="strategy-positive">시장 대비 +{sample.scores[3].brand - sample.scores[3].market}p</span></div>
     </>
+  );
+}
+
+function MarketingStrategy({ sample }: { sample: StrategySample }) {
+  return (
+    <>
+      <section className="strategy-report-section" aria-labelledby="strategy-allocation-title">
+        <div className="strategy-report-section-heading"><h5 id="strategy-allocation-title">채널별 예산 배분</h5><span>합계 100%</span></div>
+        <div className="strategy-allocation-bar" aria-hidden="true">
+          {CHANNELS.map(({ label, tone }, index) => (
+            <div key={label} className={`strategy-color-${tone}`} style={{ flex: sample.shares[index] }}><b>{sample.shares[index]}%</b></div>
+          ))}
+        </div>
+        <table className="strategy-allocation-table">
+          <thead><tr><th scope="col">채널</th><th scope="col">목표</th><th scope="col">비중</th></tr></thead>
+          <tbody>
+            {CHANNELS.map(({ label, goal, tone }, index) => (
+              <tr key={label}><th scope="row"><i className={`strategy-color-${tone}`} />{label}</th><td>{goal}</td><td>{sample.shares[index]}%</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      <div className="strategy-report-summary"><span>핵심 흐름</span><strong>인지 → 관심 → 전환</strong></div>
+    </>
+  );
+}
+
+function CampaignPlan({ sample }: { sample: StrategySample }) {
+  const progress = Math.round(sample.contentDone / sample.contentTotal * 100);
+  const stages = [
+    { label: '기획', start: 0, span: 1, tone: 'gray', progress: 100, status: '완료' },
+    { label: '제작', start: 1, span: 2, tone: 'blue', progress, status: `${progress}%` },
+    { label: '송출', start: 2, span: 2, tone: 'teal', progress: 0, status: '예정' },
+  ];
+  return (
+    <>
+      <section className="strategy-report-section" aria-labelledby="strategy-schedule-title">
+        <div className="strategy-report-section-heading"><h5 id="strategy-schedule-title">실행 타임라인</h5><span>4주 계획</span></div>
+        <div className="strategy-schedule">
+          <div className="strategy-schedule-header"><span>단계</span>{[1, 2, 3, 4].map((week) => <span key={week}>W{week}</span>)}</div>
+          {stages.map(({ label, start, span, tone, status, progress: stageProgress }) => (
+            <div className="strategy-schedule-row" key={label}>
+              <strong>{label}</strong>
+              <figure className="strategy-schedule-track" aria-label={`${label}: ${start + 1}주차부터 ${start + span}주차, ${status}`}>
+                <span className={`strategy-color-${tone}`} style={{ gridColumn: `${start + 1} / span ${span}` }} aria-hidden="true"><i style={{ transform: `scaleX(${stageProgress / 100})` }} /><b>{status}</b></span>
+              </figure>
+            </div>
+          ))}
+        </div>
+      </section>
+      <div className="strategy-report-summary strategy-progress-summary">
+        <span>제작 진행률</span><strong>{sample.contentDone} / {sample.contentTotal}건</strong>
+        <progress className="strategy-progress-track" aria-label="콘텐츠 제작 진행률" max={sample.contentTotal} value={sample.contentDone} />
+        <span className="strategy-positive">{progress}%</span>
+      </div>
+    </>
+  );
+}
+
+export function StrategyDocuments({ page, panelId, running }: { page: StrategyPageId; panelId: string; running: boolean }) {
+  const [sample, setSample] = useState(INITIAL_STRATEGY_SAMPLE);
+  const currentSample = useRef(sample);
+  useEffect(() => {
+    if (!running) return;
+    let frame = 0;
+    let timer = 0;
+    const refresh = () => {
+      const from = currentSample.current;
+      const to = createStrategySample();
+      const start = performance.now();
+      let previous = 0;
+      const animate = (now: number) => {
+        const progress = Math.min((now - start) / 800, 1);
+        if (now - previous >= 32 || progress === 1) {
+          const next = interpolateStrategySample(from, to, progress * progress * (3 - 2 * progress));
+          currentSample.current = next;
+          setSample(next);
+          previous = now;
+        }
+        if (progress < 1) frame = window.requestAnimationFrame(animate);
+        else timer = window.setTimeout(refresh, 800);
+      };
+      frame = window.requestAnimationFrame(animate);
+    };
+    timer = window.setTimeout(refresh, 300);
+    return () => { window.clearTimeout(timer); window.cancelAnimationFrame(frame); };
+  }, [page, running]);
+  const currentPage = STRATEGY_PAGES.find((item) => item.id === page)!;
+  const Icon = currentPage.icon;
+  return (
+    <section className="strategy-report" id={panelId} aria-label={currentPage.title} data-running={running}>
+      <div className="strategy-report-content" key={page}>
+        <header className="strategy-report-header">
+          <div><Icon aria-hidden="true" /><h4>{currentPage.title}</h4></div>
+          <small>예시 데이터</small>
+        </header>
+        <dl className="strategy-metrics">
+          {metricsFor(sample)[page].map(({ label, value, unit }, index) => (
+            <div key={label} style={{ '--metric-delay': `${index * 70}ms` } as CSSProperties}>
+              <dt>{label}</dt><dd>{value}<small>{unit}</small></dd>
+            </div>
+          ))}
+        </dl>
+        {page === 'analysis' ? <BrandAnalysis sample={sample} /> : page === 'marketing' ? <MarketingStrategy sample={sample} /> : <CampaignPlan sample={sample} />}
+      </div>
+    </section>
   );
 }

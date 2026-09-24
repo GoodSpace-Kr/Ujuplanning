@@ -245,7 +245,7 @@ body {
 .hero-services-copy {
   position: absolute;
   inset: 0;
-  z-index: 4;
+  z-index: 12;
   display: grid;
   place-items: center;
   padding: 0 1.5rem;
@@ -253,6 +253,23 @@ body {
   text-align: center;
   opacity: var(--hero-services-heading-opacity, 0);
   pointer-events: none;
+}
+
+.hero-services-copy-inner {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(18rem, 34vw, 28rem);
+}
+
+.hero-services-copy-inner h2 {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(2rem, 4.3vw, 4rem);
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.045em;
+  word-break: keep-all;
 }
 
 .project-stage {
@@ -491,6 +508,10 @@ body {
 
   .project-phone {
     width: min(62vw, 300px);
+  }
+
+  .hero-services-copy-inner {
+    min-height: 19rem;
   }
 }
 
@@ -793,253 +814,398 @@ body {
 }
 
 .services {
-  padding: clamp(6rem, 10vw, 10rem) 1.5rem;
+  position: relative;
+  z-index: 0;
   color: #202329;
-  background: #fff;
+  background: #f7f8fa;
 }
 
-.hero-services-copy h2 {
-  font-size: clamp(2rem, 4.3vw, 4rem);
-  font-weight: 650;
-  line-height: 1.35;
-  letter-spacing: -0.045em;
-  word-break: keep-all;
+.service-scroll-section {
+  min-height: 430svh;
+  padding: 0;
 }
 
-.service-section {
-  max-width: 1280px;
+.service-scroll-sticky {
+  position: sticky;
+  top: 0;
+  display: grid;
+  min-height: 100svh;
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(3rem, 6vw, 6.25rem) clamp(1.5rem, 5vw, 5.5rem);
+}
+
+.service-scroll-layout {
+  display: grid;
+  grid-template-columns: minmax(20rem, 0.42fr) minmax(40rem, 0.9fr);
+  gap: clamp(3rem, 6vw, 7rem);
+  align-items: center;
+  width: min(100%, 94rem);
   margin: 0 auto;
-  scroll-margin-top: 3rem;
 }
 
-.service-section + .service-section {
-  margin-top: clamp(7rem, 12vw, 12rem);
+.service-scroll-copy {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  gap: clamp(1.25rem, 2vw, 2rem);
+  align-items: center;
+  min-height: clamp(27rem, 64svh, 42rem);
 }
 
-.service-headline {
-  margin-bottom: clamp(1rem, 2vw, 2rem);
-  font-size: clamp(1.5rem, 2.8vw, 2.65rem);
-  font-weight: 600;
-  line-height: 1.45;
-  letter-spacing: -0.04em;
-  text-align: center;
-  word-break: keep-all;
-  text-wrap: balance;
+.service-scroll-index {
+  display: flex;
+  flex-direction: column;
+  gap: 0.62rem;
+  align-items: flex-start;
 }
 
-.service-headline-keyword {
-  display: inline-block;
-  color: #2f67bf;
-}
-
-@supports ((background-clip: text) or (-webkit-background-clip: text)) {
-  .service-headline-keyword {
-    background-image: linear-gradient(110deg, #2f67bf 0%, #2f67bf 35%, #4280ce 43%, #5f96de 50%, #4280ce 57%, #2f67bf 65%, #2f67bf 100%);
-    background-size: 100% 100%;
-    background-position: 50% 50%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-}
-
-@media (forced-colors: active) {
-  .service-headline-keyword {
-    animation: none;
-    background-image: none;
-    color: LinkText;
-    -webkit-text-fill-color: currentColor;
-  }
-}
-
-.service-image-link {
-  position: relative;
+.service-scroll-index span {
   display: block;
-  aspect-ratio: 16 / 7;
-  background: #f2f3f5;
-  outline-offset: 6px;
+  width: 1.65rem;
+  height: 2px;
+  border-radius: 999px;
+  background: #cdd3dc;
+  transition: width 240ms ease, height 240ms ease, background-color 240ms ease;
 }
 
-.service-visual {
-  position: relative;
+.service-scroll-index span.is-active {
+  width: 2.35rem;
+  height: 3px;
+  background: #171b23;
 }
 
-.service-visual-strategy {
-  background:
-    linear-gradient(135deg, #f5f7fb 0%, #edf2f8 52%, #e8f0f9 100%);
-  isolation: isolate;
-}
-
-.service-visual-strategy .service-image-link {
-  background: transparent;
-}
-
-.strategy-documents,
-.strategy-documents-canvas {
-  position: absolute;
-  inset: 0;
+.service-scroll-copy-window {
+  height: clamp(25rem, 62svh, 39rem);
   overflow: hidden;
 }
 
-.strategy-documents-canvas {
-  opacity: 0;
-}
-
-.strategy-documents-canvas.is-ready {
-  opacity: 1;
-}
-
-.strategy-documents-canvas canvas {
-  display: block;
-  width: 100%;
+.service-scroll-copy-track {
   height: 100%;
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
-.strategy-document-fallback {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(72%, 19rem);
-  padding: 1.5rem;
-  border-radius: 0.6rem;
-  background: linear-gradient(to bottom, rgb(255 255 255 / 94%), rgb(255 255 255 / 66%));
-  color: #283c59;
-  box-shadow: 0 15px 40px rgb(82 115 168 / 16%);
-  transform: translate(-50%, -50%);
-}
-
-.strategy-document-fallback.is-hidden {
-  display: none;
-}
-
-.strategy-document-fallback small {
-  color: #6a8bbf;
-  font-size: 0.7rem;
-}
-
-.strategy-document-fallback strong {
-  display: block;
-  margin-top: 0.75rem;
-  font-size: 1.2rem;
-  font-weight: 550;
-}
-
-.strategy-document-fallback p,
-.strategy-document-fallback dl {
-  font-size: 0.75rem;
-}
-
-.strategy-document-fallback dt {
-  margin-top: 0.6rem;
-  color: #5479b6;
-  font-weight: 500;
-}
-
-.strategy-document-fallback dd {
-  margin-top: 0.25rem;
-}
-
-@media (max-width: 808px) {
-  .service-visual-strategy .service-image-link {
-    aspect-ratio: 4 / 3;
-  }
-}
-
-@media (max-width: 600px) {
-  .service-visual-strategy .service-image-link {
-    aspect-ratio: 4 / 5;
-  }
-}
-
-.service-image-placeholder {
-  position: absolute;
-  inset: 0;
-}
-
-.service-image-link:focus-visible {
-  outline: 2px solid #202329;
-}
-
-.service-card-arrow {
-  position: absolute;
-  right: clamp(1.25rem, 3vw, 2.5rem);
-  bottom: clamp(1.25rem, 3vw, 2.5rem);
-  display: grid;
-  width: clamp(3rem, 5vw, 4.5rem);
-  aspect-ratio: 1;
-  place-items: center;
-  border-radius: 50%;
-  background: #e3e5e8;
-  transition: background-color 180ms ease;
-}
-
-.service-card-arrow svg {
-  width: 50%;
-  height: 50%;
-}
-
-.service-image-link:hover .service-card-arrow,
-.service-image-link:focus-visible .service-card-arrow {
-  background: #d5d8dd;
-}
-
-.service-card-copy {
-  padding: clamp(1.5rem, 2.5vw, 2.25rem) 0.5rem 0;
+.service-scroll-copy-panel {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
   word-break: keep-all;
 }
 
-.service-card-copy h4 {
-  font-size: clamp(1.35rem, 2vw, 1.85rem);
-  font-weight: 600;
-  line-height: 1.4;
+@media (min-width: 1021px) {
+  .service-scroll-copy-panel:not(.is-active) {
+    visibility: hidden;
+  }
+}
+
+.service-kicker {
+  display: block;
+  margin-bottom: 1rem;
+  color: #6e7887;
+  font-size: clamp(1rem, 1.5vw, 1.35rem);
+  font-weight: 550;
+  line-height: 1.45;
   letter-spacing: -0.03em;
 }
 
-.service-card-copy p {
-  margin-top: 0.75rem;
-  color: #535963;
-  font-size: clamp(1rem, 1.5vw, 1.25rem);
-  line-height: 1.7;
-  letter-spacing: -0.02em;
+.service-scroll-copy-panel h3 {
+  max-width: 11em;
+  font-size: clamp(2.05rem, 3.7vw, 4.1rem);
+  font-weight: 700;
+  line-height: 1.24;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
 }
 
-.service-card-copy ul {
+.service-scroll-copy-panel p {
+  max-width: 26rem;
+  margin-top: 1.35rem;
+  color: #748091;
+  font-size: clamp(1.05rem, 1.45vw, 1.35rem);
+  line-height: 1.75;
+  letter-spacing: -0.025em;
+}
+
+.service-scroll-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 1.4rem;
+  gap: 0.48rem;
+  max-width: 28rem;
+  margin-top: 2rem;
   padding: 0;
   list-style: none;
-  color: #666e79;
-  font-size: 0.875rem;
-  line-height: 1.4;
 }
 
-.service-card-copy li {
-  max-width: 100%;
-  padding: 0.3rem 0.65rem;
-  border-radius: 0.4rem;
-  color: #535963;
-  background: #f2f3f5;
+.service-scroll-tags li {
+  padding: 0.42rem 0.74rem;
+  border: 1px solid #e0e5ed;
+  border-radius: 999px;
+  color: #5a6574;
+  background: rgb(255 255 255 / 70%);
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+.service-notion-shell {
+  display: grid;
+  grid-template-columns: minmax(10.5rem, 14rem) minmax(0, 1fr);
+  min-height: clamp(35rem, 66svh, 48rem);
+  overflow: hidden;
+  border: 1px solid #e4e8ee;
+  border-radius: 1.75rem;
+  background: #fff;
+  box-shadow: 0 2rem 5rem rgb(32 43 60 / 10%);
+}
+
+.service-notion-sidebar {
+  min-width: 0;
+  padding: 1.5rem 1.1rem;
+  border-right: 1px solid #eef1f5;
+  background: #f7f8fa;
+  color: #7b8491;
+}
+
+.service-notion-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.52rem;
+  margin-bottom: 1.5rem;
+  color: #1d232d;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.service-notion-logo i {
+  display: block;
+  width: 1.05rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #161d28, #3868b4);
+  box-shadow: inset -0.18rem -0.18rem 0 rgb(255 255 255 / 18%);
+}
+
+.service-notion-section-label {
+  display: block;
+  margin-bottom: 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.service-notion-primary button {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 5px;
+  color: #6c7581;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: left;
+  word-break: keep-all;
   overflow-wrap: anywhere;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
 }
 
-@media (max-width: 600px) {
-  .services {
-    padding-inline: 1.25rem;
+.service-notion-primary button:hover {
+  color: #28303d;
+  background: #eceef1;
+}
+
+.service-notion-primary button[aria-current='page'] {
+  color: #202631;
+  background: #ebedf1;
+  font-weight: 650;
+}
+
+.service-notion-primary button:focus-visible {
+  outline: 2px solid #537fbf;
+  outline-offset: 2px;
+}
+
+.service-notion-submenu {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #e5e8ee;
+}
+
+.service-mobile-picker > span {
+  display: block;
+  margin-bottom: 4px;
+  color: #8a93a0;
+  font-size: 10px;
+}
+
+.service-notion-sidebar nav {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.service-notion-sidebar nav div {
+  padding: 0.7rem 0.75rem;
+  border-radius: 0.55rem;
+  overflow: hidden;
+  color: #6c7581;
+  font-size: 0.86rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+.service-notion-sidebar nav div.is-active {
+  color: #202631;
+  background: #ebedf1;
+}
+
+.service-notion-main {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  background: #fff;
+}
+
+.service-notion-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 4.35rem;
+  padding: 0 1.6rem;
+  border-bottom: 1px solid #eef1f5;
+  color: #8a93a0;
+  font-size: 0.9rem;
+}
+
+.service-notion-toolbar i {
+  width: 0.44rem;
+  height: 0.44rem;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.service-notion-toolbar strong {
+  color: #424b58;
+  font-weight: 550;
+}
+
+.service-notion-canvas-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 86% 24%, rgb(222 233 249 / 62%), transparent 28%),
+    linear-gradient(135deg, #fbfcfe 0%, #f5f8fc 100%);
+}
+
+.service-canvas-panel {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate3d(0, 1.25rem, 0) scale(0.985);
+  transition: opacity 420ms ease, transform 420ms ease, visibility 420ms ease;
+}
+
+.service-canvas-panel.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.service-visual {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #f5f7fb 0%, #edf2f8 52%, #e8f0f9 100%);
+  isolation: isolate;
+}
+
+
+@media (max-width: 1020px) {
+  .service-scroll-section {
+    min-height: auto;
   }
 
-  .service-image-link {
-    aspect-ratio: 4 / 3;
+  .service-scroll-sticky {
+    position: relative;
+    min-height: auto;
+    padding: 5rem 1.25rem;
   }
 
-  .service-card-copy {
-    padding-inline: 0;
+  .service-scroll-layout {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+
+  .service-scroll-copy {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .service-scroll-index {
+    flex-direction: row;
+  }
+
+  .service-scroll-copy-window {
+    height: auto;
+    overflow: visible;
+  }
+
+  .service-scroll-copy-track {
+    display: grid;
+    gap: 1rem;
+    transform: none !important;
+  }
+
+  .service-scroll-copy-panel {
+    height: auto;
+    min-height: 0;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid #e2e7ee;
+  }
+
+  .service-notion-shell {
+    grid-template-columns: 1fr;
+    min-height: 34rem;
+  }
+
+  .service-notion-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .service-scroll-sticky {
+    padding-block: 4rem;
+  }
+
+  .service-notion-shell {
+    min-height: 31rem;
+    border-radius: 1.15rem;
+  }
+
+  .service-notion-toolbar {
+    min-height: 3.6rem;
+    padding-inline: 1rem;
+  }
+
+  .service-scroll-copy-panel h3 {
+    max-width: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .service-card-arrow {
+  .service-scroll-index span,
+  .service-canvas-panel {
     transition: none;
   }
 }

@@ -1,19 +1,60 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 import Image from 'next/image';
-import { ArrowRight, BarChart3, Check, MousePointer2, Target, Users } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, RotateCcw } from 'lucide-react';
+import { CAMPAIGN_IMAGES } from './campaign-assets';
+import { getPerformanceMotion, PERFORMANCE_DURATION } from './performance-demo';
 import './performance-studio.css';
 
-function AdPhoto() {
-  return <Image src="/creative-product.png" alt="" width={1536} height={1024} unoptimized loading="lazy" draggable={false} />;
+const OPERATIONS = [
+  { title: '콘텐츠 제작', detail: '제품 영상 · 사진 · 카드뉴스', at: 200 },
+  { title: '광고 운영', detail: '타깃별 집행 · 소재 A/B 테스트', at: 650 },
+  { title: '성과 최적화', detail: '반응 좋은 소재에 예산 집중', at: 1100 },
+] as const;
+
+const RESULTS = [
+  { label: '방문 유입', change: '2배' },
+  { label: '구매 전환', change: '3배' },
+  { label: '광고 수익률', change: '2배' },
+] as const;
+
+function ConversionCurve({ progress }: { progress: number }) {
+  const id = useId();
+  const curve = 'M0 74 C27 74 53 72 80 70 S133 67 160 63.5 S213 54 240 49.5 S293 40 320 37 S373 26 400 22';
+  return <figure className="performance-curve" aria-label="광고 소재 최적화에 따라 구매 전환이 상승하는 예시 그래프">
+    <svg viewBox="0 0 420 105" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#719cd8" stopOpacity=".22" />
+          <stop offset="100%" stopColor="#719cd8" stopOpacity="0" />
+        </linearGradient>
+        <clipPath id={`${id}-reveal`}><rect width={400 * progress} height="110" /></clipPath>
+      </defs>
+      <g className="performance-curve-axis" aria-hidden="true">
+        {[20, 60, 100].map(y => <path key={y} d={`M10 ${y} H410`} />)}
+      </g>
+      <g transform="translate(10 0)" aria-hidden="true">
+        <path className="performance-curve-baseline" d="M0 74 H400" />
+        <g clipPath={`url(#${id}-reveal)`}>
+          <path d={`${curve} V100 H0 Z`} fill={`url(#${id}-fill)`} />
+          <path className="performance-curve-line" d={curve} />
+        </g>
+        <circle className="performance-curve-end" cx="400" cy="22" r="3.5" opacity={progress === 1 ? 1 : 0} />
+      </g>
+    </svg>
+    <figcaption><span>광고 시작</span><span>소재 최적화</span><span>성과 상승</span></figcaption>
+  </figure>;
 }
 
 export function PerformanceStudio() {
   const rootRef = useRef<HTMLElement>(null);
-  const [reduced, setReduced] = useState(false);
+  const elapsedRef = useRef(0);
+  const [elapsed, setElapsed] = useState(0);
+  const [replay, setReplay] = useState(0);
+  const [reduced, setReduced] = useState(true);
   const [inView, setInView] = useState(false);
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -21,105 +62,98 @@ export function PerformanceStudio() {
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const onMotion = () => setReduced(motion.matches);
     const onVisibility = () => setVisible(!document.hidden);
-    const resize = () => {
-      const { width, height } = root.getBoundingClientRect();
-      const compact = width < 760;
-      root.dataset.compact = String(compact);
-      root.style.setProperty('--performance-scale', String(Math.max(0, Math.min((width - 24) / (compact ? 660 : 1080), (height - 36) / (compact ? 900 : 500)))));
-    };
-    const intersection = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
-    const sizes = new ResizeObserver(resize);
-    intersection.observe(root);
-    sizes.observe(root);
+    const observer = new IntersectionObserver(([entry]) => {
+      setInView(entry.isIntersecting && entry.intersectionRatio >= 0.15);
+    }, { threshold: [0, 0.15] });
+    observer.observe(root);
     motion.addEventListener('change', onMotion);
     document.addEventListener('visibilitychange', onVisibility);
     onMotion();
     onVisibility();
-    resize();
     return () => {
-      intersection.disconnect();
-      sizes.disconnect();
+      observer.disconnect();
       motion.removeEventListener('change', onMotion);
       document.removeEventListener('visibilitychange', onVisibility);
     };
   }, []);
 
-  return <figure ref={rootRef} className="performance-studio" data-running={inView && visible && !reduced} data-still={reduced}
-    aria-label="제품 광고를 세 가지 비율로 제작하고 네이버·구글·메타에 집행한 뒤, 유입·관심·전환을 분석해 광고 문구를 개선하는 캠페인 예시 애니메이션">
-    <div className="performance-stage" aria-hidden="true">
-      <svg className="performance-connections" viewBox="0 0 1080 500" fill="none">
-        {[150, 238, 326].map((y, i) => <g key={y} className={`performance-route performance-route-${i}`}>
-          <path d={`M292 248 H326 Q338 248 338 ${y} H560`} className="performance-route-track" />
-          <path d={`M292 248 H326 Q338 248 338 ${y} H560`} className="performance-route-signal" pathLength="1" />
-        </g>)}
-      </svg>
-      <svg className="performance-connections performance-connections-mobile" viewBox="0 0 660 900" fill="none">
-        {[121, 209, 297].map((y, i) => <g key={y} className={`performance-route performance-route-${i}`}>
-          <path d={`M310 240 H394 V${y} H610 V424 H330 V449`} className="performance-route-track" />
-          <path d={`M310 240 H394 V${y} H610 V424 H330 V449`} className="performance-route-signal" pathLength="1" />
-        </g>)}
-      </svg>
+  useEffect(() => {
+    if (!inView || !visible || reduced) return;
+    let frame = 0;
+    let previous = performance.now();
+    // Pause the same short sequence when its service or browser tab is hidden.
+    const tick = (now: number) => {
+      elapsedRef.current = Math.min(PERFORMANCE_DURATION, elapsedRef.current + now - previous);
+      previous = now;
+      setElapsed(elapsedRef.current);
+      if (elapsedRef.current < PERFORMANCE_DURATION) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [inView, visible, reduced, replay]);
 
-      <div className="performance-assets">
-        <div className="performance-paper performance-ad-wide">
-          <div className="performance-format"><span>브랜드 광고</span><span>16:9</span></div>
-          <AdPhoto />
-          <p>일상에 스며드는 브랜드</p>
-        </div>
-        <div className="performance-paper performance-ad-portrait">
-          <div className="performance-format"><span>숏폼</span><span>9:16</span></div>
-          <AdPhoto />
-          <p>나를 닮은<br />새로운 일상</p>
-        </div>
-        <div className="performance-paper performance-ad-main">
-          <div className="performance-heading"><span>우주기획</span><small>FRAGRANCE</small></div>
-          <div className="performance-ad-image"><AdPhoto /><span className="performance-product-caption">시그니처 향기</span></div>
-          <div className="performance-ad-copy">
-            <small>SCENT OF YOUR DAY</small>
-            <div className="performance-copy-slot">
-              <p className="performance-copy-original"><span>일상을 채우는</span><br /><span>새로운 시선</span></p>
-              <p className="performance-copy-improved"><span>당신의 일상에</span><br /><span>어울리는 향</span></p>
+  const restart = () => {
+    elapsedRef.current = 0;
+    setElapsed(0);
+    setReplay(value => value + 1);
+  };
+
+  const { time, progress, marker, resultMarker, image } = getPerformanceMotion(reduced ? PERFORMANCE_DURATION : elapsed);
+
+  return (
+    <section ref={rootRef} className="performance-studio" aria-label="디지털 퍼포먼스 캠페인 예시 기사">
+      <article className="performance-article">
+        <header className="performance-article-header">
+          <h4><mark style={{ '--marker': marker } as CSSProperties}>콘텐츠와 광고 운영이 만나,</mark><br /><mark className="performance-marker-result" style={{ '--marker': resultMarker } as CSSProperties}>구매 전환 <em>3배</em>로</mark></h4>
+          {!reduced && <button type="button" onClick={restart} aria-label="성과 흐름 다시 보기" title="성과 흐름 다시 보기">
+            <RotateCcw size={14} aria-hidden="true" />
+          </button>}
+        </header>
+
+        <div className="performance-story">
+          <figure className="performance-editorial-photo">
+            <div>
+              {CAMPAIGN_IMAGES.map((asset, index) => <Image key={asset.src} data-current={index === image} aria-hidden={index !== image} src={asset.src} alt={asset.alt} width={1536} height={1024} unoptimized loading="lazy" draggable={false} />)}
             </div>
-            <div className="performance-ad-cta">나에게 맞는 향 만나보기 <ArrowRight size={13} /></div>
-          </div>
-          <div className="performance-footer"><span>우주기획</span><span className="performance-copy-status">메시지 개선 완료</span></div>
+            <figcaption>영상·사진·카드뉴스를 광고 소재로</figcaption>
+          </figure>
+          <ol className="performance-operations" aria-label="콘텐츠에서 성과까지">
+            {OPERATIONS.map((operation, index) => (
+              <li key={operation.title} data-reached={time >= operation.at}>
+                <span className="performance-step-number">0{index + 1}</span>
+                <div><h5>{operation.title}</h5><p>{operation.detail}</p></div>
+                {index < OPERATIONS.length - 1 && <ArrowDown className="performance-step-arrow" size={12} aria-hidden="true" />}
+              </li>
+            ))}
+          </ol>
         </div>
-      </div>
 
-      <div className="performance-media">
-        {[{ name: '네이버', icon: 'naver.png' }, { name: '구글', icon: 'google.png' }, { name: '메타', icon: 'meta.svg' }].map(({ name, icon }, i) => <div className={`performance-medium performance-medium-${i}`} key={name}>
-          <Image className="performance-medium-icon" src={`/brand-icons/${icon}`} alt="" width={26} height={26} unoptimized />
-          <span className="performance-medium-name">{name}</span>
-        </div>)}
-      </div>
-
-      <div className="performance-paper performance-dashboard">
-        <div className="performance-heading"><span><BarChart3 size={16} /> 캠페인 성과</span></div>
-        <div className="performance-dashboard-body">
-          <div className="performance-metrics">
-            {[{ label: '유입', value: '12,480', unit: '방문', Icon: MousePointer2 }, { label: '관심', value: '836', unit: '참여', Icon: Users }, { label: '전환', value: '64', unit: '문의', Icon: Target }].map(({ label, value, unit, Icon }, i) => <div className={`performance-metric performance-metric-${i}`} key={label}>
-              <span><Icon size={13} />{label}</span><strong>{value}</strong><small>{unit}</small>
-            </div>)}
-          </div>
-          <div className="performance-chart-title"><span>고객 반응의 흐름</span><small><i />전환 추이</small></div>
-          <div className="performance-chart">
-            <svg viewBox="0 0 410 140" fill="none">
-              {[26, 66, 106].map(y => <path key={y} d={`M4 ${y} H406`} stroke="#e8eef6" />)}
-              <path className="performance-chart-line" pathLength="1" d="M5 116 L38 110 L71 113 L104 94 L137 98 L170 76 L203 82 L236 61 L269 58 L294 50" />
-              <path className="performance-chart-gain" pathLength="1" d="M294 50 L323 44 L350 30 L377 25 L405 9" />
-              <path className="performance-chart-marker" d="M294 8 V124" stroke="#b0c9ef" strokeDasharray="3 4" />
-            </svg>
-            <span className="performance-chart-note">소재 개선</span>
-          </div>
-          <div className="performance-chart-axis"><span>집행 시작</span><span>반응 분석</span><span>최적화</span></div>
-          <div className="performance-comparison">
-            <div className="performance-comparison-title"><span>광고 소재 비교</span><small>참여 반응</small></div>
-            <div className="performance-variant performance-variant-a"><span>소재 A</span><div><i /></div><small>기존 문구</small></div>
-            <div className="performance-variant performance-variant-b"><span>소재 B</span><div><i /></div><small><Check size={12} />선택</small></div>
-          </div>
+        <div className="performance-channels">
+          <span>운영 매체</span>
+          {[{ name: '네이버', icon: 'naver.png' }, { name: '구글', icon: 'google.png' }, { name: '메타', icon: 'meta.svg' }].map(({ name, icon }, index) => (
+            <span key={name} data-reached={time >= 600 + index * 220}><Image src={`/brand-icons/${icon}`} alt="" width={13} height={13} unoptimized />{name}</span>
+          ))}
         </div>
-        <div className="performance-footer"><span>우주기획</span><span className="performance-result"><Check size={11} />분석을 다음 실행으로</span></div>
-      </div>
-    </div>
-  </figure>;
+
+        <section className="performance-results" aria-label="광고 운영 전후 예시 성과">
+          <div className="performance-results-heading">
+            <h5>광고 운영 이후의 변화</h5>
+            <span><i /> 구매 전환 추이</span>
+          </div>
+          <ConversionCurve progress={progress} />
+          <dl className="performance-results-grid">
+            {RESULTS.map(result => (
+              <div key={result.label}>
+                <dt>{result.label}</dt>
+                <dd className="performance-result-value" data-visible={progress === 1}>
+                  <strong>{result.change}</strong><ArrowUpRight size={16} aria-hidden="true" />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+        <footer className="performance-article-note">가상의 캠페인 사례이며, 수치는 이해를 돕기 위한 예시입니다.</footer>
+      </article>
+    </section>
+  );
 }

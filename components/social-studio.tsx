@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Bookmark, CalendarDays, Check, Heart, MessageCircle, MoreHorizontal, Play, Send } from 'lucide-react';
+import { CAMPAIGN_IMAGES } from './campaign-assets';
 import './social-studio.css';
 
 function Instagram({ size = 16 }: { size?: number }) {
@@ -13,11 +14,11 @@ function Youtube({ size = 16 }: { size?: number }) {
   return <Image src="/brand-icons/youtube.png" alt="" width={size} height={size} unoptimized />;
 }
 
-function ChannelPhoto({ className = '' }: { className?: string }) {
-  return <Image className={className} src="/creative-product.png" alt="" width={1536} height={1024} unoptimized loading="lazy" draggable={false} />;
+function ChannelPhoto({ className = '', image = 0 }: { className?: string; image?: number }) {
+  return <Image className={className} src={CAMPAIGN_IMAGES[image].src} alt="" width={1536} height={1024} unoptimized loading="lazy" draggable={false} />;
 }
 
-export function SocialStudio() {
+export function SocialStudio({ active }: { active: boolean }) {
   const rootRef = useRef<HTMLElement>(null);
   const [reduced, setReduced] = useState(false);
   const [inView, setInView] = useState(false);
@@ -31,9 +32,13 @@ export function SocialStudio() {
     const onVisibility = () => setVisible(!document.hidden);
     const resize = () => {
       const { width, height } = root.getBoundingClientRect();
-      const compact = width < 760;
+      const compact = width < 420;
+      const wide = width >= 760;
       root.dataset.compact = String(compact);
-      root.style.setProperty('--social-scale', String(Math.max(0, Math.min((width - 24) / (compact ? 660 : 1080), (height - 36) / (compact ? 960 : 540)))));
+      root.dataset.wide = String(wide);
+      const stageWidth = compact ? 660 : wide ? 1300 : 1000;
+      const stageHeight = compact ? 940 : wide ? 620 : 744;
+      root.style.setProperty('--social-scale', String(Math.max(0, Math.min((width - 8) / stageWidth, (height - 20) / stageHeight))));
     };
     const intersection = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
     const sizes = new ResizeObserver(resize);
@@ -52,7 +57,7 @@ export function SocialStudio() {
     };
   }, []);
 
-  return <figure ref={rootRef} className="social-studio" data-running={inView && visible && !reduced} data-still={reduced}
+  return <figure ref={rootRef} className="social-studio" data-running={active && inView && visible && !reduced} data-still={reduced}
     aria-label="콘텐츠 일정에 따라 인스타그램·네이버 블로그·유튜브 쇼츠를 발행하고, 댓글과 저장, 크리에이터 협업으로 브랜드 이야기가 확산되는 애니메이션">
     <div className="social-stage" aria-hidden="true">
       <div className="social-paper social-blog">
@@ -75,10 +80,10 @@ export function SocialStudio() {
           <div className="social-feed-track">
             {[0, 1].map(index => <div className={`social-post social-post-${index}`} key={index}>
               <div className="social-account"><span className="social-avatar">U</span><span>ujuplanning</span><small>{index === 0 ? '오늘의 이야기' : '함께 만드는 이야기'}</small></div>
-              <div className="social-feed-image"><ChannelPhoto /><span>{index === 0 ? 'SCENT OF YOUR DAY' : 'YOUR EVERYDAY MOMENT'}</span></div>
+              <div className="social-feed-image"><ChannelPhoto image={index + 1} /><span>{index === 0 ? 'SOUND OF YOUR DAY' : 'YOUR EVERYDAY MOMENT'}</span></div>
               <div className="social-reactions"><Heart className="social-like" /><MessageCircle /><Send className="social-share" /><Bookmark className="social-save" /></div>
               <p className="social-feed-caption">{index === 0 ? '오늘의 취향을, 한 장의 이야기로.' : '서로의 일상에서 발견하는 새로운 취향.'}</p>
-              <small className="social-feed-hashtag">#우주기획 #브랜드스토리 #일상의향기</small>
+              <small className="social-feed-hashtag">#우주기획 #브랜드스토리 #일상의취향</small>
               <div className="social-comment"><span>daily.note</span><p>다음 이야기도 기대돼요.</p><Heart size={10} /></div>
             </div>)}
           </div>
@@ -89,8 +94,8 @@ export function SocialStudio() {
       <div className="social-paper social-shorts">
         <div className="social-heading"><span><Youtube size={18} />유튜브 쇼츠</span></div>
         <div className="social-short-video">
-          <ChannelPhoto />
-          <div className="social-short-title"><small>우주기획</small><p>당신의 하루에<br />어울리는 향</p></div>
+          <ChannelPhoto image={1} />
+          <div className="social-short-title"><small>우주기획</small><p>당신의 하루에<br />어울리는 사운드</p></div>
           <div className="social-short-actions"><Heart /><MessageCircle /><Send /></div>
           <div className="social-short-progress"><i /></div>
         </div>
@@ -99,7 +104,7 @@ export function SocialStudio() {
 
       <div className="social-paper social-creator">
         <div className="social-heading"><span>크리에이터 협업</span><small>제품 제공</small></div>
-        <div className="social-creator-body"><ChannelPhoto /><div><small>CREATOR NOTE</small><p>향기로 기록하는<br />나의 하루</p><span><Send size={11} />이야기 공유하기</span></div></div>
+        <div className="social-creator-body"><ChannelPhoto image={2} /><div><small>CREATOR NOTE</small><p>걸음마다 발견한<br />나의 취향</p><span><Send size={11} />이야기 공유하기</span></div></div>
         <div className="social-footer"><span>브랜드 × 크리에이터</span><Check size={12} /></div>
       </div>
 
