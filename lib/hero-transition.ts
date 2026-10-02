@@ -2,6 +2,11 @@ const clamp = (value: number) => Math.min(1, Math.max(0, value));
 const range = (value: number, start: number, end: number) => clamp((value - start) / (end - start));
 const smooth = (value: number) => value * value * (3 - 2 * value);
 
+// Shared by the original phone transition and the filmed-phone transition.
+export function getPhoneCoverScale(viewWidth: number, viewHeight: number, screenWidth: number, screenHeight: number) {
+  return Math.max(viewWidth / screenWidth, viewHeight / screenHeight) * 1.4;
+}
+
 // The first 70% preserves the original five-project sequence. The added scroll
 // distance is reserved for the phone expansion and the service introduction.
 export function getHeroTimeline(progress: number, projectCount: number, reducedMotion = false) {
@@ -33,7 +38,7 @@ export function getHeroFrame(width: number, height: number, focus: number, expan
     phoneHeight = phoneWidth / aspect;
   }
   // Travel into the screen, then continue beyond full viewport coverage.
-  const coverScale = Math.max(width / (phoneWidth * .884), height / (phoneHeight * .943)) * 1.4;
+  const coverScale = getPhoneCoverScale(width, height, phoneWidth * .884, phoneHeight * .943);
   const scale = Math.pow(coverScale, expansion);
   const frameWidth = expansion > 0 ? phoneWidth * scale : width + (phoneWidth - width) * focus;
   const frameHeight = expansion > 0 ? phoneHeight * scale : height + (phoneHeight - height) * focus;

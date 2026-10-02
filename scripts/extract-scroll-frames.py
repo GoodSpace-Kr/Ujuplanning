@@ -15,18 +15,22 @@ parser = argparse.ArgumentParser()
 parser.add_argument('input', type=Path)
 parser.add_argument('output', type=Path)
 parser.add_argument('--ffmpeg', default='ffmpeg')
+parser.add_argument('--desktop-width', type=int, default=1920)
 args = parser.parse_args()
 probe = str(Path(args.ffmpeg).with_name('ffprobe'))
 info = json.loads(subprocess.check_output([probe, '-v', 'error', '-select_streams', 'v:0',
     '-show_entries', 'stream=width,height,avg_frame_rate:format=duration', '-of', 'json', str(args.input)]))
 stream = info['streams'][0]
 width, height = stream['width'], stream['height']
+desktop_width = min(width, args.desktop_width)
+desktop_height = round(height * desktop_width / width)
 for variant in ('desktop', 'mobile'):
     (args.output / variant).mkdir(parents=True, exist_ok=True)
 
 def encode(index, pixels):
     image = Image.frombytes('RGB', (width, height), pixels)
-    image.save(args.output / 'desktop' / f'{index:04d}.webp', quality=82, method=4)
+    image.resize((desktop_width, desktop_height), Image.Resampling.LANCZOS).save(
+        args.output / 'desktop' / f'{index:04d}.webp', quality=84, method=4)
     mobile_height = round(height * 960 / width)
     image.resize((960, mobile_height), Image.Resampling.LANCZOS).save(
         args.output / 'mobile' / f'{index:04d}.webp', quality=78, method=4)
@@ -63,6 +67,6 @@ for variant in ('desktop', 'mobile'):
         with Image.open(frame) as image:
             image.verify()
     manifest['variants'][variant] = dict(bytes=sum(f.stat().st_size for f in frames),
-        width=width if variant == 'desktop' else 960, height=height if variant == 'desktop' else round(height * 960 / width))
+        width=desktop_width if variant == 'desktop' else 960, height=desktop_height if variant == 'desktop' else round(height * 960 / width))
 (args.output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
 print(json.dumps(manifest, indent=2), flush=True)
