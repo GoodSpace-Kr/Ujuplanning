@@ -6,7 +6,27 @@ import ts from 'typescript';
 const source = readFileSync(new URL('../lib/studio-journey.ts', import.meta.url), 'utf8')
   .replace("'./hero-transition'", JSON.stringify(new URL('../lib/hero-transition.ts', import.meta.url).href));
 const js = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
-const { studioTimeline, studioGeometry, STUDIO_FRAMES, STUDIO_SCREEN, shouldStartStudioExit, studioExitProgress, STUDIO_EXIT_DURATION } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
+const { studioTimeline, studioGeometry, STUDIO_FRAMES, STUDIO_SCREEN, shouldStartStudioExit, studioExitProgress, STUDIO_EXIT_DURATION, shouldStartStudioEntry, studioEntryProgress, STUDIO_ENTRY_DURATION } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
+
+test('automatic entry starts at the straight-on phone and stops on the first project', () => {
+  assert.equal(shouldStartStudioEntry(.25,.26), true);
+  assert.equal(shouldStartStudioEntry(.2,.35), true);
+  assert.equal(shouldStartStudioEntry(.3,.31), true);
+  for (const [from,to] of [[.2,.24],[.3,.29],[.41,.45],[0,.7]]) assert.equal(shouldStartStudioEntry(from,to), false);
+  assert.equal(shouldStartStudioEntry(.25,.26,true), false);
+  let lastZoom = 0;
+  for (let ms=0; ms<=STUDIO_ENTRY_DURATION; ms+=16) {
+    const t=studioTimeline(studioEntryProgress(ms));
+    assert.equal(t.frame,240);
+    assert.equal(t.projectIndex,0);
+    assert.ok(t.zoom>=lastZoom);
+    lastZoom=t.zoom;
+  }
+  const end=studioTimeline(studioEntryProgress(STUDIO_ENTRY_DURATION));
+  assert.equal(end.projectOpacity,1);
+  assert.equal(end.zoom,1);
+  assert.equal(studioEntryProgress(STUDIO_ENTRY_DURATION*2),.4);
+});
 
 test('automatic exit handles skipped boundaries and resuming partway through the exit', () => {
   assert.equal(shouldStartStudioExit(.66, .67), true);

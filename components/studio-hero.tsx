@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { STUDIO_FRAMES, STUDIO_EXIT_END, STUDIO_EXIT_START, studioExitProgress, shouldStartStudioExit, studioGeometry, studioTimeline } from '@/lib/studio-journey';
+import { STUDIO_ENTRY_START, STUDIO_ENTRY_END, shouldStartStudioEntry, studioEntryProgress } from '@/lib/studio-journey';
 import { createStudioFrames } from '@/lib/studio-frames';
 import './studio-hero.css';
 
@@ -34,8 +35,9 @@ export function StudioHero() {
     let raf = 0, lastTime = 0, progress = 0, viewWidth = 1, viewHeight = 1;
     let currentProject = 0, projectsVisible = false;
     let paintedFrame = -1, paintedZoom = -1, paintedImage: unknown;
-    let autoExit = false, exitElapsed = 0, previousScroll = 0;
-    let exitFrom = STUDIO_EXIT_START, touchY = 0, reverseIntent = 0;
+    let autoMode: 'entry' | 'exit' | null = null;
+    let autoElapsed = 0, previousScroll = 0, entryComplete = false;
+    let autoFrom = 0, touchY = 0, reverseIntent = 0;
     const frames = createStudioFrames(schedule, () => { if (!disposed && !ready) setStatus('failed'); });
 
     function measure() {
@@ -44,10 +46,10 @@ export function StudioHero() {
     function schedule() {
       if (!disposed && active && !document.hidden && !raf) raf = requestAnimationFrame(render);
     }
-    function cancelExit() {
-      autoExit = false;
+    function cancelTransition() {
+      if (autoMode) section!.dataset[autoMode === 'entry' ? 'autoEntry' : 'autoExit'] = 'cancelled';
+      autoMode = null;
       previousScroll = measure();
-      section!.dataset.autoExit = 'cancelled';
       schedule();
     }
     function scrollToProgress(value: number) {
@@ -56,25 +58,32 @@ export function StudioHero() {
       window.scrollTo({ top: scrollY, behavior: 'instant' });
       previousScroll = value;
     }
-    function startExit(from: number) {
-      autoExit = true;
-      exitElapsed = 0;
+    function startTransition(mode: 'entry' | 'exit', from: number) {
+      autoMode = mode;
+      autoElapsed = 0;
       reverseIntent = 0;
       lastTime = 0;
-      progress = exitFrom = Math.max(STUDIO_EXIT_START, Math.min(from, STUDIO_EXIT_END));
-      section!.dataset.autoExit = 'running';
+      const start = mode === 'entry' ? STUDIO_ENTRY_START : STUDIO_EXIT_START;
+      const end = mode === 'entry' ? STUDIO_ENTRY_END : STUDIO_EXIT_END;
+      progress = autoFrom = Math.max(start, Math.min(from, end));
+      section!.dataset[mode === 'entry' ? 'autoEntry' : 'autoExit'] = 'running';
       scrollToProgress(progress);
       schedule();
     }
     function onScroll() {
       const next = measure();
-      if (autoExit) {
+      if (autoMode) {
         // Trackpad/touch momentum and browser scroll rounding must not cancel
         // the animation. The animation clock owns this interval until finished.
         schedule();
         return;
+      }
+      if (next < STUDIO_ENTRY_START - .01) entryComplete = false;
+      if (!entryComplete && shouldStartStudioEntry(previousScroll, next, motion.matches)) {
+        startTransition('entry', Math.max(STUDIO_ENTRY_START, progress));
+        return;
       } else if (shouldStartStudioExit(previousScroll, next, motion.matches)) {
-        startExit(Math.max(STUDIO_EXIT_START, progress));
+        startTransition('exit', Math.max(STUDIO_EXIT_START, progress));
         return;
       }
       previousScroll = next;
@@ -83,10 +92,13 @@ export function StudioHero() {
     function onWheel(event: WheelEvent) {
       if (event.ctrlKey) return;
       const position = measure();
-      if (!autoExit && event.deltaY > 0 && shouldStartStudioExit(position, position + .00001, motion.matches)) startExit(position);
-      if (!autoExit) return;
+      if (!autoMode && event.deltaY > 0) {
+        if (!entryComplete && shouldStartStudioEntry(position, position + .00001, motion.matches)) startTransition('entry', position);
+        else if (shouldStartStudioExit(position, position + .00001, motion.matches)) startTransition('exit', position);
+      }
+      if (!autoMode) return;
       reverseIntent = event.deltaY < 0 ? reverseIntent - event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewHeight : 1) : 0;
-      if (reverseIntent >= 24) cancelExit();
+      if (reverseIntent >= 24) cancelTransition();
       else if (event.cancelable) event.preventDefault();
     }
     function onTouchStart(event: TouchEvent) { touchY = event.touches[0]?.clientY ?? 0; }
@@ -94,17 +106,17 @@ export function StudioHero() {
       const nextY = event.touches[0]?.clientY ?? touchY;
       const delta = touchY - nextY;
       touchY = nextY;
-      if (!autoExit || event.touches.length !== 1) return;
-      if (delta < -2) cancelExit();
+      if (!autoMode || event.touches.length !== 1) return;
+      if (delta < -2) cancelTransition();
       else if (delta > 0 && event.cancelable) event.preventDefault();
     }
     function onKeyDown(event: KeyboardEvent) {
-      if (!autoExit || event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
-      if (['Escape', 'ArrowUp', 'PageUp', 'Home', 'Tab'].includes(event.key) || event.key === ' ' && event.shiftKey) cancelExit();
+      if (!autoMode || event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (['Escape', 'ArrowUp', 'PageUp', 'Home', 'Tab'].includes(event.key) || event.key === ' ' && event.shiftKey) cancelTransition();
       else if (['ArrowDown', 'PageDown', ' ', 'End'].includes(event.key)) event.preventDefault();
     }
-    function onMotionChange() { if (autoExit) cancelExit(); schedule(); }
-    function onDirectNavigation() { if (autoExit) cancelExit(); }
+    function onMotionChange() { if (autoMode) cancelTransition(); schedule(); }
+    function onDirectNavigation() { if (autoMode) cancelTransition(); }
     function onPointerDown(event: PointerEvent) {
       if (event.clientX >= document.documentElement.clientWidth || event.target instanceof HTMLElement && event.target.closest('a')) onDirectNavigation();
     }
@@ -114,13 +126,17 @@ export function StudioHero() {
       let target = measure();
       const dt = lastTime ? Math.min(50, time - lastTime) : 16;
       lastTime = time;
-      if (autoExit) {
-        exitElapsed += dt;
-        progress = target = studioExitProgress(exitElapsed, exitFrom);
+      if (autoMode) {
+        // Hold the measured phone pose until its frame is decoded, so a slow
+        // connection cannot turn automatic entry into a jump to the gallery.
+        const canAdvance = autoMode !== 'entry' || frames.get(STUDIO_FRAMES - 1, true);
+        if (canAdvance) autoElapsed += dt;
+        progress = target = autoMode === 'entry' ? studioEntryProgress(autoElapsed, autoFrom) : studioExitProgress(autoElapsed, autoFrom);
         scrollToProgress(progress);
-        if (progress >= STUDIO_EXIT_END) {
-          autoExit = false;
-          section!.dataset.autoExit = 'complete';
+        if (progress >= (autoMode === 'entry' ? STUDIO_ENTRY_END : STUDIO_EXIT_END)) {
+          if (autoMode === 'entry') entryComplete = true;
+          section!.dataset[autoMode === 'entry' ? 'autoEntry' : 'autoExit'] = 'complete';
+          autoMode = null;
         }
       } else progress = motion.matches ? target : progress + (target - progress) * (1 - Math.exp(-dt / 75));
       if (Math.abs(progress - target) < .00003) progress = target;
@@ -156,7 +172,7 @@ export function StudioHero() {
       section!.dataset.decoded = String(frames.stats().decoded);
       if (currentProject !== state.projectIndex) { currentProject = state.projectIndex; setActiveProject(currentProject); }
       if (projectsVisible !== (projectOpacity > .5)) { projectsVisible = projectOpacity > .5; setShowProjects(projectsVisible); }
-      if (autoExit || target !== progress) schedule();
+      if (autoMode || target !== progress) schedule();
     }
     function resize() {
       viewWidth = stage!.clientWidth || 1;
@@ -165,7 +181,7 @@ export function StudioHero() {
       canvas!.width = Math.round(viewWidth * ratio);
       canvas!.height = Math.round(viewHeight * ratio);
       paintedFrame = -1;
-      if (autoExit) scrollToProgress(progress);
+      if (autoMode) scrollToProgress(progress);
       schedule();
     }
     function visibility() {
@@ -190,6 +206,7 @@ export function StudioHero() {
     document.addEventListener('visibilitychange', visibility);
     motion.addEventListener('change', onMotionChange);
     progress = previousScroll = measure();
+    entryComplete = progress >= STUDIO_ENTRY_END;
     resize();
     return () => {
       disposed = true;

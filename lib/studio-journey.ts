@@ -12,6 +12,19 @@ const smooth = (p: number) => p * p * (3 - 2 * p);
 export const STUDIO_EXIT_START = .665;
 export const STUDIO_EXIT_END = .985;
 export const STUDIO_EXIT_DURATION = 2000;
+export const STUDIO_ENTRY_START = .26;
+export const STUDIO_ENTRY_END = .4;
+export const STUDIO_ENTRY_DURATION = 2000;
+
+export function shouldStartStudioEntry(previous: number, next: number, reduced = false) {
+  return !reduced && previous < STUDIO_ENTRY_END && next > previous &&
+    next >= STUDIO_ENTRY_START && next < STUDIO_ENTRY_END;
+}
+
+export function studioEntryProgress(elapsed: number, from = STUDIO_ENTRY_START) {
+  return Math.min(STUDIO_ENTRY_END, Math.max(STUDIO_ENTRY_START, from) +
+    (STUDIO_ENTRY_END - STUDIO_ENTRY_START) * clamp(elapsed / STUDIO_ENTRY_DURATION));
+}
 
 // Continue even if a gesture skips the exact boundary or starts inside the exit.
 // Jumps from the beginning or past the hero remain ordinary page navigation.
