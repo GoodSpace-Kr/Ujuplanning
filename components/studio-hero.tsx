@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { STUDIO_FRAMES, STUDIO_EXIT_DURATION, STUDIO_EXIT_START, studioExitProgress, shouldStartStudioExit, studioGeometry, studioTimeline } from '@/lib/studio-journey';
+import { STUDIO_FRAMES, STUDIO_EXIT_END, STUDIO_EXIT_START, studioExitProgress, shouldStartStudioExit, studioGeometry, studioTimeline } from '@/lib/studio-journey';
 import { createStudioFrames } from '@/lib/studio-frames';
 import './studio-hero.css';
 
@@ -35,7 +35,7 @@ export function StudioHero() {
     let currentProject = 0, projectsVisible = false;
     let paintedFrame = -1, paintedZoom = -1, paintedImage: unknown;
     let autoExit = false, exitElapsed = 0, previousScroll = 0;
-    let expectedScrollY: number | null = null, touchY = 0;
+    let exitFrom = STUDIO_EXIT_START, touchY = 0, reverseIntent = 0;
     const frames = createStudioFrames(schedule, () => { if (!disposed && !ready) setStatus('failed'); });
 
     function measure() {
@@ -46,37 +46,48 @@ export function StudioHero() {
     }
     function cancelExit() {
       autoExit = false;
-      expectedScrollY = null;
       previousScroll = measure();
       section!.dataset.autoExit = 'cancelled';
       schedule();
     }
     function scrollToProgress(value: number) {
       const top = window.scrollY + section!.getBoundingClientRect().top;
-      expectedScrollY = top + value * Math.max(1, section!.offsetHeight - stage!.clientHeight);
-      window.scrollTo({ top: expectedScrollY, behavior: 'instant' });
+      const scrollY = top + value * Math.max(1, section!.offsetHeight - stage!.clientHeight);
+      window.scrollTo({ top: scrollY, behavior: 'instant' });
       previousScroll = value;
+    }
+    function startExit(from: number) {
+      autoExit = true;
+      exitElapsed = 0;
+      reverseIntent = 0;
+      lastTime = 0;
+      progress = exitFrom = Math.max(STUDIO_EXIT_START, Math.min(from, STUDIO_EXIT_END));
+      section!.dataset.autoExit = 'running';
+      scrollToProgress(progress);
+      schedule();
     }
     function onScroll() {
       const next = measure();
       if (autoExit) {
-        // Respect scrollbar dragging, anchor navigation and other direct jumps.
-        if (expectedScrollY !== null && Math.abs(window.scrollY - expectedScrollY) > 3) cancelExit();
+        // Trackpad/touch momentum and browser scroll rounding must not cancel
+        // the animation. The animation clock owns this interval until finished.
+        schedule();
+        return;
       } else if (shouldStartStudioExit(previousScroll, next, motion.matches)) {
-        autoExit = true;
-        exitElapsed = 0;
-        lastTime = 0;
-        progress = STUDIO_EXIT_START;
-        section!.dataset.autoExit = 'running';
-        scrollToProgress(progress);
+        startExit(Math.max(STUDIO_EXIT_START, progress));
+        return;
       }
       previousScroll = next;
       schedule();
     }
     function onWheel(event: WheelEvent) {
-      if (!autoExit || event.ctrlKey) return;
-      if (event.deltaY < 0) cancelExit();
-      else if (event.deltaY > 0 && event.cancelable) event.preventDefault();
+      if (event.ctrlKey) return;
+      const position = measure();
+      if (!autoExit && event.deltaY > 0 && shouldStartStudioExit(position, position + .00001, motion.matches)) startExit(position);
+      if (!autoExit) return;
+      reverseIntent = event.deltaY < 0 ? reverseIntent - event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewHeight : 1) : 0;
+      if (reverseIntent >= 24) cancelExit();
+      else if (event.cancelable) event.preventDefault();
     }
     function onTouchStart(event: TouchEvent) { touchY = event.touches[0]?.clientY ?? 0; }
     function onTouchMove(event: TouchEvent) {
@@ -93,6 +104,10 @@ export function StudioHero() {
       else if (['ArrowDown', 'PageDown', ' ', 'End'].includes(event.key)) event.preventDefault();
     }
     function onMotionChange() { if (autoExit) cancelExit(); schedule(); }
+    function onDirectNavigation() { if (autoExit) cancelExit(); }
+    function onPointerDown(event: PointerEvent) {
+      if (event.clientX >= document.documentElement.clientWidth || event.target instanceof HTMLElement && event.target.closest('a')) onDirectNavigation();
+    }
     function render(time: number) {
       raf = 0;
       if (disposed || !active || document.hidden) return;
@@ -100,12 +115,11 @@ export function StudioHero() {
       const dt = lastTime ? Math.min(50, time - lastTime) : 16;
       lastTime = time;
       if (autoExit) {
-        exitElapsed = Math.min(STUDIO_EXIT_DURATION, exitElapsed + dt);
-        progress = target = studioExitProgress(exitElapsed);
+        exitElapsed += dt;
+        progress = target = studioExitProgress(exitElapsed, exitFrom);
         scrollToProgress(progress);
-        if (exitElapsed === STUDIO_EXIT_DURATION) {
+        if (progress >= STUDIO_EXIT_END) {
           autoExit = false;
-          expectedScrollY = null;
           section!.dataset.autoExit = 'complete';
         }
       } else progress = motion.matches ? target : progress + (target - progress) * (1 - Math.exp(-dt / 75));
@@ -171,6 +185,8 @@ export function StudioHero() {
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('hashchange', onDirectNavigation);
     document.addEventListener('visibilitychange', visibility);
     motion.addEventListener('change', onMotionChange);
     progress = previousScroll = measure();
@@ -184,6 +200,8 @@ export function StudioHero() {
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('hashchange', onDirectNavigation);
       document.removeEventListener('visibilitychange', visibility);
       motion.removeEventListener('change', onMotionChange);
     };

@@ -13,15 +13,16 @@ export const STUDIO_EXIT_START = .665;
 export const STUDIO_EXIT_END = .985;
 export const STUDIO_EXIT_DURATION = 8000;
 
-// Only a downward crossing from the last project starts autoplay. Deep links,
-// scroll restoration and jumps past the hero remain ordinary page navigation.
+// Continue even if a gesture skips the exact boundary or starts inside the exit.
+// Jumps from the beginning or past the hero remain ordinary page navigation.
 export function shouldStartStudioExit(previous: number, next: number, reduced = false) {
-  return !reduced && previous >= .6 && previous < STUDIO_EXIT_START &&
-    next >= STUDIO_EXIT_START && next < .82;
+  return !reduced && previous >= .4 && previous < STUDIO_EXIT_END &&
+    next > previous && next >= STUDIO_EXIT_START && next < STUDIO_EXIT_END;
 }
 
-export function studioExitProgress(elapsed: number) {
-  return STUDIO_EXIT_START + (STUDIO_EXIT_END - STUDIO_EXIT_START) * clamp(elapsed / STUDIO_EXIT_DURATION);
+export function studioExitProgress(elapsed: number, from = STUDIO_EXIT_START) {
+  return Math.min(STUDIO_EXIT_END, Math.max(STUDIO_EXIT_START, from) +
+    (STUDIO_EXIT_END - STUDIO_EXIT_START) * clamp(elapsed / STUDIO_EXIT_DURATION));
 }
 
 export function studioTimeline(progress: number, reduced = false) {

@@ -8,9 +8,12 @@ const source = readFileSync(new URL('../lib/studio-journey.ts', import.meta.url)
 const js = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
 const { studioTimeline, studioGeometry, STUDIO_FRAMES, STUDIO_SCREEN, shouldStartStudioExit, studioExitProgress, STUDIO_EXIT_DURATION } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
 
-test('automatic exit starts only on downward entry after the final project', () => {
+test('automatic exit handles skipped boundaries and resuming partway through the exit', () => {
   assert.equal(shouldStartStudioExit(.66, .67), true);
-  for (const [from, to] of [[.5,.55], [.66,.664], [.67,.66], [.7,.72], [0,.99], [.64,1]]) {
+  assert.equal(shouldStartStudioExit(.59, .84), true);
+  assert.equal(shouldStartStudioExit(.7, .72), true);
+  assert.equal(shouldStartStudioExit(.9, .91), true);
+  for (const [from, to] of [[.5,.55], [.66,.664], [.67,.66], [.7,.7], [0,.99], [.64,1], [.985,.99]]) {
     assert.equal(shouldStartStudioExit(from,to), false);
   }
   assert.equal(shouldStartStudioExit(.66,.67,true), false);
@@ -32,6 +35,8 @@ test('one trigger covers contraction and the full rewind without more scrolling'
   assert.equal(end.zoom, 0);
   assert.equal(end.returnCopy, 1);
   assert.equal(studioExitProgress(STUDIO_EXIT_DURATION * 2), studioExitProgress(STUDIO_EXIT_DURATION));
+  assert.equal(studioExitProgress(0, .8), .8);
+  assert.equal(studioExitProgress(STUDIO_EXIT_DURATION, .8), .985);
 });
 
 test('video completes before expansion, stays at the last frame through the gallery, then rewinds', () => {
