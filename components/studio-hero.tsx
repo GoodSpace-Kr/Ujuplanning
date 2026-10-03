@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { STUDIO_FRAMES, studioGeometry, studioTimeline } from '@/lib/studio-journey';
+import { STUDIO_FRAMES, STUDIO_EXIT_DURATION, STUDIO_EXIT_START, studioExitProgress, shouldStartStudioExit, studioGeometry, studioTimeline } from '@/lib/studio-journey';
 import { createStudioFrames } from '@/lib/studio-frames';
 import './studio-hero.css';
 
@@ -34,6 +34,8 @@ export function StudioHero() {
     let raf = 0, lastTime = 0, progress = 0, viewWidth = 1, viewHeight = 1;
     let currentProject = 0, projectsVisible = false;
     let paintedFrame = -1, paintedZoom = -1, paintedImage: unknown;
+    let autoExit = false, exitElapsed = 0, previousScroll = 0;
+    let expectedScrollY: number | null = null, touchY = 0;
     const frames = createStudioFrames(schedule, () => { if (!disposed && !ready) setStatus('failed'); });
 
     function measure() {
@@ -42,13 +44,71 @@ export function StudioHero() {
     function schedule() {
       if (!disposed && active && !document.hidden && !raf) raf = requestAnimationFrame(render);
     }
+    function cancelExit() {
+      autoExit = false;
+      expectedScrollY = null;
+      previousScroll = measure();
+      section!.dataset.autoExit = 'cancelled';
+      schedule();
+    }
+    function scrollToProgress(value: number) {
+      const top = window.scrollY + section!.getBoundingClientRect().top;
+      expectedScrollY = top + value * Math.max(1, section!.offsetHeight - stage!.clientHeight);
+      window.scrollTo({ top: expectedScrollY, behavior: 'instant' });
+      previousScroll = value;
+    }
+    function onScroll() {
+      const next = measure();
+      if (autoExit) {
+        // Respect scrollbar dragging, anchor navigation and other direct jumps.
+        if (expectedScrollY !== null && Math.abs(window.scrollY - expectedScrollY) > 3) cancelExit();
+      } else if (shouldStartStudioExit(previousScroll, next, motion.matches)) {
+        autoExit = true;
+        exitElapsed = 0;
+        lastTime = 0;
+        progress = STUDIO_EXIT_START;
+        section!.dataset.autoExit = 'running';
+        scrollToProgress(progress);
+      }
+      previousScroll = next;
+      schedule();
+    }
+    function onWheel(event: WheelEvent) {
+      if (!autoExit || event.ctrlKey) return;
+      if (event.deltaY < 0) cancelExit();
+      else if (event.deltaY > 0 && event.cancelable) event.preventDefault();
+    }
+    function onTouchStart(event: TouchEvent) { touchY = event.touches[0]?.clientY ?? 0; }
+    function onTouchMove(event: TouchEvent) {
+      const nextY = event.touches[0]?.clientY ?? touchY;
+      const delta = touchY - nextY;
+      touchY = nextY;
+      if (!autoExit || event.touches.length !== 1) return;
+      if (delta < -2) cancelExit();
+      else if (delta > 0 && event.cancelable) event.preventDefault();
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (!autoExit || event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (['Escape', 'ArrowUp', 'PageUp', 'Home', 'Tab'].includes(event.key) || event.key === ' ' && event.shiftKey) cancelExit();
+      else if (['ArrowDown', 'PageDown', ' ', 'End'].includes(event.key)) event.preventDefault();
+    }
+    function onMotionChange() { if (autoExit) cancelExit(); schedule(); }
     function render(time: number) {
       raf = 0;
       if (disposed || !active || document.hidden) return;
-      const target = measure();
+      let target = measure();
       const dt = lastTime ? Math.min(50, time - lastTime) : 16;
       lastTime = time;
-      progress = motion.matches ? target : progress + (target - progress) * (1 - Math.exp(-dt / 75));
+      if (autoExit) {
+        exitElapsed = Math.min(STUDIO_EXIT_DURATION, exitElapsed + dt);
+        progress = target = studioExitProgress(exitElapsed);
+        scrollToProgress(progress);
+        if (exitElapsed === STUDIO_EXIT_DURATION) {
+          autoExit = false;
+          expectedScrollY = null;
+          section!.dataset.autoExit = 'complete';
+        }
+      } else progress = motion.matches ? target : progress + (target - progress) * (1 - Math.exp(-dt / 75));
       if (Math.abs(progress - target) < .00003) progress = target;
       const state = studioTimeline(progress, motion.matches);
       frames.request(state.frame, true);
@@ -82,7 +142,7 @@ export function StudioHero() {
       section!.dataset.decoded = String(frames.stats().decoded);
       if (currentProject !== state.projectIndex) { currentProject = state.projectIndex; setActiveProject(currentProject); }
       if (projectsVisible !== (projectOpacity > .5)) { projectsVisible = projectOpacity > .5; setShowProjects(projectsVisible); }
-      if (target !== progress) schedule();
+      if (autoExit || target !== progress) schedule();
     }
     function resize() {
       viewWidth = stage!.clientWidth || 1;
@@ -91,6 +151,7 @@ export function StudioHero() {
       canvas!.width = Math.round(viewWidth * ratio);
       canvas!.height = Math.round(viewHeight * ratio);
       paintedFrame = -1;
+      if (autoExit) scrollToProgress(progress);
       schedule();
     }
     function visibility() {
@@ -105,18 +166,26 @@ export function StudioHero() {
     observer.observe(section);
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(stage);
-    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('keydown', onKeyDown);
     document.addEventListener('visibilitychange', visibility);
-    motion.addEventListener('change', schedule);
-    progress = measure();
+    motion.addEventListener('change', onMotionChange);
+    progress = previousScroll = measure();
     resize();
     return () => {
       disposed = true;
       cancelAnimationFrame(raf);
       observer.disconnect(); resizeObserver.disconnect(); frames.destroy();
-      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('visibilitychange', visibility);
-      motion.removeEventListener('change', schedule);
+      motion.removeEventListener('change', onMotionChange);
     };
   }, []);
 

@@ -9,6 +9,21 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n));
 const range = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
 const smooth = (p: number) => p * p * (3 - 2 * p);
 
+export const STUDIO_EXIT_START = .665;
+export const STUDIO_EXIT_END = .985;
+export const STUDIO_EXIT_DURATION = 8000;
+
+// Only a downward crossing from the last project starts autoplay. Deep links,
+// scroll restoration and jumps past the hero remain ordinary page navigation.
+export function shouldStartStudioExit(previous: number, next: number, reduced = false) {
+  return !reduced && previous >= .6 && previous < STUDIO_EXIT_START &&
+    next >= STUDIO_EXIT_START && next < .82;
+}
+
+export function studioExitProgress(elapsed: number) {
+  return STUDIO_EXIT_START + (STUDIO_EXIT_END - STUDIO_EXIT_START) * clamp(elapsed / STUDIO_EXIT_DURATION);
+}
+
 export function studioTimeline(progress: number, reduced = false) {
   const p = clamp(progress);
   const forward = range(p, .02, .26);

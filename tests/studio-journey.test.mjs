@@ -6,7 +6,33 @@ import ts from 'typescript';
 const source = readFileSync(new URL('../lib/studio-journey.ts', import.meta.url), 'utf8')
   .replace("'./hero-transition'", JSON.stringify(new URL('../lib/hero-transition.ts', import.meta.url).href));
 const js = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
-const { studioTimeline, studioGeometry, STUDIO_FRAMES, STUDIO_SCREEN } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
+const { studioTimeline, studioGeometry, STUDIO_FRAMES, STUDIO_SCREEN, shouldStartStudioExit, studioExitProgress, STUDIO_EXIT_DURATION } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
+
+test('automatic exit starts only on downward entry after the final project', () => {
+  assert.equal(shouldStartStudioExit(.66, .67), true);
+  for (const [from, to] of [[.5,.55], [.66,.664], [.67,.66], [.7,.72], [0,.99], [.64,1]]) {
+    assert.equal(shouldStartStudioExit(from,to), false);
+  }
+  assert.equal(shouldStartStudioExit(.66,.67,true), false);
+});
+
+test('one trigger covers contraction and the full rewind without more scrolling', () => {
+  const first = studioTimeline(studioExitProgress(0));
+  assert.equal(first.zoom, 1);
+  assert.equal(first.frame, 240);
+  let lastProgress = 0, lastZoom = 1, lastFrame = 240;
+  for (let ms=0; ms<=STUDIO_EXIT_DURATION; ms+=16) {
+    const p = studioExitProgress(ms);
+    const t = studioTimeline(p);
+    assert.ok(p >= lastProgress && t.zoom <= lastZoom && t.frame <= lastFrame);
+    lastProgress=p; lastZoom=t.zoom; lastFrame=t.frame;
+  }
+  const end = studioTimeline(studioExitProgress(STUDIO_EXIT_DURATION));
+  assert.equal(end.frame, 0);
+  assert.equal(end.zoom, 0);
+  assert.equal(end.returnCopy, 1);
+  assert.equal(studioExitProgress(STUDIO_EXIT_DURATION * 2), studioExitProgress(STUDIO_EXIT_DURATION));
+});
 
 test('video completes before expansion, stays at the last frame through the gallery, then rewinds', () => {
   let previous = 0;
