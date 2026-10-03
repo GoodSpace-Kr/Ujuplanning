@@ -59,6 +59,21 @@ test('one trigger covers contraction and the full rewind without more scrolling'
   assert.equal(studioExitProgress(STUDIO_EXIT_DURATION, .8), .985);
 });
 
+test('completed exit releases wheel scrolling despite browser pixel rounding', () => {
+  // Wheel events probe 0.00001 ahead; a rounded endpoint used to restart
+  // autoplay on every event and prevent scrolling into the next section.
+  for (const viewportHeight of [667, 753, 754, 844, 900, 1080]) {
+    const distance = viewportHeight * 14;
+    for (const dpr of [1, 1.25, 2]) {
+      const rounded = Math.floor(.985 * distance * dpr) / dpr / distance;
+      assert.equal(shouldStartStudioExit(rounded, rounded + .00001, false, true), false);
+      assert.equal(shouldStartStudioExit(rounded, rounded + .001, false, true), false);
+    }
+  }
+  // A fresh traversal may start again after the component rearms in projects.
+  assert.equal(shouldStartStudioExit(.65, .67, false, false), true);
+});
+
 test('video completes before expansion, stays at the last frame through the gallery, then rewinds', () => {
   let previous = 0;
   for (let i = 0; i <= 260; i++) {

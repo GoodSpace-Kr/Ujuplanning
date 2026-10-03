@@ -36,7 +36,7 @@ export function StudioHero() {
     let currentProject = 0, projectsVisible = false;
     let paintedFrame = -1, paintedZoom = -1, paintedImage: unknown;
     let autoMode: 'entry' | 'exit' | null = null;
-    let autoElapsed = 0, previousScroll = 0, entryComplete = false;
+    let autoElapsed = 0, previousScroll = 0, entryComplete = false, exitComplete = false;
     let autoFrom = 0, touchY = 0, reverseIntent = 0;
     const frames = createStudioFrames(schedule, () => { if (!disposed && !ready) setStatus('failed'); });
 
@@ -79,10 +79,13 @@ export function StudioHero() {
         return;
       }
       if (next < STUDIO_ENTRY_START - .01) entryComplete = false;
+      // Rearm only after returning to the projects, never from subpixel
+      // rounding at the exit endpoint or a subsequent viewport resize.
+      if (next < STUDIO_EXIT_START - .01) exitComplete = false;
       if (!entryComplete && shouldStartStudioEntry(previousScroll, next, motion.matches)) {
         startTransition('entry', Math.max(STUDIO_ENTRY_START, progress));
         return;
-      } else if (shouldStartStudioExit(previousScroll, next, motion.matches)) {
+      } else if (shouldStartStudioExit(previousScroll, next, motion.matches, exitComplete)) {
         startTransition('exit', Math.max(STUDIO_EXIT_START, progress));
         return;
       }
@@ -94,7 +97,7 @@ export function StudioHero() {
       const position = measure();
       if (!autoMode && event.deltaY > 0) {
         if (!entryComplete && shouldStartStudioEntry(position, position + .00001, motion.matches)) startTransition('entry', position);
-        else if (shouldStartStudioExit(position, position + .00001, motion.matches)) startTransition('exit', position);
+        else if (shouldStartStudioExit(position, position + .00001, motion.matches, exitComplete)) startTransition('exit', position);
       }
       if (!autoMode) return;
       reverseIntent = event.deltaY < 0 ? reverseIntent - event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewHeight : 1) : 0;
@@ -135,6 +138,7 @@ export function StudioHero() {
         scrollToProgress(progress);
         if (progress >= (autoMode === 'entry' ? STUDIO_ENTRY_END : STUDIO_EXIT_END)) {
           if (autoMode === 'entry') entryComplete = true;
+          else exitComplete = true;
           section!.dataset[autoMode === 'entry' ? 'autoEntry' : 'autoExit'] = 'complete';
           autoMode = null;
         }
@@ -207,6 +211,7 @@ export function StudioHero() {
     motion.addEventListener('change', onMotionChange);
     progress = previousScroll = measure();
     entryComplete = progress >= STUDIO_ENTRY_END;
+    exitComplete = progress >= STUDIO_EXIT_END - .001;
     resize();
     return () => {
       disposed = true;

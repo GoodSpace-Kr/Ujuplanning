@@ -28,8 +28,8 @@ export function studioEntryProgress(elapsed: number, from = STUDIO_ENTRY_START) 
 
 // Continue even if a gesture skips the exact boundary or starts inside the exit.
 // Jumps from the beginning or past the hero remain ordinary page navigation.
-export function shouldStartStudioExit(previous: number, next: number, reduced = false) {
-  return !reduced && previous >= .4 && previous < STUDIO_EXIT_END &&
+export function shouldStartStudioExit(previous: number, next: number, reduced = false, completed = false) {
+  return !completed && !reduced && previous >= .4 && previous < STUDIO_EXIT_END &&
     next > previous && next >= STUDIO_EXIT_START && next < STUDIO_EXIT_END;
 }
 
