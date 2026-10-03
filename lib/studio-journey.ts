@@ -11,7 +11,7 @@ const smooth = (p: number) => p * p * (3 - 2 * p);
 
 export const STUDIO_EXIT_START = .665;
 export const STUDIO_EXIT_END = .985;
-export const STUDIO_EXIT_DURATION = 8000;
+export const STUDIO_EXIT_DURATION = 2000;
 
 // Continue even if a gesture skips the exact boundary or starts inside the exit.
 // Jumps from the beginning or past the hero remain ordinary page navigation.
