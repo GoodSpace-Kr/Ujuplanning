@@ -31,10 +31,11 @@ export function BrandProcess() {
       const exchange = index === 3 ? 0 : Math.max(0, Math.min(1, (position - index - .48) / .52));
       const travel = index + exchange;
       const active = Math.min(3, Math.round(travel));
+      const textTravel = section.querySelector<HTMLElement>('.brand-process-copy-window')!.clientHeight * .9;
       section.dataset.activeStep = steps[active].word.toLowerCase();
       copies.forEach((copy, i) => {
         const distance = i - travel;
-        copy.style.setProperty('--copy-y', `${distance * viewport * .62}px`);
+        copy.style.setProperty('--copy-y', `${distance * textTravel}px`);
         copy.style.setProperty('--copy-opacity', String(Math.max(0, 1 - Math.abs(distance) * 1.25)));
         // The static reduced-motion layout exposes all four descriptions.
         copy.setAttribute('aria-hidden', String(!motion.matches && i !== active));
