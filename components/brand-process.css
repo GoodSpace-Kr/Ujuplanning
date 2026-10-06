@@ -24,6 +24,10 @@
 .brand-process-card-2 .brand-process-placeholder { background: linear-gradient(145deg, #e8f5f0, #acd6d3); }
 .brand-process-card-3 .brand-process-placeholder { background: linear-gradient(145deg, #f9ece2, #c5c9e8); }
 .brand-process-placeholder > span { color: #fff9; font-size: clamp(32px, 5vw, 76px); font-weight: 500; letter-spacing: -.06em; }
+.brand-process-image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.brand-process-card-0 .brand-process-image { object-position: 68% 50%; }
+.brand-process-card-1 .brand-process-image { object-position: 50% 67%; }
+.brand-process-card-2 .brand-process-image { object-position: 50% 70%; }
 .brand-process-card-caption { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 13px 6px 7px; font-size: clamp(8px, .75vw, 12px); color: #718095; letter-spacing: .04em; }
 .brand-process-card-caption span:last-child { color: #9ba3ae; letter-spacing: -.02em; }
 .brand-process-hint { position: absolute; left: 8%; bottom: 8%; display: flex; gap: 20px; align-items: center; color: #a0a9b6; font-size: 9px; letter-spacing: .14em; }
@@ -114,7 +118,6 @@
   .brand-process[data-phase="intro"] .brand-process-card-2 { left: 51%; top: 44%; }
   .brand-process[data-phase="intro"] .brand-process-card-3 { left: 73.5%; top: 40%; }
   .brand-process[data-phase="intro"] .brand-process-card-caption { justify-content: center; font-size: 7px; }
-  .brand-process[data-phase="intro"] .brand-process-card-caption span:last-child { display: none; }
 }
 @media(prefers-reduced-motion: reduce) {
   .brand-process { height: auto; padding: 80px 8%; }

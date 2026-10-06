@@ -106,9 +106,11 @@ export function BrandProcess() {
             <div key={step.word} className={`brand-process-card brand-process-card-${i}${i === 0 ? ' is-active' : ''}`}>
               <div className="brand-process-card-float">
                 <div className="brand-process-placeholder">
-                  {i === 3 ? <TelescopeStudy embedded /> : <span>0{i + 1}</span>}
+                  {i === 3 ? <TelescopeStudy embedded /> : (
+                    <img className="brand-process-image" src={`/assets/brand-process/${step.word.toLowerCase()}.webp`} alt="" loading="lazy" decoding="async" />
+                  )}
                 </div>
-                <div className="brand-process-card-caption" aria-hidden="true"><span>{step.word}</span><span>{step.title}</span></div>
+                <div className="brand-process-card-caption" aria-hidden="true"><span>{step.title}</span></div>
               </div>
             </div>
           ))}
