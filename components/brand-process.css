@@ -1,6 +1,5 @@
 .brand-process { position: relative; --process-reading: 465; --process-film: 360; --process-delay: 0; --expand-progress: 0; height: calc((var(--process-reading) + var(--process-delay) + 200 + var(--process-film)) * 1svh); background: #f6f7f9; }
 .brand-process-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
-.brand-process-label { position: absolute; top: 10%; left: 8%; color: #818a97; font-size: clamp(12px, .96vw, 17px); letter-spacing: -.02em; }
 .brand-process-copy-window { position: absolute; inset: 21% auto 15% 8%; width: 31%; overflow: hidden; mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
 .brand-process-copy { position: absolute; top: 50%; left: 0; width: 100%; transform: translate3d(0, calc(-50% + var(--copy-y, 0px)), 0); opacity: var(--copy-opacity, 0); will-change: transform, opacity; }
 .brand-process-copy:first-child { --copy-opacity: 1; }
@@ -33,8 +32,8 @@
 .brand-process-hint { position: absolute; left: 8%; bottom: 8%; display: flex; gap: 20px; align-items: center; color: #a0a9b6; font-size: 9px; letter-spacing: .14em; }
 .brand-process-hint span { font-size: 18px; }
 @keyframes brand-process-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
-.brand-process-intro { position: absolute; top: 8%; left: 8%; width: 84%; z-index: 3; transition: opacity .4s ease, transform .6s ease; }
-.brand-process-intro h2 { color: #202329; font-size: clamp(32px, 3.7vw, 64px); font-weight: 600; line-height: 1.35; letter-spacing: -.045em; }
+.brand-process-intro { position: absolute; top: 8%; left: 8%; width: 84%; z-index: 3; transition: top 1.15s cubic-bezier(.22,.75,.2,1); }
+.brand-process-intro h2 { color: #202329; font-size: clamp(32px, 3.7vw, 64px); font-weight: 600; line-height: 1.35; letter-spacing: -.045em; transform-origin: top left; transition: transform 1.15s cubic-bezier(.22,.75,.2,1); }
 .brand-process-intro h2 span {
   color: #245ec4;
   background: linear-gradient(180deg, #1c2d49 0%, #1f3e73 42%, #2565d5 100%);
@@ -42,11 +41,12 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.brand-process-intro p { margin-top: 24px; color: #808b9b; font-size: clamp(13px, 1.12vw, 20px); line-height: 1.85; letter-spacing: -.025em; word-break: keep-all; }
-.brand-process:not([data-phase="intro"]) .brand-process-intro { opacity: 0; transform: translateY(-30px); pointer-events: none; }
-.brand-process-copy-window, .brand-process-label { transition: opacity .4s ease; }
-.brand-process:not([data-phase="steps"]) .brand-process-copy-window,
-.brand-process:not([data-phase="steps"]) .brand-process-label { opacity: 0; pointer-events: none; }
+.brand-process-intro p { margin-top: 24px; color: #808b9b; font-size: clamp(13px, 1.12vw, 20px); line-height: 1.85; letter-spacing: -.025em; word-break: keep-all; transition: opacity .4s ease; }
+.brand-process:not([data-phase="intro"]) .brand-process-intro { top: 10%; pointer-events: none; }
+.brand-process:not([data-phase="intro"]) .brand-process-intro h2 { transform: scale(.45); }
+.brand-process:not([data-phase="intro"]) .brand-process-intro p { opacity: 0; }
+.brand-process-copy-window { transition: opacity .4s ease; }
+.brand-process:not([data-phase="steps"]) .brand-process-copy-window { opacity: 0; pointer-events: none; }
 /* One persistent set of cards moves from the stepped introduction to the gallery. */
 .brand-process-gallery { inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .brand-process-card { width: 21.15%; height: min(32svh, calc(12.8vw + 48px)); transition: left 1.15s cubic-bezier(.22,.75,.2,1), top 1.15s cubic-bezier(.22,.75,.2,1), width 1.15s cubic-bezier(.22,.75,.2,1), height 1.15s cubic-bezier(.22,.75,.2,1), filter .45s, opacity .45s, transform .55s; }
@@ -84,7 +84,7 @@
   border-radius: calc(11px * (1 - var(--expand-progress)));
 }
 .brand-process[data-expanding] .brand-process-card-caption,
-.brand-process[data-expanding] .brand-process-label,
+.brand-process[data-expanding] .brand-process-intro,
 .brand-process[data-expanding] .brand-process-hint,
 .brand-process[data-expanding] .brand-process-card:not(.brand-process-card-3) { opacity: max(0, calc(1 - var(--expand-progress) * 4)); pointer-events: none; }
 .telescope-study.telescope-study-embedded { position: absolute; inset: 0; height: 100%; width: 100%; }
@@ -92,7 +92,6 @@
 .brand-process:not([data-film]) .telescope-study-scroll { visibility: hidden; }
 @media(max-width: 700px) {
   .brand-process { --process-reading: 425; --process-film: 300; }
-  .brand-process-label { top: 5%; left: 7%; }
   .brand-process-card { width: 34.4%; height: min(18svh, 150px); }
   .brand-process-card-0 { left: 9%; top: 13%; }
   .brand-process-card-1 { left: 56.6%; top: 15%; }
@@ -110,6 +109,8 @@
   .brand-process-hint { display: none; }
   .brand-process-intro { left: 7%; top: 8%; width: 86%; }
   .brand-process-intro h2 { font-size: clamp(27px, 6.6vw, 40px); }
+  .brand-process:not([data-phase="intro"]) .brand-process-intro { top: 5%; }
+  .brand-process:not([data-phase="intro"]) .brand-process-intro h2 { transform: scale(.6); }
   .brand-process-intro p { margin-top: 20px; font-size: 14px; }
   .brand-process-intro p br { display: none; }
   .brand-process[data-phase="intro"] .brand-process-card { width: 20%; height: 32svh; }
@@ -122,12 +123,11 @@
 @media(prefers-reduced-motion: reduce) {
   .brand-process { height: auto; padding: 80px 8%; }
   .brand-process-sticky { position: relative; height: auto; overflow: visible; }
-  .brand-process-label { position: static; margin-bottom: 50px; }
   .brand-process-copy-window { position: static; width: 100%; mask-image: none; overflow: visible; }
   .brand-process-copy { position: static; opacity: 1; transform: none; margin-bottom: 65px; }
   .brand-process-gallery, .brand-process-hint { display: none; }
   .brand-process-intro { position: static; width: 100%; margin-bottom: 60px; opacity: 1 !important; transform: none !important; }
-  .brand-process-copy-window, .brand-process-label { opacity: 1 !important; transition: none; }
+  .brand-process-copy-window { opacity: 1 !important; transition: none; }
   .brand-process-gallery { display: block; position: relative; inset: auto; width: 100%; height: 220svh; }
   .brand-process-card:not(.brand-process-card-3), .brand-process-sequence-anchor { display: none; }
   .brand-process .brand-process-gallery .brand-process-card-3 { position: sticky; top: 0; left: 0; width: 100%; height: 100svh; opacity: 1; filter: none; transform: none; transition: none; }
@@ -135,6 +135,8 @@
   .brand-process .brand-process-card-3 .brand-process-placeholder { height: 100%; }
   .brand-process-card-3 .brand-process-card-caption { display: none; }
   .brand-process .telescope-study-scroll { visibility: visible; }
+  .brand-process .brand-process-intro h2 { transform: none !important; transition: none; }
+  .brand-process .brand-process-intro p { opacity: 1 !important; transition: none; }
 }
 
 /* Reveal immediately at the freshly measured scroll origin after rearrangement. */

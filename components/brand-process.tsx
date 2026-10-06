@@ -25,7 +25,7 @@ export function BrandProcess() {
     let raf = 0;
     let phase: 'intro' | 'moving' | 'steps' = 'intro';
     let transitionTimer: ReturnType<typeof setTimeout> | undefined;
-    const intro = section.querySelector<HTMLElement>('.brand-process-intro')!;
+    const introDescription = section.querySelector<HTMLElement>('.brand-process-intro p')!;
     const rebaseReading = () => {
       const viewport = section.querySelector<HTMLElement>('.brand-process-sticky')!.clientHeight;
       section.style.setProperty('--process-delay', String(brandProcessReadingDelay(-section.getBoundingClientRect().top, viewport)));
@@ -33,7 +33,7 @@ export function BrandProcess() {
     const setPhase = (next: typeof phase) => {
       phase = next;
       section.dataset.phase = next;
-      intro.setAttribute('aria-hidden', String(next !== 'intro' && !motion.matches));
+      introDescription.setAttribute('aria-hidden', String(next !== 'intro' && !motion.matches));
     };
     const update = () => {
       raf = 0;
@@ -107,7 +107,6 @@ export function BrandProcess() {
           <p>브랜드와 시장을 관찰하고, 아직 발견하지 못한 가능성을 찾습니다.<br />
             전략과 실행을 연결해, 브랜드가 더 넓은 세계로 나아가도록 돕습니다.</p>
         </header>
-        <p className="brand-process-label">우주기획이 일하는 방식</p>
         <div className="brand-process-copy-window">
           {steps.map((step, i) => (
             <article key={step.word} className="brand-process-copy">
