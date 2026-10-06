@@ -2,6 +2,11 @@ const clamp = (value: number) => Math.max(0, Math.min(1, value));
 
 export const BRAND_EXPANSION_DURATION = 900;
 
+// Include the first copy's entrance from below, not just its exit above.
+export function brandProcessCopyTravel(reading: number) {
+  return clamp(reading) * 4.65 - .65;
+}
+
 export function shouldStartBrandExpansion(previous: number, next: number, reduced: boolean, completed: boolean) {
   return !reduced && !completed && next > previous && next >= 0 && next < 1;
 }
@@ -17,7 +22,7 @@ export function brandProcessJourney(offset: number, viewport: number, readingVh 
   // Fractional svh anchor positions may land a fraction of a pixel short.
   const expansion = rawExpansion > .999 ? 1 : rawExpansion;
   return {
-    reading: clamp((position - 85) / (readingVh - 85)),
+    reading: clamp((position - 22) / (readingVh - 22)),
     expansion: expansion * expansion * (3 - 2 * expansion),
     film: clamp((position - readingVh - 100) / filmVh),
   };

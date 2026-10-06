@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { measureBrandProcess } from '@/lib/brand-process-journey';
+import { brandProcessCopyTravel, measureBrandProcess } from '@/lib/brand-process-journey';
 import { mountProcessExpansion } from '@/lib/process-expansion';
 import { TelescopeStudy } from './telescope-study';
 import './brand-process.css';
@@ -50,8 +50,8 @@ export function BrandProcess() {
       section.toggleAttribute('data-film', journey.expansion >= 1);
       section.querySelector('.brand-process-gallery')!.setAttribute('aria-hidden', String(!motion.matches && journey.expansion < 1));
       // Continuous travel through all four steps, including the final copy's exit.
-      const travel = progress * steps.length;
-      const active = Math.min(3, Math.round(travel));
+      const travel = brandProcessCopyTravel(progress);
+      const active = Math.max(0, Math.min(3, Math.round(travel)));
       const textTravel = section.querySelector<HTMLElement>('.brand-process-copy-window')!.clientHeight * .9;
       section.dataset.activeStep = steps[active].word.toLowerCase();
       copies.forEach((copy, i) => {

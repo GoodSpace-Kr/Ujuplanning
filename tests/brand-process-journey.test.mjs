@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { brandProcessJourney, brandExpansionClock, shouldStartBrandExpansion, BRAND_EXPANSION_DURATION } from '../lib/brand-process-journey.ts';
+import { brandProcessJourney, brandProcessCopyTravel, brandExpansionClock, shouldStartBrandExpansion, BRAND_EXPANSION_DURATION } from '../lib/brand-process-journey.ts';
 
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9);
 
@@ -29,7 +29,7 @@ test('reading finishes before the card expands, and film stays at its first fram
   for (const [reading, film] of [[465, 360], [425, 300]]) {
     for (const height of [720, 844]) {
       const at = vh => brandProcessJourney(vh / 100 * height, height, reading, film);
-      close(at(85).reading, 0);
+      close(at(22).reading, 0);
       close(at(reading).reading, 1);
       close(at(reading).expansion, 0);
       for (let i = 0; i <= 100; i++) close(at(reading + i).film, 0);
@@ -37,6 +37,17 @@ test('reading finishes before the card expands, and film stays at its first fram
       close(at(reading + 100).expansion, 1);
       close(at(reading + 100 + film).film, 1);
     }
+  }
+});
+
+test('observe enters from below before crossing the center, without pausing subsequent copy travel', () => {
+  for (const readingEnd of [465, 425]) {
+    const travelAt = vh => brandProcessCopyTravel(brandProcessJourney(vh * 7.2, 720, readingEnd).reading);
+    close(travelAt(22), -.65);
+    assert.ok(travelAt(45) < -.35);
+    assert.ok(travelAt(100) > 0);
+    close(travelAt(readingEnd), 4);
+    for (let vh = 23; vh < readingEnd; vh++) assert.ok(travelAt(vh) > travelAt(vh - 1));
   }
 });
 
