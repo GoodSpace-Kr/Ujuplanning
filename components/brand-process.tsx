@@ -110,7 +110,7 @@ export function BrandProcess() {
                     <img className="brand-process-image" src={`/assets/brand-process/${step.word.toLowerCase()}.webp`} alt="" loading="lazy" decoding="async" />
                   )}
                 </div>
-                <div className="brand-process-card-caption" aria-hidden="true"><span>{step.title}</span></div>
+                <div className="brand-process-card-caption" aria-hidden="true"><span>{step.word}</span></div>
               </div>
             </div>
           ))}
