@@ -246,7 +246,7 @@ export function StudioHero() {
         <h1 className="studio-headline">
           <span>전략부터 실행까지</span>{' '}
           <span>우주기획으로</span>{' '}
-          <span>연결하다.</span>
+          <span>연결하다</span>
         </h1>
         <div ref={projectsRef} className="studio-projects" aria-hidden={!showProjects}>
           <div className="studio-project-top"><span>UJU PLANNING</span><span>SELECTED PROJECTS</span></div>

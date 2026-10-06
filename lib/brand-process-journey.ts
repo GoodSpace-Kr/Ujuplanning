@@ -1,6 +1,6 @@
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 
-export const BRAND_EXPANSION_DURATION = 1200;
+export const BRAND_EXPANSION_DURATION = 900;
 
 export function shouldStartBrandExpansion(previous: number, next: number, reduced: boolean, completed: boolean) {
   return !reduced && !completed && next > previous && next >= 0 && next < 1;
