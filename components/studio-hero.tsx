@@ -242,7 +242,12 @@ export function StudioHero() {
           <img src="/assets/studio-sequence/desktop/0000.webp" width="1920" height="1080" alt="" fetchPriority="high" />
         </picture>
         <canvas ref={canvasRef} className="studio-canvas" aria-label="촬영·기획 현장에서 책상 위 휴대폰으로 다가간 뒤, 프로젝트 소개를 마치고 다시 현장으로 돌아오는 장면" role="img" />
-        <h1 className="sr-only">우주기획</h1>
+        <div className="studio-headline-shade" aria-hidden="true" />
+        <h1 className="studio-headline">
+          <span>전략부터 실행까지</span>{' '}
+          <span>우주기획으로</span>{' '}
+          <span>연결하다.</span>
+        </h1>
         <div ref={projectsRef} className="studio-projects" aria-hidden={!showProjects}>
           <div className="studio-project-top"><span>UJU PLANNING</span><span>SELECTED PROJECTS</span></div>
           {projects.map((project, index) => (
