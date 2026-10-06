@@ -1,8 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { brandProcessJourney, brandProcessCopyTravel, brandExpansionClock, shouldStartBrandExpansion, BRAND_EXPANSION_DURATION } from '../lib/brand-process-journey.ts';
+import { brandProcessJourney, brandProcessReadingDelay, brandProcessCopyTravel, brandExpansionClock, shouldStartBrandExpansion, BRAND_EXPANSION_DURATION } from '../lib/brand-process-journey.ts';
 
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9);
+
+test('scroll consumed during rearrangement never advances observe and shifts expansion by the same amount', () => {
+  for (const [height, reading, film] of [[720, 465, 360], [844, 425, 300]]) {
+    for (const offsetVh of [22, 70, 150, 300]) {
+      const offset = offsetVh / 100 * height;
+      const delay = brandProcessReadingDelay(offset, height);
+      const at = vh => brandProcessJourney(vh / 100 * height, height, reading, film, delay);
+      close(brandProcessCopyTravel(at(offsetVh).reading), -.65);
+      close(at(offsetVh).expansion, 0);
+      close(at(reading + delay).reading, 1);
+      close(at(reading + delay).expansion, 0);
+      close(at(reading + delay + 100).expansion, 1);
+      close(at(reading + delay + 100 + film).film, 1);
+      assert.ok(at(offsetVh + 30).reading > 0);
+      close(at(offsetVh - 10).reading, 0);
+    }
+  }
+});
 
 test('automatic expansion starts only on forward entry and does not trap scrolling after completion', () => {
   assert.equal(shouldStartBrandExpansion(-.01, .02, false, false), true);

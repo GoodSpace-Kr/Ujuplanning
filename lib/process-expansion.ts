@@ -11,7 +11,9 @@ export function mountProcessExpansion(section: HTMLElement) {
 
   function geometry() {
     const viewport = sticky.clientHeight;
-    const reading = parseFloat(getComputedStyle(section).getPropertyValue('--process-reading')) || 465;
+    const style = getComputedStyle(section);
+    const reading = (parseFloat(style.getPropertyValue('--process-reading')) || 465)
+      + (parseFloat(style.getPropertyValue('--process-delay')) || 0);
     const top = section.getBoundingClientRect().top;
     return { viewport, origin: window.scrollY + top, reading, position: (-top / Math.max(1, viewport) * 100 - reading) / 100 };
   }
@@ -44,7 +46,7 @@ export function mountProcessExpansion(section: HTMLElement) {
   }
 
   function start(position: number) {
-    if (running || isAutomaticScrollActive()) return;
+    if (running || isAutomaticScrollActive() || section.dataset.phase !== 'steps') return;
     running = true;
     from = Math.max(0, Math.min(1, position));
     elapsed = lastTime = reverseIntent = 0;

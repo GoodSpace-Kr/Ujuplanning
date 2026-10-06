@@ -1,4 +1,4 @@
-.brand-process { position: relative; --process-reading: 465; --process-film: 360; --expand-progress: 0; height: calc((var(--process-reading) + 200 + var(--process-film)) * 1svh); background: #f6f7f9; }
+.brand-process { position: relative; --process-reading: 465; --process-film: 360; --process-delay: 0; --expand-progress: 0; height: calc((var(--process-reading) + var(--process-delay) + 200 + var(--process-film)) * 1svh); background: #f6f7f9; }
 .brand-process-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .brand-process-label { position: absolute; top: 10%; left: 8%; color: #818a97; font-size: clamp(12px, .96vw, 17px); letter-spacing: -.02em; }
 .brand-process-copy-window { position: absolute; inset: 21% auto 15% 8%; width: 31%; overflow: hidden; mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
@@ -63,7 +63,7 @@
 .brand-process[data-phase="intro"] .brand-process-card-3 { left: 72.5%; top: 29%; }
 .brand-process:not([data-phase="steps"]) .brand-process-card-float { animation-play-state: paused; }
 .brand-process[data-phase="intro"] .brand-process-hint { opacity: 0; }
-.brand-process-sequence-anchor { position: absolute; top: calc((var(--process-reading) + 100) * 1svh); left: 0; width: 1px; height: 1px; pointer-events: none; }
+.brand-process-sequence-anchor { position: absolute; top: calc((var(--process-reading) + var(--process-delay) + 100) * 1svh); left: 0; width: 1px; height: 1px; pointer-events: none; }
 .brand-process-card-3 { --expand-left: 70.8%; --expand-top: 57%; --expand-width: 21.15%; --expand-height: min(32svh, calc(12.8vw + 48px)); --card-padding: 8px; --caption-height: 38px; }
 .brand-process-card-3 .brand-process-card-float { animation: none; }
 .brand-process[data-expanding] .brand-process-card-3 {
@@ -136,3 +136,6 @@
   .brand-process-card-3 .brand-process-card-caption { display: none; }
   .brand-process .telescope-study-scroll { visibility: visible; }
 }
+
+/* Reveal immediately at the freshly measured scroll origin after rearrangement. */
+.brand-process[data-phase="steps"] .brand-process-copy-window { transition: none; }

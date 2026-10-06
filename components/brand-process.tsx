@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { brandProcessCopyTravel, measureBrandProcess } from '@/lib/brand-process-journey';
+import { brandProcessCopyTravel, brandProcessReadingDelay, measureBrandProcess } from '@/lib/brand-process-journey';
 import { mountProcessExpansion } from '@/lib/process-expansion';
 import { TelescopeStudy } from './telescope-study';
 import './brand-process.css';
@@ -26,6 +26,10 @@ export function BrandProcess() {
     let phase: 'intro' | 'moving' | 'steps' = 'intro';
     let transitionTimer: ReturnType<typeof setTimeout> | undefined;
     const intro = section.querySelector<HTMLElement>('.brand-process-intro')!;
+    const rebaseReading = () => {
+      const viewport = section.querySelector<HTMLElement>('.brand-process-sticky')!.clientHeight;
+      section.style.setProperty('--process-delay', String(brandProcessReadingDelay(-section.getBoundingClientRect().top, viewport)));
+    };
     const setPhase = (next: typeof phase) => {
       phase = next;
       section.dataset.phase = next;
@@ -37,12 +41,23 @@ export function BrandProcess() {
       const offset = -section.getBoundingClientRect().top;
       if (offset < viewport * .06 && phase !== 'intro') {
         clearTimeout(transitionTimer);
+        section.style.removeProperty('--process-delay');
         setPhase('intro');
       } else if (offset >= viewport * .22 && phase === 'intro') {
-        // Trigger once; the rearrangement completes even if scrolling stops.
-        setPhase('moving');
-        transitionTimer = setTimeout(() => { setPhase('steps'); schedule(); }, motion.matches ? 0 : 1150);
+        const readingEnd = parseFloat(getComputedStyle(section).getPropertyValue('--process-reading')) || 465;
+        // Direct navigation to the film should retain its destination.
+        if (motion.matches || offset >= viewport * readingEnd / 100) setPhase('steps');
+        else {
+          setPhase('moving');
+          transitionTimer = setTimeout(() => {
+            rebaseReading();
+            setPhase('steps');
+            update();
+          }, 1150);
+        }
       }
+      // Scrolling during rearrangement must not consume the first copy's entrance.
+      if (phase === 'moving') rebaseReading();
       const journey = measureBrandProcess(section);
       const progress = journey.reading;
       section.style.setProperty('--expand-progress', String(journey.expansion));
@@ -76,6 +91,7 @@ export function BrandProcess() {
       stopExpansion();
       cancelAnimationFrame(raf);
       clearTimeout(transitionTimer);
+      section.style.removeProperty('--process-delay');
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
       motion.removeEventListener('change', schedule);
