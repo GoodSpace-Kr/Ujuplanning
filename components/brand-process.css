@@ -32,8 +32,8 @@
 .brand-process-intro { position: absolute; top: 8%; left: 8%; width: 84%; z-index: 3; transition: opacity .4s ease, transform .6s ease; }
 .brand-process-intro h2 { color: #202329; font-size: clamp(32px, 3.7vw, 64px); font-weight: 600; line-height: 1.35; letter-spacing: -.045em; }
 .brand-process-intro h2 span {
-  color: #477fd1;
-  background: linear-gradient(115deg, #285da8 0%, #477fd1 30%, #97bff0 48%, #4d89df 63%, #285da8 100%);
+  color: #245ec4;
+  background: linear-gradient(180deg, #1c2d49 0%, #1f3e73 42%, #2565d5 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
