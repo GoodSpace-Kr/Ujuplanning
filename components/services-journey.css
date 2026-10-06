@@ -31,10 +31,10 @@
   letter-spacing: -.045em;
   word-break: keep-all;
 }
-.service-journey-intro h2 span,
+.service-journey-intro h2 > span,
 .service-journey-copy h3 span { display: block; }
 
-.service-journey-intro h2 span:first-child {
+.service-journey-intro h2 .service-intro-gradient {
   color: #245ec4;
   background: linear-gradient(180deg, #1c2d49 0%, #1f3e73 42%, #2565d5 100%);
   background-clip: text;
