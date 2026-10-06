@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { STUDIO_FRAMES, STUDIO_EXIT_END, STUDIO_EXIT_START, studioExitProgress, shouldStartStudioExit, studioGeometry, studioTimeline } from '@/lib/studio-journey';
 import { STUDIO_ENTRY_START, STUDIO_ENTRY_END, shouldStartStudioEntry, studioEntryProgress } from '@/lib/studio-journey';
 import { createStudioFrames } from '@/lib/studio-frames';
+import { setAutomaticScrollActive } from '@/lib/scroll-motion';
 import './studio-hero.css';
 
 const projects = [
@@ -49,6 +50,7 @@ export function StudioHero() {
     function cancelTransition() {
       if (autoMode) section!.dataset[autoMode === 'entry' ? 'autoEntry' : 'autoExit'] = 'cancelled';
       autoMode = null;
+      setAutomaticScrollActive(false);
       previousScroll = measure();
       schedule();
     }
@@ -60,6 +62,7 @@ export function StudioHero() {
     }
     function startTransition(mode: 'entry' | 'exit', from: number) {
       autoMode = mode;
+      setAutomaticScrollActive(true);
       autoElapsed = 0;
       reverseIntent = 0;
       lastTime = 0;
@@ -141,6 +144,7 @@ export function StudioHero() {
           else exitComplete = true;
           section!.dataset[autoMode === 'entry' ? 'autoEntry' : 'autoExit'] = 'complete';
           autoMode = null;
+          setAutomaticScrollActive(false);
         }
       } else progress = motion.matches ? target : progress + (target - progress) * (1 - Math.exp(-dt / 75));
       if (Math.abs(progress - target) < .00003) progress = target;
@@ -201,7 +205,7 @@ export function StudioHero() {
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(stage);
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('wheel', onWheel, { passive: false, capture: true });
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('keydown', onKeyDown);
@@ -215,10 +219,11 @@ export function StudioHero() {
     resize();
     return () => {
       disposed = true;
+      setAutomaticScrollActive(false);
       cancelAnimationFrame(raf);
       observer.disconnect(); resizeObserver.disconnect(); frames.destroy();
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('wheel', onWheel, { capture: true });
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('keydown', onKeyDown);
