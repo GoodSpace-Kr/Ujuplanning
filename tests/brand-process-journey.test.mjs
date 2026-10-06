@@ -1,8 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { brandProcessJourney } from '../lib/brand-process-journey.ts';
+import { brandProcessJourney, brandExpansionClock, shouldStartBrandExpansion, BRAND_EXPANSION_DURATION } from '../lib/brand-process-journey.ts';
 
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9);
+
+test('automatic expansion starts only on forward entry and does not trap scrolling after completion', () => {
+  assert.equal(shouldStartBrandExpansion(-.01, .02, false, false), true);
+  assert.equal(shouldStartBrandExpansion(.2, .1, false, false), false);
+  assert.equal(shouldStartBrandExpansion(.99, 1.01, false, true), false);
+  assert.equal(shouldStartBrandExpansion(-.01, .02, true, false), false);
+  assert.equal(shouldStartBrandExpansion(-.01, 1.2, false, false), false);
+});
+
+test('one trigger completes expansion on its clock without advancing the telescope film', () => {
+  for (const from of [0, .15, .75]) {
+    close(brandExpansionClock(0, from), from);
+    close(brandExpansionClock(BRAND_EXPANSION_DURATION, from), 1);
+    close(brandExpansionClock(BRAND_EXPANSION_DURATION * 2, from), 1);
+    for (let elapsed = 0; elapsed <= BRAND_EXPANSION_DURATION; elapsed += 16) {
+      const position = brandExpansionClock(elapsed, from);
+      const state = brandProcessJourney((465 + position * 100) * 7.2, 720);
+      close(state.film, 0);
+    }
+  }
+});
 
 test('reading finishes before the card expands, and film stays at its first frame throughout expansion', () => {
   for (const [reading, film] of [[465, 360], [425, 300]]) {

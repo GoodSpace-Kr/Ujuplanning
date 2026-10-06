@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { measureBrandProcess } from '@/lib/brand-process-journey';
+import { mountProcessExpansion } from '@/lib/process-expansion';
 import { TelescopeStudy } from './telescope-study';
 import './brand-process.css';
 
@@ -67,10 +68,12 @@ export function BrandProcess() {
     };
     const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
     update();
+    const stopExpansion = mountProcessExpansion(section);
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
     motion.addEventListener('change', schedule);
     return () => {
+      stopExpansion();
       cancelAnimationFrame(raf);
       clearTimeout(transitionTimer);
       window.removeEventListener('scroll', schedule);

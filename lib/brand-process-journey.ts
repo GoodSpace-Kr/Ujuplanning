@@ -1,5 +1,16 @@
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 
+export const BRAND_EXPANSION_DURATION = 1200;
+
+export function shouldStartBrandExpansion(previous: number, next: number, reduced: boolean, completed: boolean) {
+  return !reduced && !completed && next > previous && next >= 0 && next < 1;
+}
+
+export function brandExpansionClock(elapsed: number, from = 0) {
+  const start = clamp(from);
+  return start + (1 - start) * clamp(elapsed / BRAND_EXPANSION_DURATION);
+}
+
 export function brandProcessJourney(offset: number, viewport: number, readingVh = 465, filmVh = 360) {
   const position = offset / Math.max(1, viewport) * 100;
   const rawExpansion = clamp((position - readingVh) / 100);
