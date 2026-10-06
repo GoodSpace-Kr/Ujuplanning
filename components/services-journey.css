@@ -34,6 +34,14 @@
 .service-journey-intro h2 span,
 .service-journey-copy h3 span { display: block; }
 
+.service-journey-intro h2 span:first-child {
+  color: #245ec4;
+  background: linear-gradient(180deg, #1c2d49 0%, #1f3e73 42%, #2565d5 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .service-journey-copy {
   position: absolute;
   z-index: 2;

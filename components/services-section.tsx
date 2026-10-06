@@ -127,7 +127,6 @@ export function ServicesSection() {
       ))}
       <div className="service-journey-sticky" ref={stickyRef}>
         <div className="service-journey-intro" ref={introRef}>
-          <p>우주기획</p>
           <h2 id="services-intro-heading"><span>브랜드의 빈 우주를</span><span>발견하기 위해</span></h2>
         </div>
         <nav className="service-journey-index" aria-label="서비스 바로가기">
