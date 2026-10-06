@@ -27,7 +27,7 @@
 .service-journey-intro h2 {
   font-size: clamp(38px, 3.7vw, 72px);
   line-height: 1.38;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -.045em;
   word-break: keep-all;
 }
