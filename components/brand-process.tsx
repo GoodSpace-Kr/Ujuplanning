@@ -25,11 +25,8 @@ export function BrandProcess() {
       const viewport = section.querySelector<HTMLElement>('.brand-process-sticky')!.clientHeight;
       const available = section.offsetHeight - viewport;
       const progress = Math.max(0, Math.min(1, -section.getBoundingClientRect().top / Math.max(1, available)));
-      // Each step has a reading hold followed by a scroll-driven exchange.
-      const position = progress * 4;
-      const index = Math.min(3, Math.floor(position));
-      const exchange = index === 3 ? 0 : Math.max(0, Math.min(1, (position - index - .48) / .52));
-      const travel = index + exchange;
+      // Continuous travel through all four steps, including the final copy's exit.
+      const travel = progress * steps.length;
       const active = Math.min(3, Math.round(travel));
       const textTravel = section.querySelector<HTMLElement>('.brand-process-copy-window')!.clientHeight * .9;
       section.dataset.activeStep = steps[active].word.toLowerCase();
