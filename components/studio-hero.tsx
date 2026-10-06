@@ -237,11 +237,7 @@ export function StudioHero() {
           <img src="/assets/studio-sequence/desktop/0000.webp" width="1920" height="1080" alt="" fetchPriority="high" />
         </picture>
         <canvas ref={canvasRef} className="studio-canvas" aria-label="촬영·기획 현장에서 책상 위 휴대폰으로 다가간 뒤, 프로젝트 소개를 마치고 다시 현장으로 돌아오는 장면" role="img" />
-        <header className="studio-intro">
-          <p className="studio-brand">우주기획</p>
-          <h1>당신의 브랜드에는,<br />아직 발견하지 못한<br className="studio-mobile-break" /> 우주가 있습니다.</h1>
-          <p className="studio-description">시장과 고객을 관찰해 브랜드의 가능성을 발견하고,<br />전략부터 콘텐츠, 광고까지 성장의 다음 항로를 만듭니다.</p>
-        </header>
+        <h1 className="sr-only">우주기획</h1>
         <div ref={projectsRef} className="studio-projects" aria-hidden={!showProjects}>
           <div className="studio-project-top"><span>UJU PLANNING</span><span>SELECTED PROJECTS</span></div>
           {projects.map((project, index) => (
@@ -260,9 +256,7 @@ export function StudioHero() {
           ))}
           <div className="studio-project-bottom"><span>{String(activeProject + 1).padStart(2, '0')}</span><div className="studio-project-track"><span /></div><span>05</span></div>
         </div>
-        <p className="studio-return-copy">가능성을 발견하고,<br />브랜드의 다음 장면을 만듭니다.</p>
-        {status !== 'ready' && <p className="studio-status" role="status">{status === 'failed' ? '영상을 불러오지 못했어요. 새로고침해 주세요.' : '장면을 준비하고 있어요.'}</p>}
-        <p className="studio-scroll" aria-hidden="true">SCROLL TO EXPLORE</p>
+        {status !== 'ready' && <p className="sr-only" role="status">{status === 'failed' ? '영상을 불러오지 못했어요. 새로고침해 주세요.' : '장면을 준비하고 있어요.'}</p>}
       </div>
     </section>
   );

@@ -38,16 +38,8 @@ export function TelescopeStudy() {
             <img src="/assets/telescope-sequence/desktop/0000.webp" width="1920" height="1080" alt="" loading="lazy" decoding="async" />
           </picture>
         </div>
-        <header className="telescope-study-heading">
-          <p>우주기획</p>
-          <h2 id="telescope-study-heading">우주를 보는 시선.</h2>
-          <span>스크롤하며 더 가까이 들여다보세요</span>
-        </header>
-        <div className="telescope-study-ending">
-          <p>당신의 브랜드에는,</p>
-          <h3>아직 발견하지 못한<br />우주가 있습니다.</h3>
-        </div>
-        {status !== 'ready' && <p className="telescope-study-status" role="status">{status === 'failed' ? '장면을 불러오지 못했어요. 새로고침해 주세요.' : '장면을 준비하고 있어요.'}</p>}
+        <h2 className="sr-only" id="telescope-study-heading">우주를 보는 시선.</h2>
+        {status !== 'ready' && <p className="sr-only" role="status">{status === 'failed' ? '장면을 불러오지 못했어요. 새로고침해 주세요.' : '장면을 준비하고 있어요.'}</p>}
         <div className="telescope-study-scroll" aria-hidden="true"><span />SCROLL TO DISCOVER</div>
       </div>
     </section>
