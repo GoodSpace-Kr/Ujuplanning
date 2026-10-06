@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { measureBrandProcess } from '@/lib/brand-process-journey';
 import './telescope-study.css';
 
-export function TelescopeStudy() {
+export function TelescopeStudy({ embedded = false }: { embedded?: boolean }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
 
@@ -18,7 +19,14 @@ export function TelescopeStudy() {
       try {
         const { mountTelescopeSequence } = await import('@/lib/telescope-sequence');
         if (disposed) return;
-        teardown = mountTelescopeSequence(host, status => { if (!disposed) setStatus(status); });
+        const process = embedded ? host.closest<HTMLElement>('.brand-process') : null;
+        teardown = mountTelescopeSequence(host, status => { if (!disposed) setStatus(status); }, process ? () => {
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            const gallery = process.querySelector<HTMLElement>('.brand-process-gallery')!;
+            return Math.max(0, Math.min(1, -gallery.getBoundingClientRect().top / Math.max(1, gallery.clientHeight - host.clientHeight)));
+          }
+          return measureBrandProcess(process).film;
+        } : undefined);
         if (disposed) teardown();
       } catch {
         if (!disposed) setStatus('failed');
@@ -26,10 +34,10 @@ export function TelescopeStudy() {
     }, { rootMargin: '500px' });
     observer.observe(host);
     return () => { disposed = true; observer.disconnect(); teardown(); };
-  }, []);
+  }, [embedded]);
 
   return (
-    <section className={`telescope-study${status === 'ready' ? ' is-ready' : ''}`} id="telescope-study" aria-labelledby="telescope-study-heading">
+    <section className={`telescope-study${embedded ? ' telescope-study-embedded' : ''}${status === 'ready' ? ' is-ready' : ''}`} id={embedded ? undefined : 'telescope-study'} aria-labelledby="telescope-study-heading">
       <div className="telescope-study-sticky">
         <div ref={hostRef} className="telescope-study-stage" role="img"
           aria-label="노을빛 창가의 망원경. 스크롤하면 접안렌즈로 천천히 다가가고, 렌즈 너머 별이 가득한 우주가 펼쳐집니다.">

@@ -3,7 +3,7 @@ import { FRAME_COUNT, clamp01, sequenceFrame, coverCrop } from './sequence-math'
 type FrameImage = ImageBitmap | HTMLImageElement;
 type SequenceStatus = 'loading' | 'ready' | 'failed';
 
-export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: SequenceStatus) => void) {
+export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: SequenceStatus) => void, externalProgress?: () => number) {
   const section = host.closest<HTMLElement>('.telescope-study')!;
   const canvas = document.createElement('canvas');
   canvas.setAttribute('aria-hidden', 'true');
@@ -117,6 +117,7 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
   }
 
   function measureProgress() {
+    if (externalProgress) return externalProgress();
     const rect = section.getBoundingClientRect();
     return clamp01(-rect.top / Math.max(1, section.offsetHeight - host.clientHeight));
   }

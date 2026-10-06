@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { measureBrandProcess } from '@/lib/brand-process-journey';
+import { TelescopeStudy } from './telescope-study';
 import './brand-process.css';
 
 const steps = [
@@ -31,7 +33,6 @@ export function BrandProcess() {
     const update = () => {
       raf = 0;
       const viewport = section.querySelector<HTMLElement>('.brand-process-sticky')!.clientHeight;
-      const available = section.offsetHeight - viewport;
       const offset = -section.getBoundingClientRect().top;
       if (offset < viewport * .06 && phase !== 'intro') {
         clearTimeout(transitionTimer);
@@ -41,8 +42,12 @@ export function BrandProcess() {
         setPhase('moving');
         transitionTimer = setTimeout(() => { setPhase('steps'); schedule(); }, motion.matches ? 0 : 1150);
       }
-      const introDistance = viewport * .85;
-      const progress = Math.max(0, Math.min(1, (offset - introDistance) / Math.max(1, available - introDistance)));
+      const journey = measureBrandProcess(section);
+      const progress = journey.reading;
+      section.style.setProperty('--expand-progress', String(journey.expansion));
+      section.toggleAttribute('data-expanding', journey.expansion > 0);
+      section.toggleAttribute('data-film', journey.expansion >= 1);
+      section.querySelector('.brand-process-gallery')!.setAttribute('aria-hidden', String(!motion.matches && journey.expansion < 1));
       // Continuous travel through all four steps, including the final copy's exit.
       const travel = progress * steps.length;
       const active = Math.min(3, Math.round(travel));
@@ -55,7 +60,10 @@ export function BrandProcess() {
         // The static reduced-motion layout exposes all four descriptions.
         copy.setAttribute('aria-hidden', String(!motion.matches && (phase !== 'steps' || i !== active)));
       });
-      cards.forEach((card, i) => card.classList.toggle('is-active', i === active));
+      cards.forEach((card, i) => {
+        card.classList.toggle('is-active', i === active);
+        card.setAttribute('aria-hidden', String(i !== 3 || (!motion.matches && journey.expansion < 1)));
+      });
     };
     const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
     update();
@@ -73,6 +81,7 @@ export function BrandProcess() {
 
   return (
     <section ref={ref} className="brand-process" data-phase="intro" id="brand-process" aria-labelledby="brand-process-heading">
+      <span id="telescope-study" className="brand-process-sequence-anchor" aria-hidden="true" />
       <div className="brand-process-sticky">
         <header className="brand-process-intro">
           <h2 id="brand-process-heading">우주기획의 <span>4가지 과정</span></h2>
@@ -93,8 +102,10 @@ export function BrandProcess() {
           {steps.map((step, i) => (
             <div key={step.word} className={`brand-process-card brand-process-card-${i}${i === 0 ? ' is-active' : ''}`}>
               <div className="brand-process-card-float">
-                <div className="brand-process-placeholder"><span>0{i + 1}</span></div>
-                <div className="brand-process-card-caption"><span>{step.word}</span><span>{step.title}</span></div>
+                <div className="brand-process-placeholder">
+                  {i === 3 ? <TelescopeStudy embedded /> : <span>0{i + 1}</span>}
+                </div>
+                <div className="brand-process-card-caption" aria-hidden="true"><span>{step.word}</span><span>{step.title}</span></div>
               </div>
             </div>
           ))}

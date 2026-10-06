@@ -1,4 +1,4 @@
-.brand-process { position: relative; height: 565svh; background: #f6f7f9; }
+.brand-process { position: relative; --process-reading: 465; --process-film: 360; --expand-progress: 0; height: calc((var(--process-reading) + 200 + var(--process-film)) * 1svh); background: #f6f7f9; }
 .brand-process-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .brand-process-label { position: absolute; top: 10%; left: 8%; color: #818a97; font-size: clamp(12px, .96vw, 17px); letter-spacing: -.02em; }
 .brand-process-copy-window { position: absolute; inset: 21% auto 15% 8%; width: 31%; overflow: hidden; mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
@@ -19,7 +19,7 @@
 .brand-process-card-1 .brand-process-card-float { animation-delay: -2s; }
 .brand-process-card-2 .brand-process-card-float { animation-delay: -4s; }
 .brand-process-card-3 .brand-process-card-float { animation-delay: -1s; }
-.brand-process-placeholder { display: grid; place-items: center; aspect-ratio: 1.65; border-radius: 11px; background: linear-gradient(145deg, #e9f1fb, #b5ccec); }
+.brand-process-placeholder { position: relative; overflow: hidden; display: grid; place-items: center; aspect-ratio: 1.65; border-radius: 11px; background: linear-gradient(145deg, #e9f1fb, #b5ccec); }
 .brand-process-card-1 .brand-process-placeholder { background: linear-gradient(145deg, #f0ebfb, #c0b7e5); }
 .brand-process-card-2 .brand-process-placeholder { background: linear-gradient(145deg, #e8f5f0, #acd6d3); }
 .brand-process-card-3 .brand-process-placeholder { background: linear-gradient(145deg, #f9ece2, #c5c9e8); }
@@ -59,14 +59,42 @@
 .brand-process[data-phase="intro"] .brand-process-card-3 { left: 72.5%; top: 29%; }
 .brand-process:not([data-phase="steps"]) .brand-process-card-float { animation-play-state: paused; }
 .brand-process[data-phase="intro"] .brand-process-hint { opacity: 0; }
+.brand-process-sequence-anchor { position: absolute; top: calc((var(--process-reading) + 100) * 1svh); left: 0; width: 1px; height: 1px; pointer-events: none; }
+.brand-process-card-3 { --expand-left: 70.8%; --expand-top: 57%; --expand-width: 21.15%; --expand-height: min(32svh, calc(12.8vw + 48px)); --card-padding: 8px; --caption-height: 38px; }
+.brand-process-card-3 .brand-process-card-float { animation: none; }
+.brand-process[data-expanding] .brand-process-card-3 {
+  left: calc(var(--expand-left) * (1 - var(--expand-progress)));
+  top: calc(var(--expand-top) * (1 - var(--expand-progress)));
+  width: calc(var(--expand-width) + (100% - var(--expand-width)) * var(--expand-progress));
+  height: calc(var(--expand-height) + (100% - var(--expand-height)) * var(--expand-progress));
+  transform: none; filter: none; opacity: 1; z-index: 10; transition: none;
+}
+.brand-process[data-expanding] .brand-process-card-3 .brand-process-card-float {
+  padding: calc(var(--card-padding) * (1 - var(--expand-progress)));
+  border-width: calc(1px * (1 - var(--expand-progress)));
+  border-radius: calc(17px * (1 - var(--expand-progress)));
+  box-shadow: none;
+}
+.brand-process[data-expanding] .brand-process-card-3 .brand-process-placeholder {
+  height: calc(100% - var(--caption-height) * (1 - var(--expand-progress)));
+  border-radius: calc(11px * (1 - var(--expand-progress)));
+}
+.brand-process[data-expanding] .brand-process-card-caption,
+.brand-process[data-expanding] .brand-process-label,
+.brand-process[data-expanding] .brand-process-hint,
+.brand-process[data-expanding] .brand-process-card:not(.brand-process-card-3) { opacity: max(0, calc(1 - var(--expand-progress) * 4)); pointer-events: none; }
+.telescope-study.telescope-study-embedded { position: absolute; inset: 0; height: 100%; width: 100%; }
+.telescope-study-embedded .telescope-study-sticky { position: absolute; inset: 0; height: 100%; }
+.brand-process:not([data-film]) .telescope-study-scroll { visibility: hidden; }
 @media(max-width: 700px) {
-  .brand-process { height: 525svh; }
+  .brand-process { --process-reading: 425; --process-film: 300; }
   .brand-process-label { top: 5%; left: 7%; }
   .brand-process-card { width: 34.4%; height: min(18svh, 150px); }
   .brand-process-card-0 { left: 9%; top: 13%; }
   .brand-process-card-1 { left: 56.6%; top: 15%; }
   .brand-process-card-2 { left: 10.6%; top: 34%; }
   .brand-process-card-3 { left: 55%; top: 36%; }
+  .brand-process-card-3 { --expand-left: 55%; --expand-top: 36%; --expand-width: 34.4%; --expand-height: min(18svh, 150px); --card-padding: 5px; --caption-height: 26px; }
   .brand-process-placeholder { height: calc(100% - 26px); }
   .brand-process-placeholder > span { font-size: 30px; }
   .brand-process-card-float { padding: 5px; border-radius: 12px; }
@@ -97,4 +125,11 @@
   .brand-process-gallery, .brand-process-hint { display: none; }
   .brand-process-intro { position: static; width: 100%; margin-bottom: 60px; opacity: 1 !important; transform: none !important; }
   .brand-process-copy-window, .brand-process-label { opacity: 1 !important; transition: none; }
+  .brand-process-gallery { display: block; position: relative; inset: auto; width: 100%; height: 220svh; }
+  .brand-process-card:not(.brand-process-card-3), .brand-process-sequence-anchor { display: none; }
+  .brand-process .brand-process-gallery .brand-process-card-3 { position: sticky; top: 0; left: 0; width: 100%; height: 100svh; opacity: 1; filter: none; transform: none; transition: none; }
+  .brand-process .brand-process-card-3 .brand-process-card-float { padding: 0; border: 0; }
+  .brand-process .brand-process-card-3 .brand-process-placeholder { height: 100%; }
+  .brand-process-card-3 .brand-process-card-caption { display: none; }
+  .brand-process .telescope-study-scroll { visibility: visible; }
 }
