@@ -2,6 +2,7 @@ import { StudioHero } from '@/components/studio-hero';
 import { ServicesSection } from '@/components/services-section';
 import { TelescopeStudy } from '@/components/telescope-study';
 import { SiteFooter } from '@/components/site-footer';
+import { BrandProcess } from '@/components/brand-process';
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
         <StudioHero />
         {/* 7단계 브랜드 소개 및 3D 캔버스는 비활성 상태로 유지합니다. */}
         <ServicesSection />
+        <BrandProcess />
         <TelescopeStudy />
       </main>
       <SiteFooter />

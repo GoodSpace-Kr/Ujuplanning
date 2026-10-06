@@ -1,0 +1,57 @@
+.brand-process { position: relative; height: 480svh; background: #f6f7f9; }
+.brand-process-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+.brand-process-label { position: absolute; top: 10%; left: 8%; color: #818a97; font-size: clamp(12px, .96vw, 17px); letter-spacing: -.02em; }
+.brand-process-copy-window { position: absolute; inset: 21% auto 15% 8%; width: 31%; overflow: hidden; mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
+.brand-process-copy { position: absolute; top: 50%; left: 0; width: 100%; transform: translate3d(0, calc(-50% + var(--copy-y, 0px)), 0); opacity: var(--copy-opacity, 0); will-change: transform, opacity; }
+.brand-process-copy:first-child { --copy-opacity: 1; }
+.brand-process-word { display: flex; gap: 16px; align-items: center; margin: 0 0 19px; color: #477fd1; font-size: clamp(12px, 1vw, 17px); font-weight: 500; letter-spacing: .12em; }
+.brand-process-word span { color: #a0a9b6; font-size: .8em; letter-spacing: .03em; }
+.brand-process-copy h3 { color: #202329; font-size: clamp(32px, 3.4vw, 60px); line-height: 1.3; font-weight: 600; letter-spacing: -.05em; }
+.brand-process-description { margin-top: 26px; max-width: 25em; color: #808b9b; font-size: clamp(14px, 1.12vw, 21px); line-height: 1.85; word-break: keep-all; letter-spacing: -.03em; }
+.brand-process-gallery { position: absolute; left: 46%; top: 15%; width: 47%; height: 69%; }
+.brand-process-card { position: absolute; width: 45%; filter: grayscale(1); opacity: .48; transform: scale(.94); transition: filter .45s, opacity .45s, transform .55s; }
+.brand-process-card.is-active { filter: grayscale(0); opacity: 1; transform: scale(1); z-index: 2; }
+.brand-process-card-0 { left: 0; top: 0; }
+.brand-process-card-1 { right: 0; top: 10%; }
+.brand-process-card-2 { left: 2%; top: 53%; }
+.brand-process-card-3 { right: 2%; top: 61%; }
+.brand-process-card-float { padding: 8px; background: #fff; border: 1px solid #e9edf2; border-radius: 17px; box-shadow: 0 14px 35px #263c5b08; animation: brand-process-float 6s ease-in-out infinite alternate; }
+.brand-process-card-1 .brand-process-card-float { animation-delay: -2s; }
+.brand-process-card-2 .brand-process-card-float { animation-delay: -4s; }
+.brand-process-card-3 .brand-process-card-float { animation-delay: -1s; }
+.brand-process-placeholder { display: grid; place-items: center; aspect-ratio: 1.65; border-radius: 11px; background: linear-gradient(145deg, #e9f1fb, #b5ccec); }
+.brand-process-card-1 .brand-process-placeholder { background: linear-gradient(145deg, #f0ebfb, #c0b7e5); }
+.brand-process-card-2 .brand-process-placeholder { background: linear-gradient(145deg, #e8f5f0, #acd6d3); }
+.brand-process-card-3 .brand-process-placeholder { background: linear-gradient(145deg, #f9ece2, #c5c9e8); }
+.brand-process-placeholder > span { color: #fff9; font-size: clamp(32px, 5vw, 76px); font-weight: 500; letter-spacing: -.06em; }
+.brand-process-card-caption { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 13px 6px 7px; font-size: clamp(8px, .75vw, 12px); color: #718095; letter-spacing: .04em; }
+.brand-process-card-caption span:last-child { color: #9ba3ae; letter-spacing: -.02em; }
+.brand-process-hint { position: absolute; left: 8%; bottom: 8%; display: flex; gap: 20px; align-items: center; color: #a0a9b6; font-size: 9px; letter-spacing: .14em; }
+.brand-process-hint span { font-size: 18px; }
+@keyframes brand-process-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
+@media(max-width: 700px) {
+  .brand-process { height: 440svh; }
+  .brand-process-label { top: 5%; left: 7%; }
+  .brand-process-gallery { left: 9%; top: 13%; width: 82%; height: 41%; }
+  .brand-process-card { width: 42%; }
+  .brand-process-card-1 { top: 5%; }
+  .brand-process-card-2 { top: 51%; }
+  .brand-process-card-3 { top: 56%; }
+  .brand-process-placeholder { aspect-ratio: 2; }
+  .brand-process-placeholder > span { font-size: 30px; }
+  .brand-process-card-float { padding: 5px; border-radius: 12px; }
+  .brand-process-card-caption { padding: 8px 3px 4px; font-size: 8px; }
+  .brand-process-copy-window { inset: 56% 7% 7%; width: auto; }
+  .brand-process-copy h3 { font-size: 34px; }
+  .brand-process-word { margin-bottom: 12px; }
+  .brand-process-description { margin-top: 16px; font-size: 15px; max-width: 27em; }
+  .brand-process-hint { display: none; }
+}
+@media(prefers-reduced-motion: reduce) {
+  .brand-process { height: auto; padding: 80px 8%; }
+  .brand-process-sticky { position: relative; height: auto; overflow: visible; }
+  .brand-process-label { position: static; margin-bottom: 50px; }
+  .brand-process-copy-window { position: static; width: 100%; mask-image: none; overflow: visible; }
+  .brand-process-copy { position: static; opacity: 1; transform: none; margin-bottom: 65px; }
+  .brand-process-gallery, .brand-process-hint { display: none; }
+}
