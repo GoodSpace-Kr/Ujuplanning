@@ -75,7 +75,7 @@ export function BrandProcess() {
     <section ref={ref} className="brand-process" data-phase="intro" id="brand-process" aria-labelledby="brand-process-heading">
       <div className="brand-process-sticky">
         <header className="brand-process-intro">
-          <h2 id="brand-process-heading">우주기획의 <span>4가지 원칙</span></h2>
+          <h2 id="brand-process-heading">우주기획의 <span>4가지 과정</span></h2>
           <p>브랜드와 시장을 관찰하고, 아직 발견하지 못한 가능성을 찾습니다.<br />
             전략과 실행을 연결해, 브랜드가 더 넓은 세계로 나아가도록 돕습니다.</p>
         </header>
