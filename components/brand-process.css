@@ -1,4 +1,4 @@
-.brand-process { position: relative; height: 480svh; background: #f6f7f9; }
+.brand-process { position: relative; height: 565svh; background: #f6f7f9; }
 .brand-process-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .brand-process-label { position: absolute; top: 10%; left: 8%; color: #818a97; font-size: clamp(12px, .96vw, 17px); letter-spacing: -.02em; }
 .brand-process-copy-window { position: absolute; inset: 21% auto 15% 8%; width: 31%; overflow: hidden; mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
@@ -29,15 +29,39 @@
 .brand-process-hint { position: absolute; left: 8%; bottom: 8%; display: flex; gap: 20px; align-items: center; color: #a0a9b6; font-size: 9px; letter-spacing: .14em; }
 .brand-process-hint span { font-size: 18px; }
 @keyframes brand-process-float { from { transform: translateY(-5px); } to { transform: translateY(5px); } }
+.brand-process-intro { position: absolute; top: 8%; left: 8%; width: 84%; z-index: 3; transition: opacity .4s ease, transform .6s ease; }
+.brand-process-intro h2 { color: #202329; font-size: clamp(32px, 3.7vw, 64px); font-weight: 600; line-height: 1.35; letter-spacing: -.045em; }
+.brand-process-intro h2 span { color: #477fd1; }
+.brand-process-intro p { margin-top: 24px; color: #808b9b; font-size: clamp(13px, 1.12vw, 20px); line-height: 1.85; letter-spacing: -.025em; word-break: keep-all; }
+.brand-process:not([data-phase="intro"]) .brand-process-intro { opacity: 0; transform: translateY(-30px); pointer-events: none; }
+.brand-process-copy-window, .brand-process-label { transition: opacity .4s ease; }
+.brand-process:not([data-phase="steps"]) .brand-process-copy-window,
+.brand-process:not([data-phase="steps"]) .brand-process-label { opacity: 0; pointer-events: none; }
+/* One persistent set of cards moves from the stepped introduction to the gallery. */
+.brand-process-gallery { inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.brand-process-card { width: 21.15%; height: min(32svh, calc(12.8vw + 48px)); transition: left 1.15s cubic-bezier(.22,.75,.2,1), top 1.15s cubic-bezier(.22,.75,.2,1), width 1.15s cubic-bezier(.22,.75,.2,1), height 1.15s cubic-bezier(.22,.75,.2,1), filter .45s, opacity .45s, transform .55s; }
+.brand-process-card-0 { left: 46%; top: 15%; }
+.brand-process-card-1 { left: 71.8%; right: auto; top: 21.9%; }
+.brand-process-card-2 { left: 47%; top: 51.5%; }
+.brand-process-card-3 { left: 70.8%; right: auto; top: 57%; }
+.brand-process-card-float { height: 100%; }
+.brand-process-placeholder { height: calc(100% - 38px); aspect-ratio: auto; }
+.brand-process[data-phase="intro"] .brand-process-card { width: 19.5%; height: 49svh; filter: none; opacity: 1; transform: none; }
+.brand-process[data-phase="intro"] .brand-process-card-0 { left: 8%; top: 44%; }
+.brand-process[data-phase="intro"] .brand-process-card-1 { left: 29.5%; top: 39%; }
+.brand-process[data-phase="intro"] .brand-process-card-2 { left: 51%; top: 34%; }
+.brand-process[data-phase="intro"] .brand-process-card-3 { left: 72.5%; top: 29%; }
+.brand-process:not([data-phase="steps"]) .brand-process-card-float { animation-play-state: paused; }
+.brand-process[data-phase="intro"] .brand-process-hint { opacity: 0; }
 @media(max-width: 700px) {
-  .brand-process { height: 440svh; }
+  .brand-process { height: 525svh; }
   .brand-process-label { top: 5%; left: 7%; }
-  .brand-process-gallery { left: 9%; top: 13%; width: 82%; height: 41%; }
-  .brand-process-card { width: 42%; }
-  .brand-process-card-1 { top: 5%; }
-  .brand-process-card-2 { top: 51%; }
-  .brand-process-card-3 { top: 56%; }
-  .brand-process-placeholder { aspect-ratio: 2; }
+  .brand-process-card { width: 34.4%; height: min(18svh, 150px); }
+  .brand-process-card-0 { left: 9%; top: 13%; }
+  .brand-process-card-1 { left: 56.6%; top: 15%; }
+  .brand-process-card-2 { left: 10.6%; top: 34%; }
+  .brand-process-card-3 { left: 55%; top: 36%; }
+  .brand-process-placeholder { height: calc(100% - 26px); }
   .brand-process-placeholder > span { font-size: 30px; }
   .brand-process-card-float { padding: 5px; border-radius: 12px; }
   .brand-process-card-caption { padding: 8px 3px 4px; font-size: 8px; }
@@ -46,6 +70,17 @@
   .brand-process-word { margin-bottom: 12px; }
   .brand-process-description { margin-top: 16px; font-size: 15px; max-width: 27em; }
   .brand-process-hint { display: none; }
+  .brand-process-intro { left: 7%; top: 8%; width: 86%; }
+  .brand-process-intro h2 { font-size: clamp(27px, 6.6vw, 40px); }
+  .brand-process-intro p { margin-top: 20px; font-size: 14px; }
+  .brand-process-intro p br { display: none; }
+  .brand-process[data-phase="intro"] .brand-process-card { width: 20%; height: 32svh; }
+  .brand-process[data-phase="intro"] .brand-process-card-0 { left: 6%; top: 52%; }
+  .brand-process[data-phase="intro"] .brand-process-card-1 { left: 28.5%; top: 48%; }
+  .brand-process[data-phase="intro"] .brand-process-card-2 { left: 51%; top: 44%; }
+  .brand-process[data-phase="intro"] .brand-process-card-3 { left: 73.5%; top: 40%; }
+  .brand-process[data-phase="intro"] .brand-process-card-caption { justify-content: center; font-size: 7px; }
+  .brand-process[data-phase="intro"] .brand-process-card-caption span:last-child { display: none; }
 }
 @media(prefers-reduced-motion: reduce) {
   .brand-process { height: auto; padding: 80px 8%; }
@@ -54,4 +89,6 @@
   .brand-process-copy-window { position: static; width: 100%; mask-image: none; overflow: visible; }
   .brand-process-copy { position: static; opacity: 1; transform: none; margin-bottom: 65px; }
   .brand-process-gallery, .brand-process-hint { display: none; }
+  .brand-process-intro { position: static; width: 100%; margin-bottom: 60px; opacity: 1 !important; transform: none !important; }
+  .brand-process-copy-window, .brand-process-label { opacity: 1 !important; transition: none; }
 }
