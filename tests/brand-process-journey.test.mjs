@@ -1,29 +1,31 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { brandProcessJourney, brandProcessReadingDelay, brandProcessCopyTravel, brandExpansionClock, shouldStartBrandExpansion, BRAND_EXPANSION_DURATION } from '../lib/brand-process-journey.ts';
+import { brandProcessJourney, brandProcessIntroPhase, brandProcessIntroDelay, brandExpansionClock, shouldStartBrandExpansion, BRAND_EXPANSION_DURATION, BRAND_PROCESS_EXPANSION_START } from '../lib/brand-process-journey.ts';
 
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-9);
 
-test('scroll consumed during rearrangement never advances observe and shifts expansion by the same amount', () => {
-  for (const [height, reading, film] of [[720, 465, 360], [844, 425, 300]]) {
+test('after tiles settle, the very next scroll starts expansion with no reading interval', () => {
+  for (const [height, film] of [[720, 360], [844, 300]]) {
     for (const offsetVh of [22, 70, 150, 300]) {
       const offset = offsetVh / 100 * height;
-      const delay = brandProcessReadingDelay(offset, height);
-      const at = vh => brandProcessJourney(vh / 100 * height, height, reading, film, delay);
-      close(brandProcessCopyTravel(at(offsetVh).reading), -.65);
-      close(at(offsetVh).expansion, 0);
-      close(at(reading + delay).reading, 1);
-      close(at(reading + delay).expansion, 0);
-      close(at(reading + delay + 100).expansion, 1);
-      close(at(reading + delay + 100 + film).film, 1);
-      assert.ok(at(offsetVh + 30).reading > 0);
-      close(at(offsetVh - 10).reading, 0);
+      const delay = brandProcessIntroDelay(offset, height);
+      const at = y => brandProcessJourney(y, height, BRAND_PROCESS_EXPANSION_START, film, delay);
+      close(at(offset).expansion, 0);
+      close(at(offset).film, 0);
+      // One pixel of forward motion enters expansion instead of four empty screens.
+      assert.ok(at(offset + 1).expansion > 0);
+      close(at(offset + 1).film, 0);
+      close(at(offset + height).expansion, 1);
+      close(at(offset + height).film, 0);
+      assert.ok(at(offset + height + 1).film > 0);
+      close(at(offset - 1).expansion, 0);
     }
   }
 });
 
 test('automatic expansion starts only on forward entry and does not trap scrolling after completion', () => {
   assert.equal(shouldStartBrandExpansion(-.01, .02, false, false), true);
+  assert.equal(shouldStartBrandExpansion(0, .000001, false, false), true);
   assert.equal(shouldStartBrandExpansion(.2, .1, false, false), false);
   assert.equal(shouldStartBrandExpansion(.99, 1.01, false, true), false);
   assert.equal(shouldStartBrandExpansion(-.01, .02, true, false), false);
@@ -37,35 +39,21 @@ test('one trigger completes expansion on its clock without advancing the telesco
     close(brandExpansionClock(BRAND_EXPANSION_DURATION * 2, from), 1);
     for (let elapsed = 0; elapsed <= BRAND_EXPANSION_DURATION; elapsed += 16) {
       const position = brandExpansionClock(elapsed, from);
-      const state = brandProcessJourney((465 + position * 100) * 7.2, 720);
+      const state = brandProcessJourney((BRAND_PROCESS_EXPANSION_START + position * 100) * 7.2, 720);
       close(state.film, 0);
     }
   }
 });
 
-test('reading finishes before the card expands, and film stays at its first frame throughout expansion', () => {
-  for (const [reading, film] of [[465, 360], [425, 300]]) {
-    for (const height of [720, 844]) {
-      const at = vh => brandProcessJourney(vh / 100 * height, height, reading, film);
-      close(at(22).reading, 0);
-      close(at(reading).reading, 1);
-      close(at(reading).expansion, 0);
-      for (let i = 0; i <= 100; i++) close(at(reading + i).film, 0);
-      close(at(reading + 50).expansion, .5);
-      close(at(reading + 100).expansion, 1);
-      close(at(reading + 100 + film).film, 1);
-    }
-  }
-});
-
-test('observe enters from below before crossing the center, without pausing subsequent copy travel', () => {
-  for (const readingEnd of [465, 425]) {
-    const travelAt = vh => brandProcessCopyTravel(brandProcessJourney(vh * 7.2, 720, readingEnd).reading);
-    close(travelAt(22), -.65);
-    assert.ok(travelAt(45) < -.35);
-    assert.ok(travelAt(100) > 0);
-    close(travelAt(readingEnd), 4);
-    for (let vh = 23; vh < readingEnd; vh++) assert.ok(travelAt(vh) > travelAt(vh - 1));
+test('the shortened section retains the full film duration on desktop and mobile', () => {
+  for (const [height, film] of [[720, 360], [844, 300]]) {
+    const at = vh => brandProcessJourney(vh / 100 * height, height, BRAND_PROCESS_EXPANSION_START, film);
+    close(at(22).expansion, 0);
+    close(at(72).expansion, .5);
+    close(at(122).expansion, 1);
+    close(at(122).film, 0);
+    close(at(122 + film / 2).film, .5);
+    close(at(122 + film).film, 1);
   }
 });
 
@@ -74,7 +62,21 @@ test('reverse scroll restores the same card and sequence positions without a sec
   const forward = positions.map(y => brandProcessJourney(y, 1000));
   const reverse = [...positions].reverse().map(y => brandProcessJourney(y, 1000));
   assert.deepEqual(reverse, [...forward].reverse());
-  for (const field of ['reading', 'expansion', 'film']) {
+  for (const field of ['expansion', 'film']) {
     assert.ok(forward.every((state, i) => state[field] >= 0 && state[field] <= 1 && (!i || state[field] >= forward[i - 1][field])));
+  }
+});
+
+test('photo diagonal settles before tiles enter and expansion waits for the full mosaic', () => {
+  assert.equal(brandProcessIntroPhase(0), 'moving');
+  assert.equal(brandProcessIntroPhase(999), 'moving');
+  assert.equal(brandProcessIntroPhase(1000), 'mosaic');
+  assert.equal(brandProcessIntroPhase(2199), 'mosaic');
+  assert.equal(brandProcessIntroPhase(2200), 'steps');
+  for (const offset of [220, 950, 1800]) {
+    const delay = brandProcessIntroDelay(offset, 720);
+    const atReveal = brandProcessJourney(offset, 720, BRAND_PROCESS_EXPANSION_START, 360, delay);
+    close(atReveal.expansion, 0);
+    close(atReveal.film, 0);
   }
 });

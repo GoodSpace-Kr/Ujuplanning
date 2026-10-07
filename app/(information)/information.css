@@ -1,0 +1,2 @@
+.uju-information { min-height: calc(100svh - 80px); background: #fff; }
+@media (max-width: 800px) { .uju-information { min-height: calc(100svh - 68px); } }

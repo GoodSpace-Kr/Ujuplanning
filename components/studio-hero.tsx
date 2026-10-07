@@ -1,19 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { STUDIO_FRAMES, STUDIO_EXIT_END, STUDIO_EXIT_START, studioExitProgress, shouldStartStudioExit, studioGeometry, studioTimeline } from '@/lib/studio-journey';
+import { STUDIO_FRAMES, studioGeometry, studioTimeline } from '@/lib/studio-journey';
 import { STUDIO_ENTRY_START, STUDIO_ENTRY_END, shouldStartStudioEntry, studioEntryProgress } from '@/lib/studio-journey';
 import { createStudioFrames } from '@/lib/studio-frames';
 import { setAutomaticScrollActive } from '@/lib/scroll-motion';
 import './studio-hero.css';
-
-const projects = [
-  { name: '청호나이스', category: '브랜딩 마케팅', headline: '브랜드의 강점을,\n고객의 일상 가까이.', description: '브랜드가 가진 가치를 명확한 메시지와 콘텐츠로 전합니다.', tags: ['브랜드 메시지', '콘텐츠 기획', '마케팅 커뮤니케이션'] },
-  { name: 'BMW · MINI\n바바리안모터스', category: '온라인·SNS 콘텐츠 운영', headline: '브랜드의 감각을\n하나의 채널 경험으로.', description: '브랜드의 개성과 이야기를 온라인 콘텐츠와 SNS 운영으로 연결합니다.', tags: ['채널 기획', '콘텐츠 제작', 'SNS 운영'] },
-  { name: '오션더힐', category: '숏폼 콘텐츠', headline: '공간의 매력을,\n짧고 선명한 장면으로.', description: '공간의 분위기와 경험을 발견하고, 시선을 사로잡는 숏폼으로 담습니다.', tags: ['콘텐츠 기획', '영상 촬영', '숏폼 편집'] },
-  { name: '오륜스포츠', category: '통합 광고 대행', headline: '기획부터 송출까지,\n하나의 방향으로.', description: '기획·제작·촬영·편집과 옥외광고 송출을 연결하는 통합 캠페인입니다.', tags: ['캠페인 기획', '영상 제작', '옥외광고'] },
-  { name: 'BYD', category: '공간 디자인 제작', headline: '브랜드를 만나는\n공간의 경험.', description: '브랜드의 메시지가 실제 공간에서도 일관되게 느껴지도록 디자인하고 제작합니다.', tags: ['공간 기획', '공간 디자인', '제작'] },
-];
+import { projects } from '@/lib/site-content';
 
 export function StudioHero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -36,8 +29,9 @@ export function StudioHero() {
     let raf = 0, lastTime = 0, progress = 0, viewWidth = 1, viewHeight = 1;
     let currentProject = 0, projectsVisible = false;
     let paintedFrame = -1, paintedZoom = -1, paintedImage: unknown;
-    let autoMode: 'entry' | 'exit' | null = null;
-    let autoElapsed = 0, previousScroll = 0, entryComplete = false, exitComplete = false;
+    let autoEntering = false;
+    let directNavigation = false;
+    let autoElapsed = 0, previousScroll = 0, entryComplete = false;
     let autoFrom = 0, touchY = 0, reverseIntent = 0;
     const frames = createStudioFrames(schedule, () => { if (!disposed && !ready) setStatus('failed'); });
 
@@ -48,8 +42,8 @@ export function StudioHero() {
       if (!disposed && active && !document.hidden && !raf) raf = requestAnimationFrame(render);
     }
     function cancelTransition() {
-      if (autoMode) section!.dataset[autoMode === 'entry' ? 'autoEntry' : 'autoExit'] = 'cancelled';
-      autoMode = null;
+      if (autoEntering) section!.dataset.autoEntry = 'cancelled';
+      autoEntering = false;
       setAutomaticScrollActive(false);
       previousScroll = measure();
       schedule();
@@ -60,36 +54,31 @@ export function StudioHero() {
       window.scrollTo({ top: scrollY, behavior: 'instant' });
       previousScroll = value;
     }
-    function startTransition(mode: 'entry' | 'exit', from: number) {
-      autoMode = mode;
+    function startTransition(from: number) {
+      autoEntering = true;
       setAutomaticScrollActive(true);
       autoElapsed = 0;
       reverseIntent = 0;
       lastTime = 0;
-      const start = mode === 'entry' ? STUDIO_ENTRY_START : STUDIO_EXIT_START;
-      const end = mode === 'entry' ? STUDIO_ENTRY_END : STUDIO_EXIT_END;
-      progress = autoFrom = Math.max(start, Math.min(from, end));
-      section!.dataset[mode === 'entry' ? 'autoEntry' : 'autoExit'] = 'running';
+      progress = autoFrom = Math.max(STUDIO_ENTRY_START, Math.min(from, STUDIO_ENTRY_END));
+      section!.dataset.autoEntry = 'running';
       scrollToProgress(progress);
       schedule();
     }
     function onScroll() {
       const next = measure();
-      if (autoMode) {
+      if (autoEntering) {
         // Trackpad/touch momentum and browser scroll rounding must not cancel
         // the animation. The animation clock owns this interval until finished.
         schedule();
         return;
       }
+      // Anchor navigation can pass through the entry range on its way to the
+      // footer. Only a new user scroll gesture should arm automatic entry again.
+      if (directNavigation) { previousScroll = next; schedule(); return; }
       if (next < STUDIO_ENTRY_START - .01) entryComplete = false;
-      // Rearm only after returning to the projects, never from subpixel
-      // rounding at the exit endpoint or a subsequent viewport resize.
-      if (next < STUDIO_EXIT_START - .01) exitComplete = false;
       if (!entryComplete && shouldStartStudioEntry(previousScroll, next, motion.matches)) {
-        startTransition('entry', Math.max(STUDIO_ENTRY_START, progress));
-        return;
-      } else if (shouldStartStudioExit(previousScroll, next, motion.matches, exitComplete)) {
-        startTransition('exit', Math.max(STUDIO_EXIT_START, progress));
+        startTransition(Math.max(STUDIO_ENTRY_START, progress));
         return;
       }
       previousScroll = next;
@@ -97,32 +86,37 @@ export function StudioHero() {
     }
     function onWheel(event: WheelEvent) {
       if (event.ctrlKey) return;
+      directNavigation = false;
       const position = measure();
-      if (!autoMode && event.deltaY > 0) {
-        if (!entryComplete && shouldStartStudioEntry(position, position + .00001, motion.matches)) startTransition('entry', position);
-        else if (shouldStartStudioExit(position, position + .00001, motion.matches, exitComplete)) startTransition('exit', position);
+      if (!autoEntering && event.deltaY > 0) {
+        if (!entryComplete && shouldStartStudioEntry(position, position + .00001, motion.matches)) startTransition(position);
       }
-      if (!autoMode) return;
+      if (!autoEntering) return;
       reverseIntent = event.deltaY < 0 ? reverseIntent - event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? viewHeight : 1) : 0;
       if (reverseIntent >= 24) cancelTransition();
       else if (event.cancelable) event.preventDefault();
     }
-    function onTouchStart(event: TouchEvent) { touchY = event.touches[0]?.clientY ?? 0; }
+    function onTouchStart(event: TouchEvent) { directNavigation = false; touchY = event.touches[0]?.clientY ?? 0; }
     function onTouchMove(event: TouchEvent) {
       const nextY = event.touches[0]?.clientY ?? touchY;
       const delta = touchY - nextY;
       touchY = nextY;
-      if (!autoMode || event.touches.length !== 1) return;
+      if (!autoEntering || event.touches.length !== 1) return;
       if (delta < -2) cancelTransition();
       else if (delta > 0 && event.cancelable) event.preventDefault();
     }
     function onKeyDown(event: KeyboardEvent) {
-      if (!autoMode || event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) directNavigation = false;
+      if (!autoEntering) return;
       if (['Escape', 'ArrowUp', 'PageUp', 'Home', 'Tab'].includes(event.key) || event.key === ' ' && event.shiftKey) cancelTransition();
       else if (['ArrowDown', 'PageDown', ' ', 'End'].includes(event.key)) event.preventDefault();
     }
-    function onMotionChange() { if (autoMode) cancelTransition(); schedule(); }
-    function onDirectNavigation() { if (autoMode) cancelTransition(); }
+    function onMotionChange() { if (autoEntering) cancelTransition(); schedule(); }
+    function onDirectNavigation() { directNavigation = true; if (autoEntering) cancelTransition(); }
+    function onLinkClick(event: MouseEvent) {
+      if (event.target instanceof Element && event.target.closest('a')) onDirectNavigation();
+    }
     function onPointerDown(event: PointerEvent) {
       if (event.clientX >= document.documentElement.clientWidth || event.target instanceof HTMLElement && event.target.closest('a')) onDirectNavigation();
     }
@@ -132,25 +126,24 @@ export function StudioHero() {
       let target = measure();
       const dt = lastTime ? Math.min(50, time - lastTime) : 16;
       lastTime = time;
-      if (autoMode) {
+      if (autoEntering) {
         // Hold the measured phone pose until its frame is decoded, so a slow
         // connection cannot turn automatic entry into a jump to the gallery.
-        const canAdvance = autoMode !== 'entry' || frames.get(STUDIO_FRAMES - 1, true);
+        const canAdvance = frames.get(STUDIO_FRAMES - 1, true);
         if (canAdvance) autoElapsed += dt;
-        progress = target = autoMode === 'entry' ? studioEntryProgress(autoElapsed, autoFrom) : studioExitProgress(autoElapsed, autoFrom);
+        progress = target = studioEntryProgress(autoElapsed, autoFrom);
         scrollToProgress(progress);
-        if (progress >= (autoMode === 'entry' ? STUDIO_ENTRY_END : STUDIO_EXIT_END)) {
-          if (autoMode === 'entry') entryComplete = true;
-          else exitComplete = true;
-          section!.dataset[autoMode === 'entry' ? 'autoEntry' : 'autoExit'] = 'complete';
-          autoMode = null;
+        if (progress >= STUDIO_ENTRY_END) {
+          entryComplete = true;
+          section!.dataset.autoEntry = 'complete';
+          autoEntering = false;
           setAutomaticScrollActive(false);
         }
       } else progress = motion.matches ? target : progress + (target - progress) * (1 - Math.exp(-dt / 75));
       if (Math.abs(progress - target) < .00003) progress = target;
       const state = studioTimeline(progress, motion.matches);
       frames.request(state.frame, true);
-      if (progress > .18 && progress < .8) frames.preloadDetail();
+      if (progress > .27) frames.preloadDetail();
       // Never zoom an earlier frame if the visitor jumped ahead before loading.
       const loaded = frames.get(state.frame, state.zoom > 0);
       const zoom = loaded?.index === STUDIO_FRAMES - 1 ? state.zoom : 0;
@@ -172,7 +165,6 @@ export function StudioHero() {
         projectsRef.current.style.opacity = String(projectOpacity);
       }
       section!.style.setProperty('--studio-opening', String(state.opening));
-      section!.style.setProperty('--studio-return', String(state.returnCopy));
       section!.style.setProperty('--studio-project-progress', String(state.projectProgress));
       section!.dataset.phase = state.phase;
       section!.dataset.frame = String(paintedFrame);
@@ -180,7 +172,7 @@ export function StudioHero() {
       section!.dataset.decoded = String(frames.stats().decoded);
       if (currentProject !== state.projectIndex) { currentProject = state.projectIndex; setActiveProject(currentProject); }
       if (projectsVisible !== (projectOpacity > .5)) { projectsVisible = projectOpacity > .5; setShowProjects(projectsVisible); }
-      if (autoMode || target !== progress) schedule();
+      if (autoEntering || target !== progress) schedule();
     }
     function resize() {
       viewWidth = stage!.clientWidth || 1;
@@ -189,7 +181,7 @@ export function StudioHero() {
       canvas!.width = Math.round(viewWidth * ratio);
       canvas!.height = Math.round(viewHeight * ratio);
       paintedFrame = -1;
-      if (autoMode) scrollToProgress(progress);
+      if (autoEntering) scrollToProgress(progress);
       schedule();
     }
     function visibility() {
@@ -210,12 +202,12 @@ export function StudioHero() {
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('click', onLinkClick, { capture: true });
     window.addEventListener('hashchange', onDirectNavigation);
     document.addEventListener('visibilitychange', visibility);
     motion.addEventListener('change', onMotionChange);
     progress = previousScroll = measure();
     entryComplete = progress >= STUDIO_ENTRY_END;
-    exitComplete = progress >= STUDIO_EXIT_END - .001;
     resize();
     return () => {
       disposed = true;
@@ -228,6 +220,7 @@ export function StudioHero() {
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('click', onLinkClick, { capture: true });
       window.removeEventListener('hashchange', onDirectNavigation);
       document.removeEventListener('visibilitychange', visibility);
       motion.removeEventListener('change', onMotionChange);
@@ -241,7 +234,7 @@ export function StudioHero() {
           <source media="(max-width:700px)" srcSet="/assets/studio-sequence/mobile/0000.webp" />
           <img src="/assets/studio-sequence/desktop/0000.webp" width="1920" height="1080" alt="" fetchPriority="high" />
         </picture>
-        <canvas ref={canvasRef} className="studio-canvas" aria-label="촬영·기획 현장에서 책상 위 휴대폰으로 다가간 뒤, 프로젝트 소개를 마치고 다시 현장으로 돌아오는 장면" role="img" />
+        <canvas ref={canvasRef} className="studio-canvas" aria-label="촬영·기획 현장에서 책상 위 휴대폰으로 다가가 프로젝트를 소개하는 장면" role="img" />
         <div className="studio-headline-shade" aria-hidden="true" />
         <h1 className="studio-headline">
           <span>전략부터 실행까지</span>{' '}

@@ -42,7 +42,6 @@ export function InquiryForm() {
         <div className="inquiry-image">
           <img src="/assets/telescope-sequence/desktop/0000.webp" alt="창 너머를 망원경으로 바라보며 새로운 가능성을 찾는 모습" loading="lazy" />
           <span className="inquiry-image-brand">UJU PLANNING</span>
-          <span className="inquiry-image-caption">다음 가능성의 시작,<br />우리의 첫 대화.</span>
         </div>
         <div className="inquiry-guide">
           <p className="inquiry-guide-title">당신의 이야기를 기다립니다.</p>
@@ -53,7 +52,6 @@ export function InquiryForm() {
       </div>
 
       <div className="inquiry-form-panel">
-        <p className="inquiry-eyebrow">LET’S TALK</p>
         <h2 id="inquiry-heading">어떤 우주를<br />함께 발견할까요?</h2>
         <p className="inquiry-lead">브랜드의 다음 이야기를 우주기획과 시작해 보세요.</p>
 
@@ -84,7 +82,7 @@ export function InquiryForm() {
                 <input name="email" type="email" autoComplete="email" required maxLength={254} placeholder="hello@company.com" />
               </label>
               <label className="inquiry-field">문의 내용 <span className="inquiry-optional">선택</span>
-                <textarea name="message" rows={4} maxLength={4000} placeholder="고민 중인 프로젝트, 일정, 예산 등을 자유롭게 남겨주세요." />
+                <textarea name="message" rows={3} maxLength={4000} placeholder="고민 중인 프로젝트, 일정, 예산 등을 자유롭게 남겨주세요." />
               </label>
               <div className="inquiry-honey" aria-hidden="true">
                 <label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label>

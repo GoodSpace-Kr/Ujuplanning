@@ -1,4 +1,4 @@
-import { brandExpansionClock, BRAND_EXPANSION_DURATION, shouldStartBrandExpansion } from './brand-process-journey';
+import { brandExpansionClock, BRAND_EXPANSION_DURATION, BRAND_PROCESS_EXPANSION_START, shouldStartBrandExpansion } from './brand-process-journey';
 import { isAutomaticScrollActive, normalizeWheelDelta, setAutomaticScrollActive } from './scroll-motion';
 
 // Advance the native scroll position over the existing expansion interval.
@@ -12,10 +12,10 @@ export function mountProcessExpansion(section: HTMLElement) {
   function geometry() {
     const viewport = sticky.clientHeight;
     const style = getComputedStyle(section);
-    const reading = (parseFloat(style.getPropertyValue('--process-reading')) || 465)
+    const expansionStart = (parseFloat(style.getPropertyValue('--process-expansion-start')) || BRAND_PROCESS_EXPANSION_START)
       + (parseFloat(style.getPropertyValue('--process-delay')) || 0);
     const top = section.getBoundingClientRect().top;
-    return { viewport, origin: window.scrollY + top, reading, position: (-top / Math.max(1, viewport) * 100 - reading) / 100 };
+    return { viewport, origin: window.scrollY + top, expansionStart, position: (-top / Math.max(1, viewport) * 100 - expansionStart) / 100 };
   }
   let previous = geometry().position;
 
@@ -37,8 +37,8 @@ export function mountProcessExpansion(section: HTMLElement) {
     elapsed += lastTime ? Math.min(50, time - lastTime) : 0;
     lastTime = time;
     const value = brandExpansionClock(elapsed, from);
-    const { origin, viewport, reading } = geometry();
-    const destination = origin + (reading / 100 + value) * viewport;
+    const { origin, viewport, expansionStart } = geometry();
+    const destination = origin + (expansionStart / 100 + value) * viewport;
     window.scrollTo({ top: value === 1 ? Math.ceil(destination) : destination, behavior: 'instant' });
     previous = geometry().position;
     if (elapsed >= BRAND_EXPANSION_DURATION) stop('complete');
@@ -58,7 +58,7 @@ export function mountProcessExpansion(section: HTMLElement) {
   function onScroll() {
     const next = geometry().position;
     if (running) return;
-    // Only rearm after deliberately returning to the copy, not from endpoint rounding.
+    // Only rearm after deliberately returning to the mosaic, not from endpoint rounding.
     if (next < -.03) completed = false;
     if (shouldStartBrandExpansion(previous, next, motion.matches, completed)) start(next);
     previous = next;

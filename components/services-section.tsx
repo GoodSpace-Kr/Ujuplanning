@@ -10,36 +10,7 @@ import { ServiceDemoNavigation, useServiceDemoPlayback } from '@/components/serv
 import { activeServiceIndex, serviceCopyPose, serviceEntryPose, servicePageScale, serviceTitleCharacterCount } from '@/lib/services-journey';
 import './services-journey.css';
 
-const SERVICES = [
-  {
-    id: 'strategy',
-    headline: ['브랜드와 마케팅', '방향을 정리하고'],
-    title: '전략기획',
-    description: '브랜드가 나아갈 방향과 시장에서의 기준점을 정리합니다.',
-    items: ['브랜드·시장 분석', '마케팅 전략 수립', '캠페인 기획', '브랜드 메시지 설계'],
-  },
-  {
-    id: 'creative',
-    headline: ['좋은 콘텐츠를', '지속해서 만들고'],
-    title: '영상·사진 제작 & 콘텐츠 크리에이티브',
-    description: '브랜드의 메시지를 영상, 이미지, 디자인과 카피로 일관되게 제작합니다.',
-    items: ['브랜드 영상', '광고 영상', '숏폼', '제품 촬영', '카드뉴스'],
-  },
-  {
-    id: 'performance',
-    headline: ['광고 성과와', '고객 전환을 높이고'],
-    title: '디지털 퍼포먼스',
-    description: '콘텐츠와 광고를 실제 유입, 행동과 전환으로 연결합니다.',
-    items: ['광고 운영', '매체 전략', '소재 기획', '성과 분석', '캠페인 최적화'],
-  },
-  {
-    id: 'social',
-    headline: ['SNS와 온라인 채널을', '체계적으로 운영하고'],
-    title: 'SNS·바이럴 마케팅',
-    description: '흩어진 온라인 채널을 하나의 브랜드 흐름으로 연결하고 지속적으로 운영합니다.',
-    items: ['SNS 운영', '블로그 콘텐츠', '숏폼 콘텐츠', '인플루언서 협업', '바이럴 확산'],
-  },
-] as const;
+import { SERVICES } from '@/lib/site-content';
 
 const INTRO_TITLE_LINES = ['브랜드의 빈 우주를', '발견하기 위해'] as const;
 const INTRO_TITLE_LENGTH = INTRO_TITLE_LINES.join('').length;

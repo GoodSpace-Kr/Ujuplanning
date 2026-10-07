@@ -1,16 +1,19 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { brandProcessCopyTravel, brandProcessReadingDelay, measureBrandProcess } from '@/lib/brand-process-journey';
+import { Binoculars, Compass, Network, Orbit } from 'lucide-react';
+import { BRAND_PROCESS_EXPANSION_START, brandProcessIntroDelay, brandProcessIntroPhase, measureBrandProcess } from '@/lib/brand-process-journey';
 import { mountProcessExpansion } from '@/lib/process-expansion';
 import { TelescopeStudy } from './telescope-study';
 import './brand-process.css';
 
+const processIcons = [Binoculars, Compass, Network, Orbit];
+
 const steps = [
-  { word: 'OBSERVE', title: '관찰하다', description: '브랜드, 시장, 경쟁사와 고객의 행동을 깊이 관찰합니다.' },
-  { word: 'DISCOVER', title: '발견하다', description: '브랜드가 놓치고 있던 문제와 새로운 가능성을 발견합니다.' },
-  { word: 'CONNECT', title: '연결하다', description: '발견한 가능성을 전략, 콘텐츠, 광고와 고객 경험으로 연결합니다.' },
-  { word: 'EXPAND', title: '확장하다', description: '실행과 성과를 통해 브랜드가 더 넓은 시장으로 나아가도록 돕습니다.' },
+  { word: 'OBSERVE', title: '관찰하다' },
+  { word: 'DISCOVER', title: '발견하다' },
+  { word: 'CONNECT', title: '연결하다' },
+  { word: 'EXPAND', title: '확장하다' },
 ];
 
 export function BrandProcess() {
@@ -19,16 +22,15 @@ export function BrandProcess() {
   useEffect(() => {
     const section = ref.current;
     if (!section) return;
-    const copies = [...section.querySelectorAll<HTMLElement>('.brand-process-copy')];
     const cards = [...section.querySelectorAll<HTMLElement>('.brand-process-card')];
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     let raf = 0;
-    let phase: 'intro' | 'moving' | 'steps' = 'intro';
-    let transitionTimer: ReturnType<typeof setTimeout> | undefined;
+    let phase: 'intro' | 'moving' | 'mosaic' | 'steps' = 'intro';
+    let transitionStart = 0;
     const introDescription = section.querySelector<HTMLElement>('.brand-process-intro p')!;
-    const rebaseReading = () => {
+    const rebaseExpansion = () => {
       const viewport = section.querySelector<HTMLElement>('.brand-process-sticky')!.clientHeight;
-      section.style.setProperty('--process-delay', String(brandProcessReadingDelay(-section.getBoundingClientRect().top, viewport)));
+      section.style.setProperty('--process-delay', String(brandProcessIntroDelay(-section.getBoundingClientRect().top, viewport)));
     };
     const setPhase = (next: typeof phase) => {
       phase = next;
@@ -40,46 +42,34 @@ export function BrandProcess() {
       const viewport = section.querySelector<HTMLElement>('.brand-process-sticky')!.clientHeight;
       const offset = -section.getBoundingClientRect().top;
       if (offset < viewport * .06 && phase !== 'intro') {
-        clearTimeout(transitionTimer);
+        transitionStart = 0;
         section.style.removeProperty('--process-delay');
         setPhase('intro');
-      } else if (offset >= viewport * .22 && phase === 'intro') {
-        const readingEnd = parseFloat(getComputedStyle(section).getPropertyValue('--process-reading')) || 465;
+      } else if (offset >= viewport * BRAND_PROCESS_EXPANSION_START / 100 && phase === 'intro') {
+        const expansionStart = parseFloat(getComputedStyle(section).getPropertyValue('--process-expansion-start')) || BRAND_PROCESS_EXPANSION_START;
         // Direct navigation to the film should retain its destination.
-        if (motion.matches || offset >= viewport * readingEnd / 100) setPhase('steps');
+        if (motion.matches || offset >= viewport * (expansionStart + 100) / 100) setPhase('steps');
         else {
+          transitionStart = performance.now();
           setPhase('moving');
-          transitionTimer = setTimeout(() => {
-            rebaseReading();
-            setPhase('steps');
-            update();
-          }, 1150);
         }
       }
-      // Scrolling during rearrangement must not consume the first copy's entrance.
-      if (phase === 'moving') rebaseReading();
+      // Keep expansion at the current scroll position until all tiles have settled.
+      // The next forward scroll can expand the image without a text-reading interval.
+      if (phase === 'moving' || phase === 'mosaic') {
+        rebaseExpansion();
+        const next = brandProcessIntroPhase(performance.now() - transitionStart);
+        if (next !== phase) setPhase(next);
+      }
       const journey = measureBrandProcess(section);
-      const progress = journey.reading;
       section.style.setProperty('--expand-progress', String(journey.expansion));
       section.toggleAttribute('data-expanding', journey.expansion > 0);
       section.toggleAttribute('data-film', journey.expansion >= 1);
       section.querySelector('.brand-process-gallery')!.setAttribute('aria-hidden', String(!motion.matches && journey.expansion < 1));
-      // Continuous travel through all four steps, including the final copy's exit.
-      const travel = brandProcessCopyTravel(progress);
-      const active = Math.max(0, Math.min(3, Math.round(travel)));
-      const textTravel = section.querySelector<HTMLElement>('.brand-process-copy-window')!.clientHeight * .9;
-      section.dataset.activeStep = steps[active].word.toLowerCase();
-      copies.forEach((copy, i) => {
-        const distance = i - travel;
-        copy.style.setProperty('--copy-y', `${distance * textTravel}px`);
-        copy.style.setProperty('--copy-opacity', String(Math.max(0, 1 - Math.abs(distance) * 1.25)));
-        // The static reduced-motion layout exposes all four descriptions.
-        copy.setAttribute('aria-hidden', String(!motion.matches && (phase !== 'steps' || i !== active)));
-      });
       cards.forEach((card, i) => {
-        card.classList.toggle('is-active', i === active);
         card.setAttribute('aria-hidden', String(i !== 3 || (!motion.matches && journey.expansion < 1)));
       });
+      if (phase === 'moving' || phase === 'mosaic') raf = requestAnimationFrame(update);
     };
     const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
     update();
@@ -90,7 +80,6 @@ export function BrandProcess() {
     return () => {
       stopExpansion();
       cancelAnimationFrame(raf);
-      clearTimeout(transitionTimer);
       section.style.removeProperty('--process-delay');
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
@@ -107,25 +96,27 @@ export function BrandProcess() {
           <p>브랜드와 시장을 관찰하고, 아직 발견하지 못한 가능성을 찾습니다.<br />
             전략과 실행을 연결해, 브랜드가 더 넓은 세계로 나아가도록 돕습니다.</p>
         </header>
-        <div className="brand-process-copy-window">
-          {steps.map((step, i) => (
-            <article key={step.word} className="brand-process-copy">
-              <p className="brand-process-word"><span>0{i + 1}</span>{step.word}</p>
-              <h3>{step.title}</h3>
-              <p className="brand-process-description">{step.description}</p>
-            </article>
-          ))}
-        </div>
         <div className="brand-process-gallery" aria-hidden="true">
+          <div className="brand-process-edge brand-process-edge-left" aria-hidden="true"><span /><span /><span /></div>
+          <div className="brand-process-edge brand-process-edge-right" aria-hidden="true"><span /><span /><span /></div>
+          {steps.flatMap((step, i) => {
+            const Icon = processIcons[i];
+            return ['top', 'bottom'].map(position => (
+              <div key={`${step.word}-${position}`} className={`brand-process-tile brand-process-tile-${i} brand-process-tile-${position}`} aria-hidden="true">
+                <span className="brand-process-tile-word">{position === 'top' ? step.title : step.word}</span>
+                <Icon className="brand-process-tile-icon" strokeWidth={1.3} />
+                <span className="brand-process-tile-number">0{i + 1}</span>
+              </div>
+            ));
+          })}
           {steps.map((step, i) => (
-            <div key={step.word} className={`brand-process-card brand-process-card-${i}${i === 0 ? ' is-active' : ''}`}>
+            <div key={step.word} className={`brand-process-card brand-process-card-${i}`}>
               <div className="brand-process-card-float">
                 <div className="brand-process-placeholder">
                   {i === 3 ? <TelescopeStudy embedded /> : (
                     <img className="brand-process-image" src={`/assets/brand-process/${step.word.toLowerCase()}.webp`} alt="" loading="lazy" decoding="async" />
                   )}
                 </div>
-                <div className="brand-process-card-caption" aria-hidden="true"><span>{step.word}</span></div>
               </div>
             </div>
           ))}

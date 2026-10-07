@@ -9,11 +9,8 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n));
 const range = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
 const smooth = (p: number) => p * p * (3 - 2 * p);
 
-export const STUDIO_EXIT_START = .665;
-export const STUDIO_EXIT_END = .985;
-export const STUDIO_EXIT_DURATION = 2000;
-export const STUDIO_ENTRY_START = .26;
-export const STUDIO_ENTRY_END = .4;
+export const STUDIO_ENTRY_START = .39;
+export const STUDIO_ENTRY_END = .6;
 export const STUDIO_ENTRY_DURATION = 2000;
 
 export function shouldStartStudioEntry(previous: number, next: number, reduced = false) {
@@ -26,37 +23,23 @@ export function studioEntryProgress(elapsed: number, from = STUDIO_ENTRY_START) 
     (STUDIO_ENTRY_END - STUDIO_ENTRY_START) * clamp(elapsed / STUDIO_ENTRY_DURATION));
 }
 
-// Continue even if a gesture skips the exact boundary or starts inside the exit.
-// Jumps from the beginning or past the hero remain ordinary page navigation.
-export function shouldStartStudioExit(previous: number, next: number, reduced = false, completed = false) {
-  return !completed && !reduced && previous >= .4 && previous < STUDIO_EXIT_END &&
-    next > previous && next >= STUDIO_EXIT_START && next < STUDIO_EXIT_END;
-}
-
-export function studioExitProgress(elapsed: number, from = STUDIO_EXIT_START) {
-  return Math.min(STUDIO_EXIT_END, Math.max(STUDIO_EXIT_START, from) +
-    (STUDIO_EXIT_END - STUDIO_EXIT_START) * clamp(elapsed / STUDIO_EXIT_DURATION));
-}
-
 export function studioTimeline(progress: number, reduced = false) {
   const p = clamp(progress);
-  const forward = range(p, .02, .26);
-  const reverse = range(p, .79, .965);
-  const zoomIn = smooth(range(p, .28, .39));
-  const zoomOut = smooth(range(p, .665, .775));
-  const zoom = reduced ? (p >= .335 && p < .72 ? 1 : 0) : zoomIn * (1 - zoomOut);
+  // The timeline ends on the fifth project. The sticky stage then releases
+  // straight into services, with no contraction or return to the studio.
+  const forward = range(p, .03, STUDIO_ENTRY_START);
+  const zoom = reduced ? (p >= .5 ? 1 : 0) : smooth(range(p, .42, .585));
   const frame = reduced
-    ? (p < .26 || p >= .965 ? 0 : STUDIO_FRAMES - 1)
-    : Math.round(forward * (1 - reverse) * (STUDIO_FRAMES - 1));
+    ? (p < STUDIO_ENTRY_START ? 0 : STUDIO_FRAMES - 1)
+    : Math.round(forward * (STUDIO_FRAMES - 1));
   return {
     frame,
     zoom,
-    phase: p < .28 ? 'approach' : p < .39 ? 'expand' : p < .665 ? 'projects' : p < .79 ? 'contract' : 'return',
-    opening: 1 - smooth(range(p, .025, .075)),
-    projectOpacity: smooth(range(p, .377, .4)) * (1 - smooth(range(p, .66, .69))),
-    projectIndex: Math.min(4, Math.floor(range(p, .40, .65) * 5)),
-    projectProgress: range(p, .40, .65),
-    returnCopy: smooth(range(p, .952, .985)),
+    phase: p < .42 ? 'approach' : p < .585 ? 'expand' : 'projects',
+    opening: 1 - smooth(range(p, .0375, .1125)),
+    projectOpacity: smooth(range(p, .566, STUDIO_ENTRY_END)),
+    projectIndex: Math.min(4, Math.floor(range(p, STUDIO_ENTRY_END, .975) * 5)),
+    projectProgress: range(p, STUDIO_ENTRY_END, .975),
   };
 }
 
