@@ -101,7 +101,6 @@
   transition: opacity 260ms ease, transform 650ms ease-out;
 }
 .performance-editorial-photo img[data-current='true'] { opacity: 1; transform: scale(1); }
-.performance-editorial-photo img:last-of-type { object-fit: contain; background: #edf3fa; }
 .performance-editorial-photo figcaption {
   margin-top: 7px;
   color: #9298a2;

@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { Fragment, useEffect, useId, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { CREATIVE_PAGES, CreativeStudio } from '@/components/creative-studio';
 import { PerformanceStudio } from '@/components/performance-studio';
 import { SocialStudio } from '@/components/social-studio';
 import { STRATEGY_PAGES, StrategyDocuments } from '@/components/strategy-documents';
 import { ServiceDemoNavigation, useServiceDemoPlayback } from '@/components/service-demo';
-import { SERVICE_STOPS, servicePageScale, servicesJourney } from '@/lib/services-journey';
+import { activeServiceIndex, serviceCopyPose, serviceEntryPose, servicePageScale, serviceTitleCharacterCount } from '@/lib/services-journey';
 import './services-journey.css';
 
 const SERVICES = [
@@ -41,14 +41,19 @@ const SERVICES = [
   },
 ] as const;
 
+const INTRO_TITLE_LINES = ['브랜드의 빈 우주를', '발견하기 위해'] as const;
+const INTRO_TITLE_LENGTH = INTRO_TITLE_LINES.join('').length;
+
 export function ServicesSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const stickyRef = useRef<HTMLDivElement>(null);
+  const introRef = useRef<HTMLDivElement>(null);
+  const introContentRef = useRef<HTMLDivElement>(null);
+  const introTitleRef = useRef<HTMLHeadingElement>(null);
+  const visualRef = useRef<HTMLDivElement>(null);
   const strategyRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
-  const introRef = useRef<HTMLDivElement>(null);
   const copyRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [typedTitleLength, setTypedTitleLength] = useState(0);
   const strategy = useServiceDemoPlayback(strategyRef, activeIndex === 0, STRATEGY_PAGES);
   const creative = useServiceDemoPlayback(strategyRef, activeIndex === 1, CREATIVE_PAGES, 4000);
   const strategyPage = strategy.page;
@@ -59,146 +64,187 @@ export function ServicesSection() {
   const currentDemo = activeIndex === 0 ? strategy : activeIndex === 1 ? creative : null;
 
   const selectService = (index: number) => {
-    const section = sectionRef.current;
-    const sticky = stickyRef.current;
-    if (!section || !sticky) return;
-    const distance = Math.max(section.offsetHeight - sticky.offsetHeight, 0);
-    window.scrollTo({
-      top: window.scrollY + section.getBoundingClientRect().top + distance * SERVICE_STOPS[index],
+    copyRefs.current[index]?.scrollIntoView({
+      block: 'start',
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
     });
   };
 
   useEffect(() => {
     let frame = 0;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const update = () => {
       frame = 0;
-      const section = sectionRef.current;
-      const sticky = stickyRef.current;
-      if (!section || !sticky || !pageRef.current || !introRef.current) return;
-      const width = sticky.clientWidth;
-      const height = sticky.clientHeight;
-      const compact = width <= 760;
-      const scrollable = Math.max(section.offsetHeight - height, 1);
-      const progress = -section.getBoundingClientRect().top / scrollable;
-      const scene = servicesJourney(progress, compact, reduced.matches);
-      const scale = servicePageScale(width, height, compact) * scene.scale;
+      const intro = introRef.current;
+      const introContent = introContentRef.current;
+      const introTitle = introTitleRef.current;
+      const visual = visualRef.current;
+      const page = pageRef.current;
+      if (!intro || !introContent || !introTitle || !visual || !page) return;
+      const introBounds = intro.getBoundingClientRect();
+      const visualBounds = visual.getBoundingClientRect();
+      const introProgress = -introBounds.top / Math.max(introBounds.height, 1);
+      const entry = serviceEntryPose(
+        introProgress,
+        window.innerWidth,
+        window.innerHeight,
+        visualBounds.left,
+        visualBounds.top,
+        visualBounds.width,
+        visualBounds.height,
+      );
+      const settled = reducedMotion.matches;
+      const nextTypedTitleLength = settled ? INTRO_TITLE_LENGTH : serviceTitleCharacterCount(introProgress, INTRO_TITLE_LENGTH);
+      setTypedTitleLength((current) => current === nextTypedTitleLength ? current : nextTypedTitleLength);
+      const reducedPeek = settled && introBounds.bottom > 0;
+      const pose = reducedPeek
+        ? serviceEntryPose(0, window.innerWidth, window.innerHeight, visualBounds.left, visualBounds.top, visualBounds.width, visualBounds.height)
+        : entry;
+      page.style.transform = `translate3d(${(settled && !reducedPeek ? visualBounds.width / 2 : pose.x) - visualBounds.width / 2}px, ${(settled && !reducedPeek ? visualBounds.height / 2 : pose.y) - visualBounds.height / 2}px, 0) translate(-50%, -50%) scale(${settled && !reducedPeek ? servicePageScale(visualBounds.width, visualBounds.height) : pose.scale})`;
+      page.style.opacity = String(entry.opacity);
+      page.style.visibility = entry.opacity > .001 ? 'visible' : 'hidden';
+      page.style.pointerEvents = introBounds.bottom <= 0 ? 'auto' : 'none';
+      introContent.style.opacity = String(settled ? 1 : entry.titleOpacity);
+      introContent.style.transform = settled ? 'none' : `translate3d(0, ${entry.titleOffset}px, 0)`;
+      introTitle.style.transform = settled ? 'none' : `scale(${entry.titleScale})`;
 
-      pageRef.current.style.transform = `translate3d(${width * scene.x}px, ${height * scene.y}px, 0) translate(-50%, -50%) scale(${scale})`;
-      introRef.current.style.transform = `translate3d(0, ${height * scene.intro.y}px, 0)`;
-      introRef.current.style.opacity = String(scene.intro.opacity);
-      introRef.current.style.visibility = scene.intro.opacity > .001 ? 'visible' : 'hidden';
-      copyRefs.current.forEach((copy, index) => {
-        if (!copy) return;
-        const pose = scene.copies[index];
-        copy.style.transform = `translate3d(${width * pose.x}px, ${height * pose.y}px, 0)`;
-        copy.style.opacity = String(pose.opacity);
-        copy.style.visibility = pose.opacity > .001 ? 'visible' : 'hidden';
+      const compact = window.innerWidth <= 760;
+      const visibleCenter = compact
+        ? (visual.clientHeight + window.innerHeight) / 2
+        : window.innerHeight / 2;
+      const centers = copyRefs.current.map((copy) => {
+        if (!copy) return Number.POSITIVE_INFINITY;
+        const frame = copy.firstElementChild as HTMLElement | null;
+        if (!frame) return Number.POSITIVE_INFINITY;
+        const readingTop = compact ? visual.clientHeight : 0;
+        const readingHeight = window.innerHeight - readingTop;
+        const stickyTop = readingTop + Math.max(12, (readingHeight - frame.offsetHeight) / 2);
+        const top = `${stickyTop}px`;
+        if (frame.style.top !== top) frame.style.top = top;
+        const bounds = frame.getBoundingClientRect();
+        const center = bounds.top + bounds.height / 2;
+        const pose = serviceCopyPose(center, visibleCenter, Math.max(readingHeight, 1));
+        copy.style.setProperty('--service-copy-offset', `${pose.offset}px`);
+        copy.style.setProperty('--service-copy-scale', String(pose.scale));
+        copy.style.setProperty('--service-copy-opacity', String(pose.opacity));
+        return center;
       });
-      setActiveIndex(scene.activeIndex);
+      const nextIndex = activeServiceIndex(centers, visibleCenter);
+      setActiveIndex((current) => current === nextIndex ? current : nextIndex);
     };
 
     const requestUpdate = () => {
       if (!frame) frame = window.requestAnimationFrame(update);
     };
     const observer = new ResizeObserver(requestUpdate);
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    if (stickyRef.current) observer.observe(stickyRef.current);
+    if (visualRef.current) observer.observe(visualRef.current);
     update();
     window.addEventListener('scroll', requestUpdate, { passive: true });
     window.addEventListener('resize', requestUpdate);
-    reduced.addEventListener('change', requestUpdate);
+    reducedMotion.addEventListener('change', requestUpdate);
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
       observer.disconnect();
       window.removeEventListener('scroll', requestUpdate);
       window.removeEventListener('resize', requestUpdate);
-      reduced.removeEventListener('change', requestUpdate);
+      reducedMotion.removeEventListener('change', requestUpdate);
     };
   }, []);
 
   return (
-    <section className="services service-journey" id="services" ref={sectionRef} aria-label="우주기획 서비스">
-      {SERVICES.map((service, index) => (
-        <span className="service-journey-anchor" id={`service-${service.id}`} key={service.id}
-          style={{ top: `calc(${SERVICE_STOPS[index] * 100}% - ${SERVICE_STOPS[index] * 100}svh)` }} aria-hidden="true" />
-      ))}
-      <div className="service-journey-sticky" ref={stickyRef}>
-        <div className="service-journey-intro" ref={introRef}>
-          <h2 id="services-intro-heading"><span>브랜드의 <span className="service-intro-gradient">빈 우주</span>를</span><span>발견하기 위해</span></h2>
+    <section className="services service-journey" id="services" aria-label="우주기획 서비스">
+      <div className="service-journey-intro" ref={introRef}>
+        <div className="service-journey-intro-content" ref={introContentRef}>
+          <p>우주기획</p>
+          <h2 id="services-intro-heading" ref={introTitleRef} aria-label={INTRO_TITLE_LINES.join(' ')}>
+            {INTRO_TITLE_LINES.map((line, lineIndex) => {
+              const offset = lineIndex === 0 ? 0 : INTRO_TITLE_LINES[0].length;
+              return <span className="service-journey-typing-line" aria-hidden="true" key={line}>
+                {Array.from(line).map((character, characterIndex) => <Fragment key={`${lineIndex}-${characterIndex}`}>
+                  {typedTitleLength === offset + characterIndex && <i className="service-journey-typing-caret" />}
+                  <span className={`service-journey-typing-character ${typedTitleLength > offset + characterIndex ? 'is-typed' : ''}`}>{character}</span>
+                </Fragment>)}
+                {lineIndex === INTRO_TITLE_LINES.length - 1 && typedTitleLength === INTRO_TITLE_LENGTH && <i className="service-journey-typing-caret" />}
+              </span>;
+            })}
+          </h2>
         </div>
-        <nav className="service-journey-index" aria-label="서비스 바로가기">
+      </div>
+      <div className="service-journey-layout">
+        <div className="service-journey-copy-list">
           {SERVICES.map((service, index) => (
-            <button key={service.id} type="button" onClick={() => selectService(index)}
-              aria-label={service.title} aria-current={index === activeIndex ? 'step' : undefined}><span /></button>
+            <article className={`service-journey-copy ${activeIndex === index ? 'is-active' : ''}`} id={`service-${service.id}`}
+              ref={(node) => { copyRefs.current[index] = node; }} key={service.id}>
+              <div className="service-journey-copy-frame">
+                <div className="service-journey-copy-content">
+                  <div className="service-journey-step" aria-hidden="true"><span>{String(index + 1).padStart(2, '0')}</span><i /><span>04</span></div>
+                  <span className="service-kicker">{service.title}</span>
+                  <h3>{service.headline.map((line) => <span key={line}>{line}</span>)}</h3>
+                  <p>{service.description}</p>
+                  <ul className="service-scroll-tags" aria-label={`${service.title} 세부 서비스`}>
+                    {service.items.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                </div>
+              </div>
+            </article>
           ))}
-        </nav>
-        {SERVICES.map((service, index) => (
-          <article className={`service-journey-copy ${index % 2 ? 'is-right' : 'is-left'}`}
-            ref={(node) => { copyRefs.current[index] = node; }} key={service.id}>
-            <span className="service-kicker">{service.title}</span>
-            <h3>{service.headline.map((line) => <span key={line}>{line}</span>)}</h3>
-            <p>{service.description}</p>
-            <ul className="service-scroll-tags" aria-label={`${service.title} 세부 서비스`}>
-              {service.items.map((item) => <li key={item}>{item}</li>)}
-            </ul>
-          </article>
-        ))}
-        <div className="service-journey-page" ref={pageRef}>
-          <div ref={strategyRef} className="service-notion-shell" data-service={SERVICES[activeIndex].id} aria-label={`${SERVICES[activeIndex].title} 화면 예시`}>
-            <div className="service-mobile-picker">
-              <span>Services</span>
-              <select aria-label="서비스 화면 선택" value={activeIndex} onChange={(event) => selectService(Number(event.target.value))}>
-                {SERVICES.map((service, index) => <option key={service.id} value={index}>{service.title}</option>)}
-              </select>
-            </div>
-            <aside className="service-notion-sidebar">
-              <div className="service-notion-logo"><i /> uju planning</div>
-              <div className="service-notion-service-list">
-                <span className="service-notion-section-label">Services</span>
-                <nav className="service-notion-primary" aria-label="Services">
+        </div>
+        <div className="service-journey-visual" ref={visualRef}>
+          <div className="service-journey-page" ref={pageRef}>
+            <div ref={strategyRef} className="service-notion-shell" data-service={SERVICES[activeIndex].id} aria-label={`${SERVICES[activeIndex].title} 화면 예시`}>
+              <div className="service-mobile-picker">
+                <span>Services</span>
+                <select aria-label="서비스 화면 선택" value={activeIndex} onChange={(event) => selectService(Number(event.target.value))}>
+                  {SERVICES.map((service, index) => <option key={service.id} value={index}>{service.title}</option>)}
+                </select>
+              </div>
+              <aside className="service-notion-sidebar">
+                <div className="service-notion-logo"><i /> uju planning</div>
+                <div className="service-notion-service-list">
+                  <span className="service-notion-section-label">Services</span>
+                  <nav className="service-notion-primary" aria-label="Services">
+                    {SERVICES.map((service, index) => (
+                      <button type="button" aria-current={index === activeIndex ? 'page' : undefined} onClick={() => selectService(index)} key={service.id}>
+                        {service.title}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+                {currentDemo && <div className="service-notion-submenu">
+                  <span className="service-notion-section-label">{activeIndex === 0 ? '전략기획' : '콘텐츠 제작'}</span>
+                  {activeIndex === 0 ? (
+                    <ServiceDemoNavigation pages={STRATEGY_PAGES} label="전략기획 문서" page={strategyPage} onSelect={strategy.select} panelId={strategyPanelId} target={strategy.target} phase={strategy.phase} running={strategy.running} />
+                  ) : (
+                    <ServiceDemoNavigation pages={CREATIVE_PAGES} label="콘텐츠 제작 작업" page={creative.page} onSelect={creative.select} panelId={creativePanelId} target={creative.target} phase={creative.phase} running={creative.running} />
+                  )}
+                </div>}
+              </aside>
+              <div className="service-notion-main">
+                <div className="service-notion-toolbar">
+                  <span aria-hidden="true">{activeIndex === 0 ? '전략기획' : activeIndex === 1 ? '콘텐츠 제작' : '서비스'}</span>
+                  <i aria-hidden="true" />
+                  <strong aria-hidden="true">{activeIndex === 0 ? strategyTitle : activeIndex === 1 ? creativeTitle : SERVICES[activeIndex].title}</strong>
+                  {currentDemo && !currentDemo.reduced && <button className="strategy-playback-toggle" type="button" onClick={currentDemo.toggle} aria-label={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'} title={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'}>
+                    {currentDemo.paused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
+                  </button>}
+                </div>
+                <div className="service-notion-canvas-stage">
                   {SERVICES.map((service, index) => (
-                    <button type="button" aria-current={index === activeIndex ? 'page' : undefined} onClick={() => selectService(index)} key={service.id}>
-                      {service.title}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-              {currentDemo && <div className="service-notion-submenu">
-                <span className="service-notion-section-label">{activeIndex === 0 ? '전략기획' : '콘텐츠 제작'}</span>
-                {activeIndex === 0 ? (
-                  <ServiceDemoNavigation pages={STRATEGY_PAGES} label="전략기획 문서" page={strategyPage} onSelect={strategy.select} panelId={strategyPanelId} target={strategy.target} phase={strategy.phase} running={strategy.running} />
-                ) : (
-                  <ServiceDemoNavigation pages={CREATIVE_PAGES} label="콘텐츠 제작 작업" page={creative.page} onSelect={creative.select} panelId={creativePanelId} target={creative.target} phase={creative.phase} running={creative.running} />
-                )}
-              </div>}
-            </aside>
-            <div className="service-notion-main">
-              <div className="service-notion-toolbar">
-                <span aria-hidden="true">{activeIndex === 0 ? '전략기획' : activeIndex === 1 ? '콘텐츠 제작' : '서비스'}</span>
-                <i aria-hidden="true" />
-                <strong aria-hidden="true">{activeIndex === 0 ? strategyTitle : activeIndex === 1 ? creativeTitle : SERVICES[activeIndex].title}</strong>
-                {currentDemo && !currentDemo.reduced && <button className="strategy-playback-toggle" type="button" onClick={currentDemo.toggle} aria-label={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'} title={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'}>
-                  {currentDemo.paused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
-                </button>}
-              </div>
-              <div className="service-notion-canvas-stage">
-                {SERVICES.map((service, index) => (
-                  <div
-                    className={`service-canvas-panel ${index === activeIndex ? 'is-active' : ''}`}
-                    aria-hidden={index !== activeIndex}
-                    inert={index !== activeIndex}
-                    key={service.id}
-                  >
-                    <div className={`service-visual service-visual-${service.id}`}>
-                      {service.id === 'strategy' ? <StrategyDocuments page={strategyPage} panelId={strategyPanelId} running={strategy.running} />
-                        : service.id === 'creative' ? <CreativeStudio page={creative.page} panelId={creativePanelId} running={creative.running} reduced={creative.reduced} />
-                        : service.id === 'performance' ? activeIndex === 2 && <PerformanceStudio /> : <SocialStudio active={activeIndex === 3} />}
+                    <div
+                      className={`service-canvas-panel ${index === activeIndex ? 'is-active' : ''}`}
+                      aria-hidden={index !== activeIndex}
+                      inert={index !== activeIndex}
+                      key={service.id}
+                    >
+                      <div className={`service-visual service-visual-${service.id}`}>
+                        {service.id === 'strategy' ? <StrategyDocuments page={strategyPage} panelId={strategyPanelId} running={strategy.running} />
+                          : service.id === 'creative' ? <CreativeStudio page={creative.page} panelId={creativePanelId} active={activeIndex === 1} running={creative.running} reduced={creative.reduced} />
+                            : service.id === 'performance' ? activeIndex === 2 && <PerformanceStudio /> : <SocialStudio active={activeIndex === 3} />}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
