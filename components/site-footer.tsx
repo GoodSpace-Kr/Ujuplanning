@@ -1,4 +1,5 @@
 import './site-footer.css';
+import { InquiryForm } from './inquiry-form';
 
 const services = [
   ['전략기획', '#service-strategy'],
@@ -10,6 +11,7 @@ const services = [
 export function SiteFooter() {
   return (
     <footer className="uju-footer" id="footer" aria-label="우주기획 회사 정보">
+      <InquiryForm />
       <div className="uju-footer-content">
         <div className="uju-footer-top">
           <div className="uju-footer-brand">
