@@ -153,16 +153,6 @@ export function ServicesSection() {
   }, []);
 
   return (
-<<<<<<< HEAD
-    <section className="services service-journey" id="services" ref={sectionRef} aria-label="우주기획 서비스">
-      {SERVICES.map((service, index) => (
-        <span className="service-journey-anchor" id={`service-${service.id}`} key={service.id}
-          style={{ top: `calc(${SERVICE_STOPS[index] * 100}% - ${SERVICE_STOPS[index] * 100}svh)` }} aria-hidden="true" />
-      ))}
-      <div className="service-journey-sticky" ref={stickyRef}>
-        <div className="service-journey-intro" ref={introRef}>
-          <h2 id="services-intro-heading"><span>브랜드의 <span className="service-intro-gradient">빈 우주</span>를</span><span>발견하기 위해</span></h2>
-=======
     <section className="services service-journey" id="services" aria-label="우주기획 서비스">
       <div className="service-journey-intro" ref={introRef}>
         <div className="service-journey-intro-content" ref={introContentRef}>
@@ -179,7 +169,6 @@ export function ServicesSection() {
               </span>;
             })}
           </h2>
->>>>>>> 5fee23b (서비스 섹션 수정)
         </div>
       </div>
       <div className="service-journey-layout">
@@ -203,61 +192,61 @@ export function ServicesSection() {
         </div>
         <div className="service-journey-visual" ref={visualRef}>
           <div className="service-journey-page" ref={pageRef}>
-          <div ref={strategyRef} className="service-notion-shell" data-service={SERVICES[activeIndex].id} aria-label={`${SERVICES[activeIndex].title} 화면 예시`}>
-            <div className="service-mobile-picker">
-              <span>Services</span>
-              <select aria-label="서비스 화면 선택" value={activeIndex} onChange={(event) => selectService(Number(event.target.value))}>
-                {SERVICES.map((service, index) => <option key={service.id} value={index}>{service.title}</option>)}
-              </select>
-            </div>
-            <aside className="service-notion-sidebar">
-              <div className="service-notion-logo"><i /> uju planning</div>
-              <div className="service-notion-service-list">
-                <span className="service-notion-section-label">Services</span>
-                <nav className="service-notion-primary" aria-label="Services">
+            <div ref={strategyRef} className="service-notion-shell" data-service={SERVICES[activeIndex].id} aria-label={`${SERVICES[activeIndex].title} 화면 예시`}>
+              <div className="service-mobile-picker">
+                <span>Services</span>
+                <select aria-label="서비스 화면 선택" value={activeIndex} onChange={(event) => selectService(Number(event.target.value))}>
+                  {SERVICES.map((service, index) => <option key={service.id} value={index}>{service.title}</option>)}
+                </select>
+              </div>
+              <aside className="service-notion-sidebar">
+                <div className="service-notion-logo"><i /> uju planning</div>
+                <div className="service-notion-service-list">
+                  <span className="service-notion-section-label">Services</span>
+                  <nav className="service-notion-primary" aria-label="Services">
+                    {SERVICES.map((service, index) => (
+                      <button type="button" aria-current={index === activeIndex ? 'page' : undefined} onClick={() => selectService(index)} key={service.id}>
+                        {service.title}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+                {currentDemo && <div className="service-notion-submenu">
+                  <span className="service-notion-section-label">{activeIndex === 0 ? '전략기획' : '콘텐츠 제작'}</span>
+                  {activeIndex === 0 ? (
+                    <ServiceDemoNavigation pages={STRATEGY_PAGES} label="전략기획 문서" page={strategyPage} onSelect={strategy.select} panelId={strategyPanelId} target={strategy.target} phase={strategy.phase} running={strategy.running} />
+                  ) : (
+                    <ServiceDemoNavigation pages={CREATIVE_PAGES} label="콘텐츠 제작 작업" page={creative.page} onSelect={creative.select} panelId={creativePanelId} target={creative.target} phase={creative.phase} running={creative.running} />
+                  )}
+                </div>}
+              </aside>
+              <div className="service-notion-main">
+                <div className="service-notion-toolbar">
+                  <span aria-hidden="true">{activeIndex === 0 ? '전략기획' : activeIndex === 1 ? '콘텐츠 제작' : '서비스'}</span>
+                  <i aria-hidden="true" />
+                  <strong aria-hidden="true">{activeIndex === 0 ? strategyTitle : activeIndex === 1 ? creativeTitle : SERVICES[activeIndex].title}</strong>
+                  {currentDemo && !currentDemo.reduced && <button className="strategy-playback-toggle" type="button" onClick={currentDemo.toggle} aria-label={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'} title={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'}>
+                    {currentDemo.paused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
+                  </button>}
+                </div>
+                <div className="service-notion-canvas-stage">
                   {SERVICES.map((service, index) => (
-                    <button type="button" aria-current={index === activeIndex ? 'page' : undefined} onClick={() => selectService(index)} key={service.id}>
-                      {service.title}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-              {currentDemo && <div className="service-notion-submenu">
-                <span className="service-notion-section-label">{activeIndex === 0 ? '전략기획' : '콘텐츠 제작'}</span>
-                {activeIndex === 0 ? (
-                  <ServiceDemoNavigation pages={STRATEGY_PAGES} label="전략기획 문서" page={strategyPage} onSelect={strategy.select} panelId={strategyPanelId} target={strategy.target} phase={strategy.phase} running={strategy.running} />
-                ) : (
-                  <ServiceDemoNavigation pages={CREATIVE_PAGES} label="콘텐츠 제작 작업" page={creative.page} onSelect={creative.select} panelId={creativePanelId} target={creative.target} phase={creative.phase} running={creative.running} />
-                )}
-              </div>}
-            </aside>
-            <div className="service-notion-main">
-              <div className="service-notion-toolbar">
-                <span aria-hidden="true">{activeIndex === 0 ? '전략기획' : activeIndex === 1 ? '콘텐츠 제작' : '서비스'}</span>
-                <i aria-hidden="true" />
-                <strong aria-hidden="true">{activeIndex === 0 ? strategyTitle : activeIndex === 1 ? creativeTitle : SERVICES[activeIndex].title}</strong>
-                {currentDemo && !currentDemo.reduced && <button className="strategy-playback-toggle" type="button" onClick={currentDemo.toggle} aria-label={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'} title={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'}>
-                  {currentDemo.paused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
-                </button>}
-              </div>
-              <div className="service-notion-canvas-stage">
-                {SERVICES.map((service, index) => (
-                  <div
-                    className={`service-canvas-panel ${index === activeIndex ? 'is-active' : ''}`}
-                    aria-hidden={index !== activeIndex}
-                    inert={index !== activeIndex}
-                    key={service.id}
-                  >
-                    <div className={`service-visual service-visual-${service.id}`}>
-                      {service.id === 'strategy' ? <StrategyDocuments page={strategyPage} panelId={strategyPanelId} running={strategy.running} />
-                        : service.id === 'creative' ? <CreativeStudio page={creative.page} panelId={creativePanelId} active={activeIndex === 1} running={creative.running} reduced={creative.reduced} />
-                        : service.id === 'performance' ? activeIndex === 2 && <PerformanceStudio /> : <SocialStudio active={activeIndex === 3} />}
+                    <div
+                      className={`service-canvas-panel ${index === activeIndex ? 'is-active' : ''}`}
+                      aria-hidden={index !== activeIndex}
+                      inert={index !== activeIndex}
+                      key={service.id}
+                    >
+                      <div className={`service-visual service-visual-${service.id}`}>
+                        {service.id === 'strategy' ? <StrategyDocuments page={strategyPage} panelId={strategyPanelId} running={strategy.running} />
+                          : service.id === 'creative' ? <CreativeStudio page={creative.page} panelId={creativePanelId} active={activeIndex === 1} running={creative.running} reduced={creative.reduced} />
+                            : service.id === 'performance' ? activeIndex === 2 && <PerformanceStudio /> : <SocialStudio active={activeIndex === 3} />}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
       </div>

@@ -49,33 +49,6 @@
   transform-origin: left center;
   will-change: transform;
 }
-<<<<<<< HEAD
-.service-journey-intro h2 > span,
-.service-journey-copy h3 span { display: block; }
-
-.service-journey-intro h2 .service-intro-gradient {
-  color: #245ec4;
-  background: linear-gradient(180deg, #1c2d49 0%, #1f3e73 42%, #2565d5 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.service-journey-copy {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  left: 8%;
-  width: 28%;
-  max-width: 470px;
-  margin-top: -135px;
-  opacity: 0;
-  visibility: hidden;
-  will-change: transform, opacity;
-  word-break: keep-all;
-  pointer-events: none;
-=======
-
 .service-journey-intro h2 > span,
 .service-journey-copy h3 span { display: block; }
 
@@ -83,7 +56,6 @@
   display: inline;
   color: #d5d9e0;
   transition: color 90ms ease-out;
->>>>>>> 5fee23b (서비스 섹션 수정)
 }
 .service-journey-typing-character.is-typed { color: #202329; }
 .service-journey-typing-caret {
