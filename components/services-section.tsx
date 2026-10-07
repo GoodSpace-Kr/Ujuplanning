@@ -5,7 +5,7 @@ import { Pause, Play } from 'lucide-react';
 import { CREATIVE_PAGES, CreativeStudio } from '@/components/creative-studio';
 import { PerformanceStudio } from '@/components/performance-studio';
 import { SocialStudio } from '@/components/social-studio';
-import { STRATEGY_PAGES, StrategyDocuments } from '@/components/strategy-documents';
+import { StrategyDocuments } from '@/components/strategy-documents';
 import { ServiceDemoNavigation, useServiceDemoPlayback } from '@/components/service-demo';
 import { activeServiceIndex, serviceCopyPose, serviceEntryPose, servicePageScale, serviceTitleCharacterCount } from '@/lib/services-journey';
 import './services-journey.css';
@@ -53,15 +53,12 @@ export function ServicesSection() {
   const pageRef = useRef<HTMLDivElement>(null);
   const copyRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [strategyMotionActive, setStrategyMotionActive] = useState(false);
   const [typedTitleLength, setTypedTitleLength] = useState(0);
-  const strategy = useServiceDemoPlayback(strategyRef, activeIndex === 0, STRATEGY_PAGES);
   const creative = useServiceDemoPlayback(strategyRef, activeIndex === 1, CREATIVE_PAGES, 4000);
-  const strategyPage = strategy.page;
-  const strategyPanelId = useId();
   const creativePanelId = useId();
-  const strategyTitle = STRATEGY_PAGES.find((page) => page.id === strategyPage)!.title;
   const creativeTitle = CREATIVE_PAGES.find((page) => page.id === creative.page)!.title;
-  const currentDemo = activeIndex === 0 ? strategy : activeIndex === 1 ? creative : null;
+  const currentDemo = activeIndex === 1 ? creative : null;
 
   const selectService = (index: number) => {
     copyRefs.current[index]?.scrollIntoView({
@@ -132,6 +129,8 @@ export function ServicesSection() {
       });
       const nextIndex = activeServiceIndex(centers, visibleCenter);
       setActiveIndex((current) => current === nextIndex ? current : nextIndex);
+      const nextStrategyMotionActive = introBounds.bottom < window.innerHeight * .35 && nextIndex === 0;
+      setStrategyMotionActive((current) => current === nextStrategyMotionActive ? current : nextStrategyMotionActive);
     };
 
     const requestUpdate = () => {
@@ -211,20 +210,16 @@ export function ServicesSection() {
                     ))}
                   </nav>
                 </div>
-                {currentDemo && <div className="service-notion-submenu">
-                  <span className="service-notion-section-label">{activeIndex === 0 ? '전략기획' : '콘텐츠 제작'}</span>
-                  {activeIndex === 0 ? (
-                    <ServiceDemoNavigation pages={STRATEGY_PAGES} label="전략기획 문서" page={strategyPage} onSelect={strategy.select} panelId={strategyPanelId} target={strategy.target} phase={strategy.phase} running={strategy.running} />
-                  ) : (
-                    <ServiceDemoNavigation pages={CREATIVE_PAGES} label="콘텐츠 제작 작업" page={creative.page} onSelect={creative.select} panelId={creativePanelId} target={creative.target} phase={creative.phase} running={creative.running} />
-                  )}
-                </div>}
+              {activeIndex === 1 && <div className="service-notion-submenu">
+                <span className="service-notion-section-label">콘텐츠 제작</span>
+                <ServiceDemoNavigation pages={CREATIVE_PAGES} label="콘텐츠 제작 작업" page={creative.page} onSelect={creative.select} panelId={creativePanelId} target={creative.target} phase={creative.phase} running={creative.running} />
+              </div>}
               </aside>
               <div className="service-notion-main">
                 <div className="service-notion-toolbar">
                   <span aria-hidden="true">{activeIndex === 0 ? '전략기획' : activeIndex === 1 ? '콘텐츠 제작' : '서비스'}</span>
                   <i aria-hidden="true" />
-                  <strong aria-hidden="true">{activeIndex === 0 ? strategyTitle : activeIndex === 1 ? creativeTitle : SERVICES[activeIndex].title}</strong>
+                <strong aria-hidden="true">{activeIndex === 0 ? '전략 통합 대시보드' : activeIndex === 1 ? creativeTitle : SERVICES[activeIndex].title}</strong>
                   {currentDemo && !currentDemo.reduced && <button className="strategy-playback-toggle" type="button" onClick={currentDemo.toggle} aria-label={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'} title={currentDemo.paused ? '자동 재생 시작' : '자동 재생 일시정지'}>
                     {currentDemo.paused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
                   </button>}
@@ -238,7 +233,7 @@ export function ServicesSection() {
                       key={service.id}
                     >
                       <div className={`service-visual service-visual-${service.id}`}>
-                        {service.id === 'strategy' ? <StrategyDocuments page={strategyPage} panelId={strategyPanelId} running={strategy.running} />
+                      {service.id === 'strategy' ? <StrategyDocuments active={strategyMotionActive} />
                           : service.id === 'creative' ? <CreativeStudio page={creative.page} panelId={creativePanelId} active={activeIndex === 1} running={creative.running} reduced={creative.reduced} />
                             : service.id === 'performance' ? activeIndex === 2 && <PerformanceStudio /> : <SocialStudio active={activeIndex === 3} />}
                       </div>
