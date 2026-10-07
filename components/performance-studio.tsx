@@ -3,12 +3,12 @@
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 import Image from 'next/image';
 import { ArrowDown, ArrowUpRight, RotateCcw } from 'lucide-react';
-import { CAMPAIGN_IMAGES } from './campaign-assets';
+import { CAMPAIGN_VIDEO_FRAMES } from './campaign-assets';
 import { getPerformanceMotion, PERFORMANCE_DURATION } from './performance-demo';
 import './performance-studio.css';
 
 const OPERATIONS = [
-  { title: '콘텐츠 제작', detail: '제품 영상 · 사진 · 카드뉴스', at: 200 },
+  { title: '콘텐츠 제작', detail: '브랜드 영상 · 숏폼 · 광고 컷', at: 200 },
   { title: '광고 운영', detail: '타깃별 집행 · 소재 A/B 테스트', at: 650 },
   { title: '성과 최적화', detail: '반응 좋은 소재에 예산 집중', at: 1100 },
 ] as const;
@@ -113,9 +113,9 @@ export function PerformanceStudio() {
         <div className="performance-story">
           <figure className="performance-editorial-photo">
             <div>
-              {CAMPAIGN_IMAGES.map((asset, index) => <Image key={asset.src} data-current={index === image} aria-hidden={index !== image} src={asset.src} alt={asset.alt} width={1536} height={1024} unoptimized loading="lazy" draggable={false} />)}
+              {CAMPAIGN_VIDEO_FRAMES.map((asset, index) => <Image key={asset.src} data-current={index === image} aria-hidden={index !== image} src={asset.src} alt={asset.alt} width={1280} height={720} unoptimized loading="lazy" draggable={false} />)}
             </div>
-            <figcaption>영상·사진·카드뉴스를 광고 소재로</figcaption>
+            <figcaption>오륜스포츠 영상 장면을 광고 소재로</figcaption>
           </figure>
           <ol className="performance-operations" aria-label="콘텐츠에서 성과까지">
             {OPERATIONS.map((operation, index) => (
