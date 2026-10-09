@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { STUDIO_FRAMES, studioGeometry, studioTimeline } from '@/lib/studio-journey';
 import { STUDIO_ENTRY_START, STUDIO_ENTRY_END, shouldStartStudioEntry, studioEntryProgress } from '@/lib/studio-journey';
 import { createStudioFrames } from '@/lib/studio-frames';
@@ -244,11 +245,15 @@ export function StudioHero() {
         <div ref={projectsRef} className="studio-projects" aria-hidden={!showProjects}>
           <div className="studio-project-top"><span>UJU PLANNING</span><span>SELECTED PROJECTS</span></div>
           {projects.map((project, index) => (
-            <article key={project.name} className={`studio-project ${activeProject === index ? 'is-active' : ''}`} aria-hidden={activeProject !== index}>
+            <article key={project.name} className={`studio-project ${activeProject === index ? 'is-active' : ''}`} aria-hidden={activeProject !== index} inert={!showProjects || activeProject !== index}>
               <div className="studio-project-title">
                 <p className="studio-project-number">PROJECT {String(index + 1).padStart(2, '0')} <span>/ 05</span></p>
                 <h2>{project.name}</h2>
                 <p className="studio-project-category">{project.category}</p>
+                <a className="studio-project-link" href="/work" aria-label={`${project.name.replace(/\n/g, ' ')} 프로젝트 보기`}>
+                  <span>프로젝트 보기</span>
+                  <ArrowUpRight size={17} strokeWidth={1.6} aria-hidden="true" />
+                </a>
               </div>
               <div className="studio-project-copy">
                 <h3>{project.headline}</h3>
