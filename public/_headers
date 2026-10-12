@@ -5,6 +5,8 @@
   Cache-Control: public, max-age=31536000, immutable
 /assets/scroll-video/*
   Cache-Control: public, max-age=31536000, immutable
+/assets/service-media/*
+  Cache-Control: public, max-age=31536000, immutable
 
 # Unversioned stills may be replaced; keep their browser cache short.
 /assets/studio-sequence/*

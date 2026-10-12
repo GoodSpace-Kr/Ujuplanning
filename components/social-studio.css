@@ -117,7 +117,7 @@
 .social-instagram-top { display: flex; align-items: center; gap: 7px; width: 100%; max-width: 300px; height: 29px; color: #354354; font-size: 10px; }
 .social-instagram-top > svg { width: 14px; height: 14px; margin-left: auto; }
 .social-instagram-media { width: 100%; max-width: 300px; aspect-ratio: 1; border: 1px solid #ecedef; }
-.mini-campaign-tile { position: relative; min-width: 0; min-height: 0; background-image: url('/mini-campaign-grid.png'); background-repeat: no-repeat; background-size: 313% 208%; }
+.mini-campaign-tile { position: relative; min-width: 0; min-height: 0; background-repeat: no-repeat; background-size: 313% 208%; }
 .mini-campaign-tile > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .mini-campaign-tile-0 { background-position: 0 0; }
 .mini-campaign-tile-1 { background-position: 50% 0; }

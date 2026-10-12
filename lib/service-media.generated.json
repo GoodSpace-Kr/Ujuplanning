@@ -1,0 +1,12 @@
+{
+  "images": {
+    "mini-campaign-grid.png": "/assets/service-media/mini-campaign-grid-c2a2a9363f95.webp",
+    "cardnews/bmw-color-lineup.jpg": "/assets/service-media/bmw-color-lineup-cdff9c9efa19.webp",
+    "cardnews/bmw-golf-cup.jpg": "/assets/service-media/bmw-golf-cup-a1a1afa8884c.webp",
+    "cardnews/bmw-march-promotion.jpg": "/assets/service-media/bmw-march-promotion-179ad2e0bb51.webp"
+  },
+  "video": {
+    "src": "/assets/service-media/ohrun-e82fa6d26146.mp4",
+    "bytes": 1539151
+  }
+}

@@ -32,6 +32,18 @@ function browser(t) {
 }
 const options = { src: '/film.mp4', count: 241, fps: 24, directory: '/stills', onChange() {}, onFailure() { assert.fail('unexpected failure'); } };
 
+test('metadata does not interrupt the first frame download with a redundant seek', t => {
+  const b = browser(t), frames = createScrollVideo(options);
+  frames.request(0, true);
+  b.video.readyState = 1;
+  b.video.dispatchEvent(new Event('loadedmetadata')); b.flush();
+  assert.equal(b.seeks.length, 0);
+  b.ready(); b.flush();
+  assert.equal(b.seeks.length, 0);
+  assert.equal(frames.get(0, true).index, 0);
+  frames.destroy();
+});
+
 test('scroll seeks coalesce to the latest target, preserving the previous shot while decoding', t => {
   const b = browser(t), frames = createScrollVideo(options);
   frames.request(0, true); b.ready(); b.flush();

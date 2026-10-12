@@ -65,7 +65,9 @@ export function createScrollVideo(options: {
   }
 
   function pump() {
-    if (disposed || !active || reduced || failed || document.hidden || seeking || video.seeking || video.readyState < 1) return;
+    // Metadata alone cannot supply a drawable frame. Seeking at that point can
+    // interrupt the opening download (notably WebKit's initial range probe).
+    if (disposed || !active || reduced || failed || document.hidden || seeking || video.seeking || video.readyState < 2) return;
     if (rendered === desired) return;
     // Seek into the middle of a frame to avoid floating point/keyframe boundaries.
     const time = Math.min((desired + .25) / fps, Math.max(0, video.duration - .001));

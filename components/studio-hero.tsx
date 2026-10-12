@@ -145,7 +145,8 @@ export function StudioHero() {
       if (Math.abs(progress - target) < .00003) progress = target;
       const state = studioTimeline(progress, motion.matches);
       frames.request(state.frame, true, motion.matches);
-      if (progress > .27) frames.preloadDetail();
+      // Prepare the phone close-up well before entry, even on a slow connection.
+      if (progress > .08) frames.preloadDetail();
       // Never zoom an earlier frame if the visitor jumped ahead before loading.
       const loaded = frames.get(state.frame, state.zoom > 0);
       const zoom = loaded?.index === STUDIO_FRAMES - 1 ? state.zoom : 0;

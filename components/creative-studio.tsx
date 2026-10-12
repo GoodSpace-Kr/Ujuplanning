@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import serviceMedia from '@/lib/service-media.generated.json';
 import {
   Bookmark,
   Brush,
@@ -133,7 +134,7 @@ function VideoEditor({ active, reduced }: { active: boolean; reduced: boolean })
               <video
                 ref={videoRef}
                 className="creative-editor-video"
-                src="/ohrun.mp4"
+                src={serviceMedia.video.src.replace('/assets/service-media/', '/api/scroll-video/')}
                 poster="/ohrun-frame-03.webp"
                 preload="metadata"
                 playsInline
@@ -308,7 +309,7 @@ export function BavarianInstagramFeed() {
         <button type="button" onClick={() => setFollowing((value) => !value)}>{following ? '팔로잉' : '팔로우'}</button>
         <MoreHorizontal aria-hidden="true" />
       </div>
-      <CardNewsArtwork src="/cardnews/bmw-color-lineup.jpg" alt="다섯 가지 BMW 컬러와 차량을 함께 표현한 캠페인 이미지" position="24.8%" />
+      <CardNewsArtwork src={serviceMedia.images['cardnews/bmw-color-lineup.jpg']} alt="다섯 가지 BMW 컬러와 차량을 함께 표현한 캠페인 이미지" position="24.8%" />
       <div className="creative-feed-actions">
         <button type="button" aria-label={liked ? '좋아요 취소' : '좋아요'} aria-pressed={liked} onClick={() => setLiked((value) => !value)}><Heart fill={liked ? 'currentColor' : 'none'} /></button>
         <MessageCircle aria-hidden="true" /><Repeat2 aria-hidden="true" /><Send aria-hidden="true" />
@@ -327,7 +328,7 @@ export function BavarianInstagramFeed() {
 function CardComposition() {
   const cards = [
     {
-      src: '/cardnews/bmw-march-promotion.jpg',
+      src: serviceMedia.images['cardnews/bmw-march-promotion.jpg'],
       alt: '도심을 달리는 BMW 세단과 3월 프로모션 안내',
       position: '30.3%',
       number: '01',
@@ -336,7 +337,7 @@ function CardComposition() {
       description: '새로운 달의 드라이빙 혜택',
     },
     {
-      src: '/cardnews/bmw-color-lineup.jpg',
+      src: serviceMedia.images['cardnews/bmw-color-lineup.jpg'],
       alt: '다섯 가지 BMW 컬러와 차량을 함께 표현한 캠페인 이미지',
       position: '24.8%',
       number: '02',
@@ -345,7 +346,7 @@ function CardComposition() {
       description: '컬러로 만나는 BMW의 이야기',
     },
     {
-      src: '/cardnews/bmw-golf-cup.jpg',
+      src: serviceMedia.images['cardnews/bmw-golf-cup.jpg'],
       alt: '골프 코스를 내려다본 BMW GOLF CUP 2024 이미지',
       position: '26.2%',
       number: '03',
