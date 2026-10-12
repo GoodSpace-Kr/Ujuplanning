@@ -44,7 +44,7 @@ export function createScrollVideo(options: {
     const abort = new AbortController();
     downloadControllers.add(abort);
     if (priority === 'low') upgradeAbort = abort;
-    const timeout = window.setTimeout(() => abort.abort(), 60_000);
+    const timeout = window.setTimeout(() => abort.abort(), priority === 'high' ? 60_000 : 180_000);
     try {
       const response = await fetch(url, { signal: abort.signal, priority });
       if (!response.ok) throw new Error('Video unavailable');

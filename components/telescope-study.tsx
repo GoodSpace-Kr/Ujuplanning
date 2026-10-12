@@ -6,6 +6,7 @@ import './telescope-study.css';
 
 export function TelescopeStudy({ embedded = false }: { embedded?: boolean }) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const [preparePoster, setPreparePoster] = useState(false);
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
 
   useEffect(() => {
@@ -16,6 +17,7 @@ export function TelescopeStudy({ embedded = false }: { embedded?: boolean }) {
     const observer = new IntersectionObserver(async ([entry]) => {
       if (!entry.isIntersecting) return;
       observer.disconnect();
+      setPreparePoster(true);
       try {
         const { mountTelescopeSequence } = await import('@/lib/telescope-sequence');
         if (disposed) return;
@@ -31,7 +33,7 @@ export function TelescopeStudy({ embedded = false }: { embedded?: boolean }) {
       } catch {
         if (!disposed) setStatus('failed');
       }
-    }, { rootMargin: '2000px' });
+    }, { rootMargin: '4000px' });
     observer.observe(embedded ? host.closest('.brand-process')! : host);
     return () => { disposed = true; observer.disconnect(); teardown(); };
   }, [embedded]);
@@ -42,8 +44,8 @@ export function TelescopeStudy({ embedded = false }: { embedded?: boolean }) {
         <div ref={hostRef} className="telescope-study-stage" role="img"
           aria-label="노을빛 창가의 망원경. 스크롤하면 접안렌즈로 천천히 다가가고, 렌즈 너머 별이 가득한 우주가 펼쳐집니다.">
           <picture className="telescope-study-poster" aria-hidden="true">
-            <source media="(max-width: 700px)" srcSet="/assets/telescope-sequence/mobile/0000.webp" />
-            <img src="/assets/telescope-sequence/desktop/0000.webp" width="1920" height="1080" alt="" loading="eager" fetchPriority="low" decoding="async" />
+            <source media="(max-width: 700px)" srcSet={preparePoster ? "/assets/telescope-sequence/mobile/0000.webp" : undefined} />
+            <img src={preparePoster ? "/assets/telescope-sequence/desktop/0000.webp" : undefined} width="1920" height="1080" alt="" loading="eager" fetchPriority="low" decoding="async" />
           </picture>
         </div>
         <h2 className="sr-only" id="telescope-study-heading">우주를 보는 시선.</h2>

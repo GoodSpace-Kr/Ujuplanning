@@ -46,8 +46,8 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
     host.dataset.quality = frames.stats().quality;
     host.dataset.downloadMs = frames.stats().downloadMs.toFixed(0);
     host.dataset.maxSeekMs = frames.stats().maxSeekMs.toFixed(1);
-      host.dataset.mediaError = frames.stats().downloadError;
-      host.dataset.receivedBytes = String(frames.stats().receivedBytes);
+    host.dataset.mediaError = frames.stats().downloadError;
+    host.dataset.receivedBytes = String(frames.stats().receivedBytes);
     if (!ready) { ready = true; onStatus('ready'); }
   }
 

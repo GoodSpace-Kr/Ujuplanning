@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Binoculars, Compass, Network, Orbit } from 'lucide-react';
 import { BRAND_PROCESS_EXPANSION_START, brandProcessIntroDelay, brandProcessIntroPhase, measureBrandProcess } from '@/lib/brand-process-journey';
 import { mountProcessExpansion } from '@/lib/process-expansion';
@@ -18,6 +18,21 @@ const steps = [
 
 export function BrandProcess() {
   const ref = useRef<HTMLElement>(null);
+  const [prepareImages, setPrepareImages] = useState(false);
+
+  useEffect(() => {
+    const section = ref.current;
+    if (!section) return;
+    // Preload all cards together well before their animation, without competing
+    // with the opening film when this section is still many screens away.
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      setPrepareImages(true);
+      observer.disconnect();
+    }, { rootMargin: '4000px' });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const section = ref.current;
@@ -114,7 +129,7 @@ export function BrandProcess() {
               <div className="brand-process-card-float">
                 <div className="brand-process-placeholder">
                   {i === 3 ? <TelescopeStudy embedded /> : (
-                    <img className="brand-process-image" src={`/assets/brand-process/${step.word.toLowerCase()}.webp`} alt="" loading="eager" fetchPriority="low" decoding="async" />
+                    <img className="brand-process-image" src={prepareImages ? `/assets/brand-process/${step.word.toLowerCase()}.webp` : undefined} alt="" loading="eager" fetchPriority="low" decoding="async" />
                   )}
                 </div>
               </div>
