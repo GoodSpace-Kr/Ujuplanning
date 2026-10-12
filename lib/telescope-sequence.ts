@@ -1,6 +1,7 @@
 import { FRAME_COUNT, clamp01, sequenceFrame, coverCrop } from './sequence-math';
 
-type FrameImage = ImageBitmap | HTMLImageElement;
+import { createSequenceFrames } from './sequence-frames';
+import packs from './sequence-packs.generated.json';
 type SequenceStatus = 'loading' | 'ready' | 'failed';
 
 export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: SequenceStatus) => void, externalProgress?: () => number) {
@@ -13,107 +14,37 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
   const mobile = matchMedia('(max-width: 700px)').matches;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const variant = mobile ? 'mobile' : 'desktop';
-  const cacheLimit = mobile ? 8 : 10;
-  const blobs = new Map<number, Blob>();
-  const decoded = new Map<number, FrameImage>();
-  const pending = new Set<number>();
-  const attempts = new Map<number, number>();
-  const abort = new AbortController();
-  let disposed = false, active = false, decoding = false, ready = false;
+  let disposed = false, active = false, ready = false;
   let raf = 0, desired = 0, rendered = -1, progress = 0, lastTime = 0;
   let viewWidth = 1, viewHeight = 1;
-
-  function release(image: FrameImage) {
-    if ('close' in image) image.close();
-    else image.src = '';
-  }
+  const frames = createSequenceFrames({
+    count: FRAME_COUNT,
+    directory: `/assets/telescope-sequence/${variant}`,
+    packs: packs.telescope[variant],
+    decodedLimit: mobile ? 8 : 10,
+    onChange: () => { drawBestAvailable(); },
+    onFailure: () => { if (!ready) onStatus('failed'); },
+  });
 
   function paint(frame: number) {
-    const image = decoded.get(frame);
+    const image = frames.get(frame, true)?.image;
     if (!image || disposed) return;
     const crop = coverCrop(image.width, image.height, viewWidth, viewHeight, frame);
     context!.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
     rendered = frame;
-    decoded.delete(frame);
-    decoded.set(frame, image);
     const position = frame / (FRAME_COUNT - 1);
     section.style.setProperty('--journey-opening', String(1 - clamp01(position / 0.18)));
     section.style.setProperty('--journey-ending', String(clamp01((position - 0.88) / 0.12)));
     host.dataset.frame = String(frame);
-    host.dataset.decoded = String(decoded.size);
+    host.dataset.loaded = String(frames.stats().loaded);
+    host.dataset.decoded = String(frames.stats().decoded);
     if (!ready) { ready = true; onStatus('ready'); }
   }
 
   function drawBestAvailable() {
-    if (decoded.has(desired)) { if (rendered !== desired) paint(desired); return; }
-    let nearest = rendered;
-    for (const frame of decoded.keys()) {
-      if (nearest < 0 || Math.abs(frame - desired) < Math.abs(nearest - desired)) nearest = frame;
-    }
-    if (nearest >= 0 && nearest !== rendered) paint(nearest);
-  }
-
-  async function decode(blob: Blob): Promise<FrameImage> {
-    if (typeof createImageBitmap === 'function') return createImageBitmap(blob);
-    const url = URL.createObjectURL(blob);
-    const image = new Image();
-    image.src = url;
-    try { await image.decode(); return image; }
-    finally { URL.revokeObjectURL(url); }
-  }
-
-  // Compressed frames can be retained; only a small moving window is decoded.
-  async function pumpDecode() {
-    if (decoding || disposed || !active) return;
-    decoding = true;
-    try {
-      while (!disposed && active) {
-        const candidates = motion.matches ? [desired] : [desired, desired + 1, desired - 1, desired + 2, desired - 2];
-        const frame = candidates.find(index => blobs.has(index) && !decoded.has(index));
-        if (frame === undefined) break;
-        try {
-          const image = await decode(blobs.get(frame)!);
-          if (disposed) { release(image); break; }
-          decoded.set(frame, image);
-          while (decoded.size > cacheLimit) {
-            const oldest = [...decoded.keys()].find(index => index !== rendered && index !== desired)!;
-            release(decoded.get(oldest)!);
-            decoded.delete(oldest);
-          }
-          drawBestAvailable();
-        } catch {
-          blobs.delete(frame);
-          if (frame === desired && !ready) onStatus('failed');
-          pumpFetch();
-        }
-      }
-    } finally { decoding = false; }
-  }
-
-  function priorities() {
-    if (motion.matches) return [desired, 0, FRAME_COUNT - 1];
-    const order = [desired, 0, FRAME_COUNT - 1];
-    for (let offset = 1; offset <= 12; offset++) order.push(desired + offset, desired - offset);
-    // Sparse coverage first makes a fast scroll or a jump to the end responsive.
-    for (let index = 0; index < FRAME_COUNT; index += 8) order.push(index);
-    for (let offset = 13; offset < FRAME_COUNT; offset++) order.push(desired + offset, desired - offset);
-    return order.filter(index => index >= 0 && index < FRAME_COUNT);
-  }
-
-  function pumpFetch() {
-    if (disposed || !active || document.hidden) return;
-    const queue = priorities();
-    while (pending.size < 4) {
-      const frame = queue.find(index => !blobs.has(index) && !pending.has(index) && (attempts.get(index) || 0) < 2);
-      if (frame === undefined) break;
-      pending.add(frame);
-      attempts.set(frame, (attempts.get(frame) || 0) + 1);
-      fetch(`/assets/telescope-sequence/${variant}/${String(frame).padStart(4, '0')}.webp`, { signal: abort.signal })
-        .then(response => { if (!response.ok) throw new Error('Frame unavailable'); return response.blob(); })
-        .then(blob => { if (!disposed) { blobs.set(frame, blob); host.dataset.loaded = String(blobs.size); } })
-        .catch(() => { if (!disposed && !ready && frame === desired && attempts.get(frame) === 2) onStatus('failed'); })
-        .finally(() => { pending.delete(frame); if (!disposed) { void pumpDecode(); pumpFetch(); } });
-    }
+    if (!active || disposed) return;
+    const loaded = frames.get(desired);
+    if (loaded && loaded.index !== rendered) paint(loaded.index);
   }
 
   function measureProgress() {
@@ -132,8 +63,7 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
     if (Math.abs(target - progress) < 0.0002) progress = target;
     desired = sequenceFrame(progress, motion.matches);
     drawBestAvailable();
-    pumpFetch();
-    void pumpDecode();
+    frames.request(desired, true, motion.matches);
     if (progress !== target) raf = requestAnimationFrame(tick);
   }
 
@@ -151,7 +81,7 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
   const observer = new IntersectionObserver(([entry]) => {
     active = entry.isIntersecting;
     if (active) { progress = measureProgress(); schedule(); }
-    else { cancelAnimationFrame(raf); raf = 0; }
+    else { cancelAnimationFrame(raf); raf = 0; frames.request(desired, false); }
   }, { rootMargin: '700px' });
   observer.observe(section);
   const resizeObserver = new ResizeObserver(resize);
@@ -163,16 +93,13 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
 
   return () => {
     disposed = true;
-    abort.abort();
+    frames.destroy();
     observer.disconnect();
     resizeObserver.disconnect();
     cancelAnimationFrame(raf);
     window.removeEventListener('scroll', schedule);
     document.removeEventListener('visibilitychange', schedule);
     motion.removeEventListener('change', schedule);
-    decoded.forEach(release);
-    decoded.clear();
-    blobs.clear();
     canvas.remove();
   };
 }

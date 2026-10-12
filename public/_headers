@@ -1,0 +1,13 @@
+# Pack names contain a content hash, so new footage always gets a new URL.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/sequence-packs/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unversioned stills may be replaced; keep their browser cache short.
+/assets/studio-sequence/*
+  Cache-Control: public, max-age=3600
+/assets/telescope-sequence/*
+  Cache-Control: public, max-age=3600
+/fonts/pretendard-1.3.9/*
+  Cache-Control: public, max-age=31536000, immutable

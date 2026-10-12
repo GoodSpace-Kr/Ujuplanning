@@ -205,8 +205,8 @@ export function ServicesSection() {
                     >
                       <div className={`service-visual service-visual-${service.id}`}>
                       {service.id === 'strategy' ? <StrategyDocuments active={strategyMotionActive} />
-                          : service.id === 'creative' ? <CreativeStudio page={creative.page} panelId={creativePanelId} active={activeIndex === 1} running={creative.running} reduced={creative.reduced} />
-                            : service.id === 'performance' ? activeIndex === 2 && <PerformanceStudio /> : <SocialStudio active={activeIndex === 3} />}
+                          : service.id === 'creative' ? activeIndex === 1 && <CreativeStudio page={creative.page} panelId={creativePanelId} active running={creative.running} reduced={creative.reduced} />
+                            : service.id === 'performance' ? activeIndex === 2 && <PerformanceStudio /> : activeIndex === 3 && <SocialStudio active />}
                       </div>
                     </div>
                   ))}

@@ -143,7 +143,7 @@ export function StudioHero() {
       } else progress = motion.matches ? target : progress + (target - progress) * (1 - Math.exp(-dt / 75));
       if (Math.abs(progress - target) < .00003) progress = target;
       const state = studioTimeline(progress, motion.matches);
-      frames.request(state.frame, true);
+      frames.request(state.frame, true, motion.matches);
       if (progress > .27) frames.preloadDetail();
       // Never zoom an earlier frame if the visitor jumped ahead before loading.
       const loaded = frames.get(state.frame, state.zoom > 0);
@@ -171,6 +171,7 @@ export function StudioHero() {
       section!.dataset.frame = String(paintedFrame);
       section!.dataset.zoom = zoom.toFixed(4);
       section!.dataset.decoded = String(frames.stats().decoded);
+      section!.dataset.loaded = String(frames.stats().loaded);
       if (currentProject !== state.projectIndex) { currentProject = state.projectIndex; setActiveProject(currentProject); }
       if (projectsVisible !== (projectOpacity > .5)) { projectsVisible = projectOpacity > .5; setShowProjects(projectsVisible); }
       if (autoEntering || target !== progress) schedule();
@@ -178,7 +179,8 @@ export function StudioHero() {
     function resize() {
       viewWidth = stage!.clientWidth || 1;
       viewHeight = stage!.clientHeight || 1;
-      const ratio = Math.min(devicePixelRatio || 1, 2);
+      // Rendering above the source resolution adds GPU work without detail.
+      const ratio = Math.min(devicePixelRatio || 1, 2, 1920 / viewWidth, 1920 / viewHeight);
       canvas!.width = Math.round(viewWidth * ratio);
       canvas!.height = Math.round(viewHeight * ratio);
       paintedFrame = -1;

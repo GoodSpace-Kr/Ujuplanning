@@ -1,0 +1,1382 @@
+{
+  "studio": {
+    "desktop": [
+      {
+        "url": "/assets/sequence-packs/studio/desktop/af838bd16067101d.bin",
+        "frames": [
+          0,
+          12,
+          24,
+          36,
+          48,
+          60,
+          72,
+          84,
+          96,
+          108,
+          120,
+          132,
+          144,
+          156,
+          168,
+          180,
+          192,
+          204,
+          216,
+          228,
+          240
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/106351d88cff58a8.bin",
+        "frames": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/bbb20c8b4cc504d7.bin",
+        "frames": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/5860e0c377e429a9.bin",
+        "frames": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/e4019312e57d2967.bin",
+        "frames": [
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/5f8351244cc4b757.bin",
+        "frames": [
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/095e7e9e7a9cfe6b.bin",
+        "frames": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/2a5b3afc2e82032d.bin",
+        "frames": [
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/1869ec68853571bd.bin",
+        "frames": [
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/f4b2308cff962dbd.bin",
+        "frames": [
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/3b1e303ad624e772.bin",
+        "frames": [
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/5abc50e86c6952de.bin",
+        "frames": [
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/4c613ab6d1d055ec.bin",
+        "frames": [
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/05e9bbb19eed57cd.bin",
+        "frames": [
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/f3c892c1d16b45b6.bin",
+        "frames": [
+          157,
+          158,
+          159,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/25529e7ab8f22b36.bin",
+        "frames": [
+          169,
+          170,
+          171,
+          172,
+          173,
+          174,
+          175,
+          176,
+          177,
+          178,
+          179
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/1f3d89cce78f8485.bin",
+        "frames": [
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          191
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/a50f2d949b47c576.bin",
+        "frames": [
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/a0fb7405f648e74f.bin",
+        "frames": [
+          205,
+          206,
+          207,
+          208,
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          215
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/25e7b265fdaad957.bin",
+        "frames": [
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/desktop/7012329f4fbcf541.bin",
+        "frames": [
+          229,
+          230,
+          231,
+          232,
+          233,
+          234,
+          235,
+          236,
+          237,
+          238,
+          239
+        ]
+      }
+    ],
+    "mobile": [
+      {
+        "url": "/assets/sequence-packs/studio/mobile/8c90b1d5978433a1.bin",
+        "frames": [
+          0,
+          12,
+          24,
+          36,
+          48,
+          60,
+          72,
+          84,
+          96,
+          108,
+          120,
+          132,
+          144,
+          156,
+          168,
+          180,
+          192,
+          204,
+          216,
+          228,
+          240
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/ef67ce7836e17c8a.bin",
+        "frames": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/1c36622c3d87e0c5.bin",
+        "frames": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/959d5e8be259c1b6.bin",
+        "frames": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/51159e46aa227662.bin",
+        "frames": [
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/5f5c01cbc663e656.bin",
+        "frames": [
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/0d25d606e3426a07.bin",
+        "frames": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/8f16a50c642e7ac4.bin",
+        "frames": [
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/fd8b843954f0ffa3.bin",
+        "frames": [
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/a196eedf65285411.bin",
+        "frames": [
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/0f15dc5db941361b.bin",
+        "frames": [
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/7e5a15709981ba31.bin",
+        "frames": [
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/c13baf9982469e2d.bin",
+        "frames": [
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/24d10ab1dd54406f.bin",
+        "frames": [
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/3ec97fb19ea9abc1.bin",
+        "frames": [
+          157,
+          158,
+          159,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/84740e0dbaab4b0b.bin",
+        "frames": [
+          169,
+          170,
+          171,
+          172,
+          173,
+          174,
+          175,
+          176,
+          177,
+          178,
+          179
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/d018f06b60ff0c02.bin",
+        "frames": [
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          191
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/dc552aec858b7302.bin",
+        "frames": [
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/7fe88c0f3f313059.bin",
+        "frames": [
+          205,
+          206,
+          207,
+          208,
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          215
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/9a54edeeea225a01.bin",
+        "frames": [
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/studio/mobile/47b7fa5a32988c91.bin",
+        "frames": [
+          229,
+          230,
+          231,
+          232,
+          233,
+          234,
+          235,
+          236,
+          237,
+          238,
+          239
+        ]
+      }
+    ]
+  },
+  "telescope": {
+    "desktop": [
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/672e79dc54e429da.bin",
+        "frames": [
+          0,
+          12,
+          24,
+          36,
+          48,
+          60,
+          72,
+          84,
+          96,
+          108,
+          120,
+          132,
+          144,
+          156,
+          168,
+          180,
+          192,
+          204,
+          216,
+          228,
+          232
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/6d33585f88420c5d.bin",
+        "frames": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/f637fd9e9f74ef0c.bin",
+        "frames": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/837593019b779c70.bin",
+        "frames": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/bfd06cbf297c7601.bin",
+        "frames": [
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/0985092b889828e2.bin",
+        "frames": [
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/dfcec052c9ff9165.bin",
+        "frames": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/43a167bcb1f32946.bin",
+        "frames": [
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/ded4528bc0ae3528.bin",
+        "frames": [
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/f37cc602c88b9ad4.bin",
+        "frames": [
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/73b7373e63fb0705.bin",
+        "frames": [
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/2870c871a711d379.bin",
+        "frames": [
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/0eeb5c28b07d350d.bin",
+        "frames": [
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/661170458c401c10.bin",
+        "frames": [
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/5f630578095d80ef.bin",
+        "frames": [
+          157,
+          158,
+          159,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/8ce7ec9de9979ab2.bin",
+        "frames": [
+          169,
+          170,
+          171,
+          172,
+          173,
+          174,
+          175,
+          176,
+          177,
+          178,
+          179
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/149a9cae0c4ba76b.bin",
+        "frames": [
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          191
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/c5e657fe87d26648.bin",
+        "frames": [
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/5cc11a0587977bcb.bin",
+        "frames": [
+          205,
+          206,
+          207,
+          208,
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          215
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/a363473054566ddc.bin",
+        "frames": [
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/desktop/2ef83594cf0f8ac9.bin",
+        "frames": [
+          229,
+          230,
+          231
+        ]
+      }
+    ],
+    "mobile": [
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/092c8c7812c11ac3.bin",
+        "frames": [
+          0,
+          12,
+          24,
+          36,
+          48,
+          60,
+          72,
+          84,
+          96,
+          108,
+          120,
+          132,
+          144,
+          156,
+          168,
+          180,
+          192,
+          204,
+          216,
+          228,
+          232
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/c02f68ac5af9973d.bin",
+        "frames": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/cfa796349fd8422e.bin",
+        "frames": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/ee842d0abf613f94.bin",
+        "frames": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/e54961ab680fce73.bin",
+        "frames": [
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/7c5b69c5f7a418a0.bin",
+        "frames": [
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/787ff24f4f187d47.bin",
+        "frames": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/4e46d67acebaf85c.bin",
+        "frames": [
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/a7a71ab2cd7716c6.bin",
+        "frames": [
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/7fc824b10d0babc2.bin",
+        "frames": [
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/86d3ff6183970811.bin",
+        "frames": [
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/6820d32122fe28f9.bin",
+        "frames": [
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/a9c6ca717827ca28.bin",
+        "frames": [
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/7c7702eae999b4f0.bin",
+        "frames": [
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/95e81db4ed213f64.bin",
+        "frames": [
+          157,
+          158,
+          159,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/9f2061a9761aa081.bin",
+        "frames": [
+          169,
+          170,
+          171,
+          172,
+          173,
+          174,
+          175,
+          176,
+          177,
+          178,
+          179
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/e368adc126e371af.bin",
+        "frames": [
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          191
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/b4416b06b9622872.bin",
+        "frames": [
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/66741536b8e64185.bin",
+        "frames": [
+          205,
+          206,
+          207,
+          208,
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          215
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/e3e516110bba63fc.bin",
+        "frames": [
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227
+        ]
+      },
+      {
+        "url": "/assets/sequence-packs/telescope/mobile/4c9bd8474ae5979b.bin",
+        "frames": [
+          229,
+          230,
+          231
+        ]
+      }
+    ]
+  }
+}
