@@ -15,6 +15,14 @@
       "fps": 24,
       "frames": 241,
       "bytes": 1069963
+    },
+    "preview": {
+      "src": "/assets/scroll-video/studio-preview-54afe66a788d.mp4",
+      "width": 640,
+      "height": 360,
+      "fps": 24,
+      "frames": 241,
+      "bytes": 368864
     }
   },
   "telescope": {
@@ -33,6 +41,14 @@
       "fps": 24,
       "frames": 233,
       "bytes": 675642
+    },
+    "preview": {
+      "src": "/assets/scroll-video/telescope-preview-1aa613972990.mp4",
+      "width": 640,
+      "height": 360,
+      "fps": 24,
+      "frames": 233,
+      "bytes": 178788
     }
   }
 }

@@ -128,7 +128,7 @@ function ShortsEditor({ active, reduced }: { active: boolean; reduced: boolean }
       <div className="social-shorts-preview">
         <div className="social-media-block social-shorts-media">
           <div className="social-media-placeholder"><Video /><span>영상을 추가하는 중</span></div>
-          <video src={serviceMedia.video.src.replace('/assets/service-media/', '/api/scroll-video/')} poster="/ohrun-frame-02.webp" autoPlay={active && !reduced} muted loop playsInline preload="metadata" aria-label="오륜스포츠 캠페인 쇼츠 영상">
+          <video src={serviceMedia.video.src.replace('/assets/service-media/', '/api/scroll-video/')} poster="/ohrun-frame-02.webp" autoPlay={active && !reduced} muted loop playsInline preload="none" aria-label="오륜스포츠 캠페인 쇼츠 영상">
             <track kind="captions" src="/ohrun-captions.vtt" srcLang="ko" label="장면 설명" />
           </video>
           <div className="social-shorts-play"><Play fill="currentColor" /> 00:11</div>

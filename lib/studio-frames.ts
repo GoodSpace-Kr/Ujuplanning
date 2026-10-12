@@ -9,6 +9,7 @@ export function createStudioFrames(onChange: () => void, onFailure: () => void) 
   const frames = createScrollVideo({
     count: STUDIO_FRAMES,
     src: media.studio[variant].src,
+    previewSrc: media.studio.preview.src,
     fps: media.studio[variant].fps,
     directory: `/assets/studio-sequence/${variant}`,
     onChange,
@@ -25,7 +26,7 @@ export function createStudioFrames(onChange: () => void, onFailure: () => void) 
     preloadDetail() {
       if (detailRequested || disposed) return;
       detailRequested = true;
-      fetch(`/assets/studio-sequence/${mobile ? 'desktop/0240.webp' : 'detail.webp'}`, { signal: abort.signal })
+      fetch(`/assets/studio-sequence/${mobile ? 'desktop/0240.webp' : 'detail.webp'}`, { signal: abort.signal, priority: 'low' })
         .then(response => { if (!response.ok) throw new Error('Detail unavailable'); return response.blob(); })
         .then(decodeFrame).then(image => { if (disposed) releaseFrame(image); else { detail = image; onChange(); } })
         .catch(() => { /* The normal final frame remains usable if detail fails. */ });

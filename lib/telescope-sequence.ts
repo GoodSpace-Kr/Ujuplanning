@@ -15,11 +15,13 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const variant = mobile ? 'mobile' : 'desktop';
   let disposed = false, active = false, ready = false;
+  let paintedImage: CanvasImageSource | null = null;
   let raf = 0, desired = 0, rendered = -1, progress = 0, lastTime = 0;
   let viewWidth = 1, viewHeight = 1;
   const frames = createScrollVideo({
     count: FRAME_COUNT,
     src: media.telescope[variant].src,
+    previewSrc: media.telescope.preview.src,
     fps: media.telescope[variant].fps,
     directory: `/assets/telescope-sequence/${variant}`,
     onChange: () => { drawBestAvailable(); },
@@ -32,7 +34,7 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
     if (!shot || disposed) return;
     const crop = coverCrop(shot.width, shot.height, viewWidth, viewHeight, frame);
     context!.drawImage(shot.image, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
-    rendered = frame;
+    rendered = frame; paintedImage = shot.image;
     const position = frame / (FRAME_COUNT - 1);
     section.style.setProperty('--journey-opening', String(1 - clamp01(position / 0.18)));
     section.style.setProperty('--journey-ending', String(clamp01((position - 0.88) / 0.12)));
@@ -41,13 +43,16 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
     host.dataset.decoded = String(frames.stats().decoded);
     host.dataset.seekMs = frames.stats().seekMs.toFixed(1);
     host.dataset.seeks = String(frames.stats().completedSeeks);
+    host.dataset.quality = frames.stats().quality;
+    host.dataset.downloadMs = frames.stats().downloadMs.toFixed(0);
+    host.dataset.maxSeekMs = frames.stats().maxSeekMs.toFixed(1);
     if (!ready) { ready = true; onStatus('ready'); }
   }
 
   function drawBestAvailable() {
     if (!active || disposed) return;
     const loaded = frames.get(desired);
-    if (loaded && loaded.index !== rendered) paint(loaded.index);
+    if (loaded && (loaded.index !== rendered || loaded.image !== paintedImage)) paint(loaded.index);
   }
 
   function measureProgress() {

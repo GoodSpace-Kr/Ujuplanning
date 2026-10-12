@@ -136,7 +136,7 @@ function VideoEditor({ active, reduced }: { active: boolean; reduced: boolean })
                 className="creative-editor-video"
                 src={serviceMedia.video.src.replace('/assets/service-media/', '/api/scroll-video/')}
                 poster="/ohrun-frame-03.webp"
-                preload="metadata"
+                preload="none"
                 playsInline
                 muted={muted}
                 loop
