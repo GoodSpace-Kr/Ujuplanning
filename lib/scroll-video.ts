@@ -29,6 +29,8 @@ export function createScrollVideo(options: {
   let started = false, failed = !context, disposed = false, seeking = false, pumpRaf = 0;
   let seekStarted = 0, seekMs = 0, maxSeekMs = 0, completedSeeks = 0;
   let downloadMs = 0, downloaded = false, forceSeek = false;
+  let downloadError = '';
+  let receivedBytes = 0;
   let quality: 'none' | 'preview' | 'full' = 'none';
   let sourceQuality: 'preview' | 'full' = 'preview';
   let generation = 0, upgradeStarted = false, previewUrl = '';
@@ -46,7 +48,16 @@ export function createScrollVideo(options: {
     try {
       const response = await fetch(url, { signal: abort.signal, priority });
       if (!response.ok) throw new Error('Video unavailable');
-      const blob = await response.blob();
+      const chunks: Uint8Array<ArrayBuffer>[] = [];
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('Missing video body');
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        chunks.push(value as Uint8Array<ArrayBuffer>);
+        if (priority === 'high') receivedBytes += value.byteLength;
+      }
+      const blob = new Blob(chunks, { type: 'video/mp4' });
       if (disposed || reduced || run !== generation || abort.signal.aborted) return null;
       if (!blob.size) throw new Error('Empty video');
       const local = URL.createObjectURL(new Blob([blob], { type: 'video/mp4' }));
@@ -114,7 +125,7 @@ export function createScrollVideo(options: {
       downloadMs = performance.now() - start;
       if (previewSrc) previewUrl = local;
       install(local, previewSrc ? 'preview' : 'full');
-    }).catch(() => { if (!disposed && run === generation && !reduced) fail(); });
+    }).catch(error => { if (!disposed && run === generation && !reduced) { downloadError = `${error.name}: ${error.message}`; fail(); onChange(); } });
   }
 
   function schedulePump() {
@@ -200,7 +211,7 @@ export function createScrollVideo(options: {
     },
     stats() {
       return { loaded: downloaded ? count : 0, decoded: rendered >= 0 ? 1 : 0,
-        seekMs, maxSeekMs, completedSeeks, downloadMs, quality, failed };
+        seekMs, maxSeekMs, completedSeeks, downloadMs, quality, failed, downloadError, receivedBytes };
     },
     destroy() {
       disposed = true;

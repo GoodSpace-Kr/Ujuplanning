@@ -179,6 +179,8 @@ export function StudioHero() {
       section!.dataset.quality = frames.stats().quality;
       section!.dataset.downloadMs = frames.stats().downloadMs.toFixed(0);
       section!.dataset.maxSeekMs = frames.stats().maxSeekMs.toFixed(1);
+      section!.dataset.mediaError = frames.stats().downloadError;
+      section!.dataset.receivedBytes = String(frames.stats().receivedBytes);
       if (currentProject !== state.projectIndex) { currentProject = state.projectIndex; setActiveProject(currentProject); }
       if (projectsVisible !== (projectOpacity > .5)) { projectsVisible = projectOpacity > .5; setShowProjects(projectsVisible); }
       if (autoEntering || target !== progress) schedule();
