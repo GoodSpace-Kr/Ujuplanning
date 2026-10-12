@@ -1,4 +1,4 @@
-import { decodeOrder, unpackFrames, type FramePack } from './frame-pack';
+import { consumeFramePack, decodeOrder, type FramePack } from './frame-pack';
 
 export type FrameImage = ImageBitmap | HTMLImageElement;
 
@@ -84,12 +84,18 @@ export function createSequenceFrames(options: {
       if (index === undefined) break;
       pendingPacks.add(index);
       packAttempts.set(index, (packAttempts.get(index) ?? 0) + 1);
+      const received = new Set<number>();
       fetch(packs[index].url, { signal: controller.signal })
-        .then(response => { if (!response.ok) throw new Error('Pack unavailable'); return response.arrayBuffer(); })
-        .then(data => {
-          const frames = unpackFrames(data, count);
-          if (packs[index].frames.some(frame => !frames.has(frame))) throw new Error('Incomplete pack');
-          if (!disposed) { frames.forEach((blob, frame) => blobs.set(frame, blob)); completedPacks.add(index); }
+        .then(response => {
+          if (!response.ok) throw new Error('Pack unavailable');
+          return consumeFramePack(response, count, (frame, blob) => {
+            received.add(frame);
+            if (!disposed) { blobs.set(frame, blob); void pumpDecode(); }
+          });
+        })
+        .then(() => {
+          if (packs[index].frames.some(frame => !received.has(frame))) throw new Error('Incomplete pack');
+          if (!disposed) completedPacks.add(index);
         })
         .catch(() => { /* Keep individual-frame fallback available on a stale deployment. */ })
         .finally(() => { pendingPacks.delete(index); if (!disposed) { void pumpDecode(); pumpFetch(); } });

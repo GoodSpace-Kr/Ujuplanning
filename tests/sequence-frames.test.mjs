@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
-import { unpackFrames, decodeOrder } from '../lib/frame-pack.ts';
+import { consumeFramePack, unpackFrames, decodeOrder } from '../lib/frame-pack.ts';
 
 const manifests = JSON.parse(readFileSync(new URL('../lib/sequence-packs.generated.json', import.meta.url)));
 const source = readFileSync(new URL('../lib/sequence-frames.ts', import.meta.url), 'utf8')
@@ -43,6 +43,20 @@ test('truncated or corrupt packs fail without returning partial images', () => {
   assert.throws(() => unpackFrames(packData([241]), 241));
   assert.throws(() => unpackFrames(packData([1, 1]), 241));
   assert.throws(() => unpackFrames(packData([0]).slice(0, -1), 241));
+});
+
+test('streaming paints complete frames before the download ends, including split headers', async () => {
+  const bytes = new Uint8Array(packData([0, 12, 24]));
+  let controller;
+  const stream = new ReadableStream({ start(c) { controller = c; } });
+  const received = [];
+  const consuming = consumeFramePack(new Response(stream), 25, (frame) => received.push(frame));
+  controller.enqueue(bytes.slice(0, 2)); await settle(); assert.deepEqual(received, []);
+  controller.enqueue(bytes.slice(2, 13)); await settle(); assert.deepEqual(received, [0]);
+  controller.enqueue(bytes.slice(13, 24)); await settle(); assert.deepEqual(received, [0, 12]);
+  controller.enqueue(bytes.slice(24)); controller.close(); await consuming;
+  assert.deepEqual(received, [0, 12, 24]);
+  await assert.rejects(() => consumeFramePack(new Response(bytes.slice(0, -1)), 25, () => {}));
 });
 
 test('a fast jump decodes an available nearby frame before waiting for exact neighbours', () => {

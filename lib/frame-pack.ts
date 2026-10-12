@@ -1,5 +1,45 @@
 export type FramePack = { url: string; frames: number[] };
 
+// Consume each complete WebP as bytes arrive. Waiting for response.arrayBuffer()
+// would make a slow connection wait for an entire pack before showing any shot.
+export async function consumeFramePack(response: Response, count: number, onFrame: (index: number, blob: Blob) => void) {
+  if (!response.body) {
+    unpackFrames(await response.arrayBuffer(), count).forEach((blob, frame) => onFrame(frame, blob));
+    return;
+  }
+  const reader = response.body.getReader();
+  let buffer = new Uint8Array(0), started = false;
+  const seen = new Set<number>();
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      const combined = new Uint8Array(buffer.length + value.length);
+      combined.set(buffer); combined.set(value, buffer.length); buffer = combined;
+      let offset = 0;
+      if (!started) {
+        if (buffer.length < 4) continue;
+        if (String.fromCharCode(...buffer.subarray(0, 4)) !== 'UJU1') throw new Error('Invalid frame pack');
+        started = true; offset = 4;
+      }
+      const view = new DataView(buffer.buffer);
+      while (offset + 8 <= buffer.length) {
+        const index = view.getUint32(offset, true), size = view.getUint32(offset + 4, true);
+        if (index >= count || size === 0 || seen.has(index)) throw new Error('Invalid frame data');
+        if (offset + 8 + size > buffer.length) break;
+        seen.add(index);
+        onFrame(index, new Blob([buffer.slice(offset + 8, offset + 8 + size)], { type: 'image/webp' }));
+        offset += 8 + size;
+      }
+      buffer = buffer.slice(offset);
+    }
+    if (!started || buffer.length) throw new Error('Truncated frame pack');
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally { reader.releaseLock(); }
+}
+
 export function unpackFrames(data: ArrayBuffer, count: number): Map<number, Blob> {
   const bytes = new Uint8Array(data);
   if (bytes.length < 4 || String.fromCharCode(...bytes.subarray(0, 4)) !== 'UJU1') throw new Error('Invalid frame pack');
