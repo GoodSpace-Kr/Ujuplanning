@@ -31,8 +31,8 @@ export function TelescopeStudy({ embedded = false }: { embedded?: boolean }) {
       } catch {
         if (!disposed) setStatus('failed');
       }
-    }, { rootMargin: '500px' });
-    observer.observe(host);
+    }, { rootMargin: '2000px' });
+    observer.observe(embedded ? host.closest('.brand-process')! : host);
     return () => { disposed = true; observer.disconnect(); teardown(); };
   }, [embedded]);
 
@@ -43,7 +43,7 @@ export function TelescopeStudy({ embedded = false }: { embedded?: boolean }) {
           aria-label="노을빛 창가의 망원경. 스크롤하면 접안렌즈로 천천히 다가가고, 렌즈 너머 별이 가득한 우주가 펼쳐집니다.">
           <picture className="telescope-study-poster" aria-hidden="true">
             <source media="(max-width: 700px)" srcSet="/assets/telescope-sequence/mobile/0000.webp" />
-            <img src="/assets/telescope-sequence/desktop/0000.webp" width="1920" height="1080" alt="" loading="lazy" decoding="async" />
+            <img src="/assets/telescope-sequence/desktop/0000.webp" width="1920" height="1080" alt="" loading="eager" fetchPriority="low" decoding="async" />
           </picture>
         </div>
         <h2 className="sr-only" id="telescope-study-heading">우주를 보는 시선.</h2>

@@ -26,7 +26,8 @@ export function StudioHero() {
     const context = canvas.getContext('2d', { alpha: false });
     if (!context) { setStatus('failed'); return; }
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    let disposed = false, active = true, ready = false;
+    const initialRect = section.getBoundingClientRect();
+    let disposed = false, active = initialRect.top < innerHeight + 200 && initialRect.bottom > -200, ready = false;
     let raf = 0, lastTime = 0, progress = 0, viewWidth = 1, viewHeight = 1;
     let currentProject = 0, projectsVisible = false;
     let paintedFrame = -1, paintedZoom = -1, paintedImage: unknown;
@@ -172,6 +173,8 @@ export function StudioHero() {
       section!.dataset.zoom = zoom.toFixed(4);
       section!.dataset.decoded = String(frames.stats().decoded);
       section!.dataset.loaded = String(frames.stats().loaded);
+      section!.dataset.seekMs = frames.stats().seekMs.toFixed(1);
+      section!.dataset.seeks = String(frames.stats().completedSeeks);
       if (currentProject !== state.projectIndex) { currentProject = state.projectIndex; setActiveProject(currentProject); }
       if (projectsVisible !== (projectOpacity > .5)) { projectsVisible = projectOpacity > .5; setShowProjects(projectsVisible); }
       if (autoEntering || target !== progress) schedule();

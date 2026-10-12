@@ -1,15 +1,16 @@
 import { STUDIO_FRAMES } from './studio-journey';
-import packs from './sequence-packs.generated.json';
-import { createSequenceFrames, decodeFrame, releaseFrame, type FrameImage } from './sequence-frames';
+import media from './scroll-video.generated.json';
+import { createScrollVideo } from './scroll-video';
+import { decodeFrame, releaseFrame, type FrameImage } from './sequence-frames';
 
 export function createStudioFrames(onChange: () => void, onFailure: () => void) {
   const mobile = matchMedia('(max-width: 700px)').matches;
   const variant = mobile ? 'mobile' : 'desktop';
-  const frames = createSequenceFrames({
+  const frames = createScrollVideo({
     count: STUDIO_FRAMES,
+    src: media.studio[variant].src,
+    fps: media.studio[variant].fps,
     directory: `/assets/studio-sequence/${variant}`,
-    packs: packs.studio[variant],
-    decodedLimit: mobile ? 8 : 10,
     onChange,
     onFailure,
   });
@@ -18,7 +19,7 @@ export function createStudioFrames(onChange: () => void, onFailure: () => void) 
   return {
     ...frames,
     get(frame: number, exact = false) {
-      if (frame === STUDIO_FRAMES - 1 && detail) return { image: detail, index: frame };
+      if (frame === STUDIO_FRAMES - 1 && detail) return { image: detail, width: detail.width, height: detail.height, index: frame };
       return frames.get(frame, exact);
     },
     preloadDetail() {

@@ -27,7 +27,7 @@
 .uju-footer-details address { margin: 0; font-style: normal; word-break: keep-all; }
 .uju-footer-company { margin-bottom: 5px !important; }
 .uju-footer-company span { padding-inline: 10px; color: #c6cfdf; }
-.uju-footer-wordmark { margin: clamp(80px, 8vw, 140px) 0 38px; font-family: var(--font-geist-sans), 'Pretendard', sans-serif; font-size: min(13.5cqw, 340px); font-weight: 500; letter-spacing: -.025em; word-spacing: .08em; line-height: 1.12; text-align: center; white-space: nowrap; color: rgba(233, 236, 248, .23); user-select: none; }
+.uju-footer-wordmark { margin: clamp(80px, 8vw, 140px) 0 38px; font-family: var(--font-geist-sans), 'UjuText', 'Pretendard', sans-serif; font-size: min(13.5cqw, 340px); font-weight: 500; letter-spacing: -.025em; word-spacing: .08em; line-height: 1.12; text-align: center; white-space: nowrap; color: rgba(233, 236, 248, .23); user-select: none; }
 .uju-footer-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; color: #d6ddea; }
 .uju-footer-bottom small, .uju-footer-bottom a { font-size: 11px; line-height: 1.6; font-weight: 400; }
 .uju-footer-bottom a { white-space: nowrap; }

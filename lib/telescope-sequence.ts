@@ -1,7 +1,7 @@
 import { FRAME_COUNT, clamp01, sequenceFrame, coverCrop } from './sequence-math';
 
-import { createSequenceFrames } from './sequence-frames';
-import packs from './sequence-packs.generated.json';
+import { createScrollVideo } from './scroll-video';
+import media from './scroll-video.generated.json';
 type SequenceStatus = 'loading' | 'ready' | 'failed';
 
 export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: SequenceStatus) => void, externalProgress?: () => number) {
@@ -17,20 +17,21 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
   let disposed = false, active = false, ready = false;
   let raf = 0, desired = 0, rendered = -1, progress = 0, lastTime = 0;
   let viewWidth = 1, viewHeight = 1;
-  const frames = createSequenceFrames({
+  const frames = createScrollVideo({
     count: FRAME_COUNT,
+    src: media.telescope[variant].src,
+    fps: media.telescope[variant].fps,
     directory: `/assets/telescope-sequence/${variant}`,
-    packs: packs.telescope[variant],
-    decodedLimit: mobile ? 8 : 10,
     onChange: () => { drawBestAvailable(); },
     onFailure: () => { if (!ready) onStatus('failed'); },
   });
+  if (!motion.matches) frames.preload();
 
   function paint(frame: number) {
-    const image = frames.get(frame, true)?.image;
-    if (!image || disposed) return;
-    const crop = coverCrop(image.width, image.height, viewWidth, viewHeight, frame);
-    context!.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
+    const shot = frames.get(frame, true);
+    if (!shot || disposed) return;
+    const crop = coverCrop(shot.width, shot.height, viewWidth, viewHeight, frame);
+    context!.drawImage(shot.image, crop.x, crop.y, crop.width, crop.height, 0, 0, canvas.width, canvas.height);
     rendered = frame;
     const position = frame / (FRAME_COUNT - 1);
     section.style.setProperty('--journey-opening', String(1 - clamp01(position / 0.18)));
@@ -38,6 +39,8 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
     host.dataset.frame = String(frame);
     host.dataset.loaded = String(frames.stats().loaded);
     host.dataset.decoded = String(frames.stats().decoded);
+    host.dataset.seekMs = frames.stats().seekMs.toFixed(1);
+    host.dataset.seeks = String(frames.stats().completedSeeks);
     if (!ready) { ready = true; onStatus('ready'); }
   }
 
@@ -71,7 +74,7 @@ export function mountTelescopeSequence(host: HTMLElement, onStatus: (status: Seq
   function resize() {
     viewWidth = host.clientWidth || 1;
     viewHeight = host.clientHeight || 1;
-    const ratio = Math.min(devicePixelRatio || 1, 2, (mobile ? 960 : 1920) / viewWidth, (mobile ? 540 : 1080) / viewHeight);
+    const ratio = Math.min(devicePixelRatio || 1, 2, media.telescope[variant].width / viewWidth, media.telescope[variant].height / viewHeight);
     canvas.width = Math.max(1, Math.round(viewWidth * ratio));
     canvas.height = Math.max(1, Math.round(viewHeight * ratio));
     if (rendered >= 0) paint(rendered);

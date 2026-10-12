@@ -114,7 +114,7 @@ export function BrandProcess() {
               <div className="brand-process-card-float">
                 <div className="brand-process-placeholder">
                   {i === 3 ? <TelescopeStudy embedded /> : (
-                    <img className="brand-process-image" src={`/assets/brand-process/${step.word.toLowerCase()}.webp`} alt="" loading="lazy" decoding="async" />
+                    <img className="brand-process-image" src={`/assets/brand-process/${step.word.toLowerCase()}.webp`} alt="" loading="eager" fetchPriority="low" decoding="async" />
                   )}
                 </div>
               </div>

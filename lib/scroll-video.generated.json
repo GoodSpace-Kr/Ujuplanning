@@ -1,0 +1,38 @@
+{
+  "studio": {
+    "desktop": {
+      "src": "/assets/scroll-video/studio-desktop-432c8174351c.mp4",
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "frames": 241,
+      "bytes": 1785667
+    },
+    "mobile": {
+      "src": "/assets/scroll-video/studio-mobile-41c240a5f7e9.mp4",
+      "width": 960,
+      "height": 540,
+      "fps": 24,
+      "frames": 241,
+      "bytes": 1069963
+    }
+  },
+  "telescope": {
+    "desktop": {
+      "src": "/assets/scroll-video/telescope-desktop-9358b11244a9.mp4",
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "frames": 233,
+      "bytes": 1323955
+    },
+    "mobile": {
+      "src": "/assets/scroll-video/telescope-mobile-2b917c710706.mp4",
+      "width": 960,
+      "height": 540,
+      "fps": 24,
+      "frames": 233,
+      "bytes": 675642
+    }
+  }
+}
