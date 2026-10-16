@@ -261,7 +261,7 @@ export function StudioHero() {
                 <p className="studio-project-number">PROJECT {String(index + 1).padStart(2, '0')} <span>/ 05</span></p>
                 <h2>{project.name}</h2>
                 <p className="studio-project-category">{project.category}</p>
-                <a className="studio-project-link" href="/work" aria-label={`${project.name.replace(/\n/g, ' ')} 프로젝트 보기`}>
+                <a className="studio-project-link" href={`/work#${project.id}`} aria-label={`${project.name.replace(/\n/g, ' ')} 프로젝트 보기`}>
                   <span>프로젝트 보기</span>
                   <ArrowUpRight size={17} strokeWidth={1.6} aria-hidden="true" />
                 </a>

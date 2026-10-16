@@ -1,9 +1,9 @@
 export const projects = [
-  { name: '청호나이스', category: '브랜딩 마케팅', headline: '브랜드의 강점을,\n고객의 일상 가까이.', description: '브랜드가 가진 가치를 명확한 메시지와 콘텐츠로 전합니다.', tags: ['브랜드 메시지', '콘텐츠 기획', '마케팅 커뮤니케이션'] },
-  { name: 'BMW · MINI\n바바리안모터스', category: '온라인·SNS 콘텐츠 운영', headline: '브랜드의 감각을\n하나의 채널 경험으로.', description: '브랜드의 개성과 이야기를 온라인 콘텐츠와 SNS 운영으로 연결합니다.', tags: ['채널 기획', '콘텐츠 제작', 'SNS 운영'] },
-  { name: '오션더힐', category: '숏폼 콘텐츠', headline: '공간의 매력을,\n짧고 선명한 장면으로.', description: '공간의 분위기와 경험을 발견하고, 시선을 사로잡는 숏폼으로 담습니다.', tags: ['콘텐츠 기획', '영상 촬영', '숏폼 편집'] },
-  { name: '오륜스포츠', category: '통합 광고 대행', headline: '기획부터 송출까지,\n하나의 방향으로.', description: '기획·제작·촬영·편집과 옥외광고 송출을 연결하는 통합 캠페인입니다.', tags: ['캠페인 기획', '영상 제작', '옥외광고'] },
-  { name: 'BYD', category: '공간 디자인 제작', headline: '브랜드를 만나는\n공간의 경험.', description: '브랜드의 메시지가 실제 공간에서도 일관되게 느껴지도록 디자인하고 제작합니다.', tags: ['공간 기획', '공간 디자인', '제작'] },
+  { id: 'chungho', name: '청호나이스', category: '브랜딩 마케팅', headline: '브랜드의 강점을,\n고객의 일상 가까이.', description: '브랜드가 가진 가치를 명확한 메시지와 콘텐츠로 전합니다.', tags: ['브랜드 메시지', '콘텐츠 기획', '마케팅 커뮤니케이션'] },
+  { id: 'bavarian', name: 'BMW · MINI\n바바리안모터스', category: '온라인·SNS 콘텐츠 운영', headline: '브랜드의 감각을\n하나의 채널 경험으로.', description: '브랜드의 개성과 이야기를 온라인 콘텐츠와 SNS 운영으로 연결합니다.', tags: ['채널 기획', '콘텐츠 제작', 'SNS 운영'] },
+  { id: 'ocean', name: '오션더힐', category: '숏폼 콘텐츠', headline: '공간의 매력을,\n짧고 선명한 장면으로.', description: '공간의 분위기와 경험을 발견하고, 시선을 사로잡는 숏폼으로 담습니다.', tags: ['콘텐츠 기획', '영상 촬영', '숏폼 편집'] },
+  { id: 'ohrun', name: '오륜스포츠', category: '통합 광고 대행', headline: '기획부터 송출까지,\n하나의 방향으로.', description: '기획·제작·촬영·편집과 옥외광고 송출을 연결하는 통합 캠페인입니다.', tags: ['캠페인 기획', '영상 제작', '옥외광고'] },
+  { id: 'byd', name: 'BYD', category: '공간 디자인 제작', headline: '브랜드를 만나는\n공간의 경험.', description: '브랜드의 메시지가 실제 공간에서도 일관되게 느껴지도록 디자인하고 제작합니다.', tags: ['공간 기획', '공간 디자인', '제작'] },
 ];
 
 export const SERVICES = [

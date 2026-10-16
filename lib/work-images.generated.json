@@ -1,0 +1,72 @@
+{
+  "chungho": [
+    {
+      "src": "/assets/work/chungho-480-944bbfe400bb.webp",
+      "width": 480,
+      "height": 573,
+      "bytes": 10642
+    },
+    {
+      "src": "/assets/work/chungho-710-9b362288f3e3.webp",
+      "width": 710,
+      "height": 848,
+      "bytes": 18504
+    }
+  ],
+  "bavarian": [
+    {
+      "src": "/assets/work/bavarian-480-3f604c843587.webp",
+      "width": 480,
+      "height": 271,
+      "bytes": 19406
+    },
+    {
+      "src": "/assets/work/bavarian-1280-ab86addd443f.webp",
+      "width": 1280,
+      "height": 722,
+      "bytes": 91822
+    }
+  ],
+  "ocean": [
+    {
+      "src": "/assets/work/ocean-480-4722b82ec1d5.webp",
+      "width": 480,
+      "height": 348,
+      "bytes": 26938
+    },
+    {
+      "src": "/assets/work/ocean-926-bc6499418266.webp",
+      "width": 926,
+      "height": 672,
+      "bytes": 75440
+    }
+  ],
+  "ohrun": [
+    {
+      "src": "/assets/work/ohrun-480-38844e078381.webp",
+      "width": 480,
+      "height": 270,
+      "bytes": 8644
+    },
+    {
+      "src": "/assets/work/ohrun-1280-702cc0b6644a.webp",
+      "width": 1280,
+      "height": 720,
+      "bytes": 26164
+    }
+  ],
+  "byd": [
+    {
+      "src": "/assets/work/byd-480-21318d2d741e.webp",
+      "width": 480,
+      "height": 320,
+      "bytes": 20798
+    },
+    {
+      "src": "/assets/work/byd-680-340051f3c809.webp",
+      "width": 680,
+      "height": 453,
+      "bytes": 34010
+    }
+  ]
+}
