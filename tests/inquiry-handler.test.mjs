@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { handleInquiry } from '../lib/inquiry-handler.ts';
 
-const url = 'https://ujuplanning-hero.goodspace82.chatgpt.site/api/inquiry';
+const url = 'https://ujuplanning.goodspace82.workers.dev/api/inquiry';
 const valid = { name: '문의폼 테스트', email: 'test@example.com', phone: '010-0000-0000' };
 const request = (body, origin = new URL(url).origin) => new Request(url, { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: origin }, body: JSON.stringify(body) });
 const neverSend = async () => { throw new Error('unexpected outbound request'); };
@@ -19,6 +19,7 @@ test('valid inquiry forwards all fields to the fixed recipient with reply-to', a
   assert.equal(sent['문의 내용'], '<문의>\n두 번째 줄');
   assert.equal(sent._replyto, valid.email);
   assert.equal(sent._cc, undefined);
+  assert.equal(sent._url, 'https://ujuplanning.goodspace82.workers.dev/contact');
   assert.deepEqual(await result.json(), { success: true, pendingActivation: false });
 });
 

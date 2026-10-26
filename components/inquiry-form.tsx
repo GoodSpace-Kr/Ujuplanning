@@ -3,7 +3,8 @@
 import { useRef, useState, type FormEvent } from 'react';
 import './inquiry-form.css';
 
-export function InquiryForm() {
+// Both the homepage and CONTACT use the same validation and submission flow.
+export function InquiryFields() {
   const [state, setState] = useState<'idle' | 'sending' | 'success' | 'pending' | 'error'>('idle');
   const [error, setError] = useState('');
   const sending = useRef(false);
@@ -37,24 +38,7 @@ export function InquiryForm() {
   }
 
   return (
-    <section className="uju-inquiry" id="contact" aria-labelledby="inquiry-heading">
-      <div className="inquiry-story">
-        <div className="inquiry-image">
-          <img src="/assets/telescope-sequence/desktop/0000.webp" alt="창 너머를 망원경으로 바라보며 새로운 가능성을 찾는 모습" loading="lazy" />
-          <span className="inquiry-image-brand">UJU PLANNING</span>
-        </div>
-        <div className="inquiry-guide">
-          <p className="inquiry-guide-title">당신의 이야기를 기다립니다.</p>
-          <p>브랜드의 고민부터 아직 구체화되지 않은 아이디어까지, 편하게 들려주세요. 남겨주신 내용을 꼼꼼히 살펴보고 담당자가 영업일 1~2일 이내로 연락드리겠습니다.</p>
-          <p>함께할 가능성을 열어주셔서 감사합니다.<br />브랜드에 꼭 맞는 다음 항로를 함께 고민하겠습니다.</p>
-          <span className="inquiry-response-time"><span aria-hidden="true" />영업일 1~2일 이내 답변</span>
-        </div>
-      </div>
-
-      <div className="inquiry-form-panel">
-        <h2 id="inquiry-heading">어떤 우주를<br />함께 발견할까요?</h2>
-        <p className="inquiry-lead">브랜드의 다음 이야기를 우주기획과 시작해 보세요.</p>
-
+    <>
         {state === 'success' || state === 'pending' ? (
           <div className="inquiry-success" role="status" aria-live="polite">
             <span className="inquiry-success-icon" aria-hidden="true">✓</span>
@@ -93,6 +77,29 @@ export function InquiryForm() {
             </fieldset>
           </form>
         )}
+    </>
+  );
+}
+
+export function InquiryForm() {
+  return (
+    <section className="uju-inquiry" id="contact" aria-labelledby="inquiry-heading">
+      <div className="inquiry-story">
+        <div className="inquiry-image">
+          <img src="/assets/telescope-sequence/desktop/0000.webp" alt="창 너머를 망원경으로 바라보며 새로운 가능성을 찾는 모습" loading="lazy" />
+          <span className="inquiry-image-brand">UJU PLANNING</span>
+        </div>
+        <div className="inquiry-guide">
+          <p className="inquiry-guide-title">당신의 이야기를 기다립니다.</p>
+          <p>브랜드의 고민부터 아직 구체화되지 않은 아이디어까지, 편하게 들려주세요. 남겨주신 내용을 꼼꼼히 살펴보고 담당자가 영업일 1~2일 이내로 연락드리겠습니다.</p>
+          <p>함께할 가능성을 열어주셔서 감사합니다.<br />브랜드에 꼭 맞는 다음 항로를 함께 고민하겠습니다.</p>
+          <span className="inquiry-response-time"><span aria-hidden="true" />영업일 1~2일 이내 답변</span>
+        </div>
+      </div>
+      <div className="inquiry-form-panel">
+        <h2 id="inquiry-heading">어떤 우주를<br />함께 발견할까요?</h2>
+        <p className="inquiry-lead">브랜드의 다음 이야기를 우주기획과 시작해 보세요.</p>
+        <InquiryFields />
       </div>
     </section>
   );

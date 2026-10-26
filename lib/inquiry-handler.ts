@@ -1,5 +1,5 @@
 const RECIPIENT = 'reviewary.wz@gmail.com';
-const FORM_URL = 'https://ujuplanning-hero.goodspace82.chatgpt.site/#contact';
+const FORM_URL = 'https://ujuplanning.goodspace82.workers.dev/contact';
 const MAX_BYTES = 20000;
 
 function respond(status: number, body: Record<string, unknown>) {

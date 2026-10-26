@@ -76,7 +76,7 @@ export function SiteHeader() {
           {links.map(([label, href]) => <a key={href} href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</a>)}
         </nav>
         <div className="uju-header-actions">
-          <a className="uju-header-contact" href={pathname === '/' ? '#contact' : '/#contact'} onClick={() => setOpen(false)}>문의하기</a>
+          <a className="uju-header-contact" href={pathname === '/' || pathname === '/contact' ? '#contact' : '/#contact'} onClick={() => setOpen(false)}>문의하기</a>
           <button ref={toggle} className="uju-header-toggle" type="button" aria-label={open ? '메뉴 닫기' : '메뉴 열기'} aria-expanded={open} aria-controls="site-navigation" onClick={() => setOpen(!open)}>
             {open ? <X size={22} /> : <Menu size={22} />}
           </button>
