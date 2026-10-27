@@ -154,7 +154,7 @@ export function mountTelescopeScene(host: HTMLDivElement) {
 
   // Textures are actual optical labels and ruler marks, not baked pictures.
   const label = texture(2048,512,ctx => {
-    ctx.fillStyle='#26364d'; ctx.font='500 106px Arial'; ctx.fillText('UJU',70,185);
+    ctx.fillStyle='#26364d'; ctx.font='500 106px Arial'; ctx.fillText('WOOZOO',70,185);
     ctx.font='400 40px Arial'; ctx.fillText('O B S E R V A T O R Y',73,253);
     ctx.fillStyle='#697688'; ctx.font='400 28px Arial'; ctx.fillText('APOCHROMATIC REFRACTOR',75,354); ctx.fillText('80 ED  /  480 mm  /  f 6.0',75,402);
     ctx.fillStyle='#496d9b'; ctx.fillRect(1390,142,7,212); ctx.font='500 52px Arial'; ctx.fillText('ED',1430,204); ctx.font='400 30px Arial'; ctx.fillText('EXTRA-LOW',1430,277); ctx.fillText('DISPERSION',1430,318);

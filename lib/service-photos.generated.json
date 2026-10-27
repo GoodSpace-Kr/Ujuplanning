@@ -1,0 +1,30 @@
+{
+  "strategy": [
+    {
+      "src": "/assets/service-photos/strategy-480-a8eb592830f9.webp",
+      "width": 480,
+      "height": 600,
+      "bytes": 39592
+    },
+    {
+      "src": "/assets/service-photos/strategy-1120-744256c9f23f.webp",
+      "width": 1120,
+      "height": 1400,
+      "bytes": 113272
+    }
+  ],
+  "performance": [
+    {
+      "src": "/assets/service-photos/performance-photo-480-f79d18ecc85f.webp",
+      "width": 480,
+      "height": 318,
+      "bytes": 11714
+    },
+    {
+      "src": "/assets/service-photos/performance-photo-1120-b2009730ebe9.webp",
+      "width": 1120,
+      "height": 742,
+      "bytes": 36308
+    }
+  ]
+}

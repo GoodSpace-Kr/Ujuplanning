@@ -87,7 +87,7 @@ export function InquiryForm() {
       <div className="inquiry-story">
         <div className="inquiry-image">
           <img src="/assets/telescope-sequence/desktop/0000.webp" alt="창 너머를 망원경으로 바라보며 새로운 가능성을 찾는 모습" loading="lazy" />
-          <span className="inquiry-image-brand">UJU PLANNING</span>
+          <span className="inquiry-image-brand">WOOZOO PLANNING</span>
         </div>
         <div className="inquiry-guide">
           <p className="inquiry-guide-title">당신의 이야기를 기다립니다.</p>

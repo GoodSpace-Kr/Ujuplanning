@@ -254,7 +254,7 @@ export function StudioHero() {
           <span>연결하다</span>
         </h1>
         <div ref={projectsRef} className="studio-projects" aria-hidden={!showProjects}>
-          <div className="studio-project-top"><span>UJU PLANNING</span><span>SELECTED PROJECTS</span></div>
+          <div className="studio-project-top"><span>WOOZOO PLANNING</span><span>SELECTED PROJECTS</span></div>
           {projects.map((project, index) => (
             <article key={project.name} className={`studio-project ${activeProject === index ? 'is-active' : ''}`} aria-hidden={activeProject !== index} inert={!showProjects || activeProject !== index}>
               <div className="studio-project-title">

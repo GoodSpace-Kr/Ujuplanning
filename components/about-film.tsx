@@ -24,7 +24,7 @@ export function AboutFilm() {
       tabIndex={0}
     /> : <button className="about-film-cover" onClick={() => setPlaying(true)} aria-label={`${companyFilm.title} 재생`}>
       {!thumbnailFailed && <img src={companyFilm.thumbnail} alt="" width="1280" height="720" loading="lazy" decoding="async" onError={() => setThumbnailFailed(true)} />}
-      {thumbnailFailed && <span className="about-film-fallback">UJU PLANNING<br /><span>브랜드의 성장 여정</span></span>}
+      {thumbnailFailed && <span className="about-film-fallback">WOOZOO PLANNING<br /><span>브랜드의 성장 여정</span></span>}
       <span className="about-film-play"><Play size={24} fill="currentColor" aria-hidden="true" /></span>
       <span className="about-film-cover-label">우주기획의 이야기 재생 <span aria-hidden="true">↗</span></span>
     </button>}

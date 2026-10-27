@@ -13,7 +13,7 @@ export default function AboutPage() {
   return <>
     <div className="about-page">
       <section className="about-hero about-container" aria-labelledby="about-heading">
-        <p className="about-eyebrow">ABOUT UJU</p>
+        <p className="about-eyebrow">ABOUT 우주기획</p>
         <div className="about-hero-heading">
           <h1 id="about-heading">당신의 브랜드에는,<br />아직 발견하지 못한<br /><span className="about-gradient">우주가 있습니다.</span></h1>
           <div className="about-hero-intro">
@@ -26,9 +26,9 @@ export default function AboutPage() {
             <source media="(max-width: 760px)" srcSet="/assets/studio-sequence/mobile/0000.webp" />
             <img src="/assets/studio-sequence/desktop/0000.webp" width="1920" height="1080" alt="기획자의 시선 너머로 펼쳐진 촬영 현장을 표현한 브랜드 이미지" fetchPriority="high" />
           </picture>
-          <figcaption><span>가능성을 보는 시선.<br />현실로 만드는 실행.</span><span>FROM PERSPECTIVE<br />TO POSSIBILITY</span></figcaption>
+          <figcaption><span className="about-caption-main">가능성을 보는 시선.<br />현실로 만드는 실행.</span><span className="about-caption-label">FROM PERSPECTIVE<br />TO POSSIBILITY</span></figcaption>
         </figure>
-        <div className="about-hero-footnote"><span>우주기획의 시선을 담은 브랜드 비주얼</span><span>OBSERVE · DISCOVER · CONNECT · EXPAND</span></div>
+
       </section>
 
       <section className="about-perspective about-container" id="our-perspective" aria-labelledby="perspective-heading">
@@ -41,7 +41,6 @@ export default function AboutPage() {
         </div>
         <figure className="about-perspective-visual">
           <img src="/assets/telescope-sequence/desktop/0000.webp" width="1920" height="1080" loading="lazy" decoding="async" alt="망원경 너머의 새로운 가능성을 바라보는 브랜드 비주얼" />
-          <figcaption>더 멀리 보기 위해, 더 깊이 들여다봅니다.</figcaption>
         </figure>
       </section>
 
@@ -67,8 +66,8 @@ export default function AboutPage() {
           <p>브랜드를 이해하는 일에서 시작해,<br />더 넓은 시장으로 나아가는 일까지.</p>
         </div>
         <ol className="about-process-list">
-          {aboutSteps.map((step, index) => <li className={`about-process-step about-process-${step.word.toLowerCase()}`} key={step.word}>
-            <div className="about-process-photo"><img src={step.image} alt={step.alt} width={step.width} height={step.height} loading="lazy" decoding="async" /><span aria-hidden="true">0{index + 1}</span></div>
+          {aboutSteps.map(step => <li className={`about-process-step about-process-${step.word.toLowerCase()}`} key={step.word}>
+            <div className="about-process-photo"><img src={step.image} alt={step.alt} width={step.width} height={step.height} loading="lazy" decoding="async" /></div>
             <p className="about-process-word">{step.word}<ArrowRight size={17} aria-hidden="true" /></p>
             <h3>{step.title}</h3><p className="about-process-description">{step.description}</p>
           </li>)}
@@ -78,7 +77,7 @@ export default function AboutPage() {
       <section className="about-films" id="brand-film" aria-labelledby="film-heading">
         <div className="about-container">
           <div className="about-section-heading">
-            <div><p className="about-eyebrow">UJU ON FILM</p><h2 id="film-heading">우주기획의 이야기를,<br />조금 더 가까이.</h2></div>
+            <div><p className="about-eyebrow">우주기획 ON FILM</p><h2 id="film-heading">우주기획의 이야기를,<br />조금 더 가까이.</h2></div>
             <div className="about-film-intro"><p>브랜드의 성장을 어떻게 바라보는지,<br />우주기획 대표가 직접 이야기합니다.</p><a className="about-text-link" href={companyFilm.channelUrl} target="_blank" rel="noopener noreferrer">YouTube 채널 둘러보기 <ArrowUpRight size={17} aria-hidden="true" /><span className="about-sr-only"> (새 탭)</span></a></div>
           </div>
           <AboutFilm />
