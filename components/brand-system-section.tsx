@@ -42,7 +42,7 @@ const SYSTEM_STEPS = [
   },
   {
     key: 'system',
-    eyebrow: 'WOOZOO BRAND SYSTEM',
+    eyebrow: 'WOOJU BRAND SYSTEM',
     title: ['흩어진 문제를 연결해', '하나의 브랜드 경험을 만듭니다.'],
   },
 ];

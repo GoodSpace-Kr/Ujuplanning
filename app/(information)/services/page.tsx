@@ -52,7 +52,7 @@ export default function ServicesPage() {
       </div>
 
       <section className="offering-connection offering-container" aria-labelledby="connection-heading">
-        <div><p className="offering-eyebrow">CONNECTED BY WOOZOO</p><h2 id="connection-heading">필요한 부분부터,<br /><span className="offering-gradient">함께 연결합니다.</span></h2></div>
+        <div><p className="offering-eyebrow">CONNECTED BY WOOJU</p><h2 id="connection-heading">필요한 부분부터,<br /><span className="offering-gradient">함께 연결합니다.</span></h2></div>
         <div className="offering-connection-copy"><p>브랜드의 상황마다 필요한 시작점은 다릅니다.<br />처음부터 방향을 정하는 일도, 이미 정해진 전략을<br className="offering-desktop-break" /> 콘텐츠와 광고로 옮기는 일도 함께할 수 있습니다.</p><p>지금의 고민과 목표를 들려주세요.<br />어떤 서비스를 어떻게 연결할지 함께 정리하겠습니다.</p><a className="offering-text-link" href="/about">우주기획이 일하는 방식 <ArrowUpRight size={17} aria-hidden="true" /></a></div>
       </section>
 

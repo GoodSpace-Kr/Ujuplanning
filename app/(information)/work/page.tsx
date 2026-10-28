@@ -36,7 +36,7 @@ function ProjectVisual({ id, alt }: { id: ProjectId; alt: string }) {
       <img src={media.images['mini-campaign-grid.png']} alt="MINI 프로모션 콘텐츠 모음" width="1620" height="1076" loading="lazy" decoding="async" />
       <div><span>ONE BRAND.<br />MANY STORIES.</span><p>브랜드의 다양한 이야기를<br />하나의 채널 안에.</p></div>
     </div>}
-    <figcaption><span>{id === 'chungho' ? 'BRAND COMMUNICATION' : id === 'bavarian' ? 'SOCIAL & CONTENTS' : id === 'ocean' ? 'SHORT-FORM CONTENTS' : 'SPATIAL EXPERIENCE'}</span><span>WOOZOO PLANNING</span></figcaption>
+    <figcaption><span>{id === 'chungho' ? 'BRAND COMMUNICATION' : id === 'bavarian' ? 'SOCIAL & CONTENTS' : id === 'ocean' ? 'SHORT-FORM CONTENTS' : 'SPATIAL EXPERIENCE'}</span><span>WOOJU PLANNING</span></figcaption>
   </figure>;
 }
 

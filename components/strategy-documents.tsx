@@ -142,7 +142,7 @@ export function StrategyDocuments({ active }: { active: boolean }) {
   return (
     <section className="strategy-report strategy-dashboard" aria-label="전략기획 통합 대시보드" data-motion={active ? 'playing' : 'idle'}>
       <div className="strategy-dashboard-utility">
-        <div className="strategy-dashboard-breadcrumb"><span>WOOZOO PLANNING</span><i />브랜드 성장 설계</div>
+        <div className="strategy-dashboard-breadcrumb"><span>WOOJU PLANNING</span><i />브랜드 성장 설계</div>
         <div className="strategy-dashboard-utility-meta"><span>최근 4주</span><span className="strategy-dashboard-status"><i />데모 데이터</span></div>
       </div>
       <div className="strategy-report-content strategy-dashboard-content">
