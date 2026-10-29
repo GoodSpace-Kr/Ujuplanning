@@ -1,0 +1,37 @@
+name: Deploy WOOJU to client Cloudflare
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wooju-client-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the site
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Check inquiry handling
+        run: node --experimental-strip-types --test tests/inquiry-handler.test.mjs
+      - name: Build the site
+        run: npm run build
+      - name: Deploy to the client account
+        run: npx wrangler deploy --config dist/server/wrangler.json --name ujuplanning
+        env:
+          CLOUDFLARE_ACCOUNT_ID: f741113c4681b688b30ce8cf8e2310c1
+          CLOUDFLARE_API_TOKEN: ${{ secrets.WOOJU_CLOUDFLARE_API_TOKEN }}
