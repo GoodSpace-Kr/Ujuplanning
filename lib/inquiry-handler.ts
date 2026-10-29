@@ -1,5 +1,4 @@
 const RECIPIENT = 'reviewary.wz@gmail.com';
-const FORM_URL = 'https://ujuplanning.goodspace82.workers.dev/contact';
 const MAX_BYTES = 20000;
 
 function respond(status: number, body: Record<string, unknown>) {
@@ -61,7 +60,7 @@ export async function handleInquiry(request: Request, send: typeof fetch = fetch
         _replyto: fields.email,
         _subject: '[우주기획] 새로운 프로젝트 문의',
         _template: 'table',
-        _url: FORM_URL,
+        _url: new URL('/contact', request.url).href,
       }),
       signal: AbortSignal.timeout(18000),
     });

@@ -31,6 +31,25 @@ test('rejects cross-origin, missing fields, invalid phone and spam before delive
   assert.equal((await handleInquiry(request({ ...valid, message: 'x'.repeat(25000) }), neverSend)).status, 413);
 });
 
+test('custom-domain inquiries use the receiving site URL and ignore a supplied form URL', async () => {
+  for (const host of ['우주기획.com', 'www.우주기획.com']) {
+    const endpoint = new URL(`https://${host}/api/inquiry`);
+    const incoming = new Request(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: endpoint.origin },
+      body: JSON.stringify({ ...valid, _url: 'https://elsewhere.example/contact' }),
+    });
+    let sent;
+    const result = await handleInquiry(incoming, async (destination, options) => {
+      assert.equal(destination, 'https://formsubmit.co/ajax/reviewary.wz@gmail.com');
+      sent = JSON.parse(options.body);
+      return Response.json({ success: 'true' });
+    });
+    assert.equal(result.status, 200);
+    assert.equal(sent._url, `${endpoint.origin}/contact`);
+  }
+});
+
 test('provider rejection, invalid responses and timeout are never reported as success', async () => {
   for (const send of [async () => Response.json({ success: 'false' }), async () => new Response('upstream error', { status: 503 }), async () => { throw new Error('timeout'); }]) {
     const result = await handleInquiry(request(valid), send);
