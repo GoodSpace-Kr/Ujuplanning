@@ -1,9 +1,10 @@
 import { env } from 'cloudflare:workers';
 import media from '@/lib/scroll-video.generated.json';
 import serviceMedia from '@/lib/service-media.generated.json';
+import projectMedia from '@/lib/project-media.generated.json';
 import { videoResponse } from '@/lib/video-response';
 
-const assets = [...Object.values(media).flatMap(variants => Object.values(variants)), serviceMedia.video];
+const assets = [...Object.values(media).flatMap(variants => Object.values(variants)), serviceMedia.video, ...projectMedia.reels.map(reel => reel.video)];
 
 export async function GET(request: Request, { params }: { params: Promise<{ file: string }> }) {
   const { file } = await params;

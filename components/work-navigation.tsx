@@ -43,7 +43,7 @@ export function WorkNavigation({ items }: { items: { id: string; label: string }
 
   return <div className="work-navigation">
     <div className="work-navigation-inner">
-      <span className="work-navigation-label">SELECTED WORK <span>05</span></span>
+      <span className="work-navigation-label">프로젝트 <span>05</span></span>
       <nav ref={navigation} aria-label="프로젝트 바로가기" data-native-scroll>
         {items.map(item => <a key={item.id} href={`#${item.id}`} aria-current={active === item.id ? 'location' : undefined}>{item.label}</a>)}
       </nav>

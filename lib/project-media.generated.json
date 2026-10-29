@@ -1,0 +1,164 @@
+{
+  "blog": [
+    {
+      "id": "223522955319",
+      "title": "시원하게 즐기는 여름 홈캉스",
+      "date": "2024.07.25",
+      "url": "https://blog.naver.com/chunghonais_official/223522955319",
+      "images": [
+        {
+          "src": "/assets/work-selected/chungho-223522955319-480-e8fd3ff2ca3d.webp",
+          "width": 480,
+          "height": 480
+        },
+        {
+          "src": "/assets/work-selected/chungho-223522955319-966-06f18f8c5073.webp",
+          "width": 966,
+          "height": 966
+        }
+      ]
+    },
+    {
+      "id": "223521076261",
+      "title": "올여름, 홈카페 커피 레시피",
+      "date": "2024.07.23",
+      "url": "https://blog.naver.com/chunghonais_official/223521076261",
+      "images": [
+        {
+          "src": "/assets/work-selected/chungho-223521076261-480-b2ce4d1f3ee6.webp",
+          "width": 480,
+          "height": 480
+        },
+        {
+          "src": "/assets/work-selected/chungho-223521076261-966-b6e0156aaf63.webp",
+          "width": 966,
+          "height": 966
+        }
+      ]
+    },
+    {
+      "id": "223490971857",
+      "title": "깨끗하고 건강한 여름 레시피",
+      "date": "2024.06.25",
+      "url": "https://blog.naver.com/chunghonais_official/223490971857",
+      "images": [
+        {
+          "src": "/assets/work-selected/chungho-223490971857-480-5257ab2db802.webp",
+          "width": 480,
+          "height": 480
+        },
+        {
+          "src": "/assets/work-selected/chungho-223490971857-966-533dc85c15f7.webp",
+          "width": 966,
+          "height": 966
+        }
+      ]
+    },
+    {
+      "id": "223490879355",
+      "title": "일상 속 커피 이야기",
+      "date": "2024.06.25",
+      "url": "https://blog.naver.com/chunghonais_official/223490879355",
+      "images": [
+        {
+          "src": "/assets/work-selected/chungho-223490879355-480-94ff9012e8b6.webp",
+          "width": 480,
+          "height": 480
+        },
+        {
+          "src": "/assets/work-selected/chungho-223490879355-966-ec92470e79ba.webp",
+          "width": 966,
+          "height": 966
+        }
+      ]
+    },
+    {
+      "id": "223477113233",
+      "title": "다가오는 여름 바캉스",
+      "date": "2024.06.12",
+      "url": "https://blog.naver.com/chunghonais_official/223477113233",
+      "images": [
+        {
+          "src": "/assets/work-selected/chungho-223477113233-480-04a9723630f4.webp",
+          "width": 480,
+          "height": 480
+        },
+        {
+          "src": "/assets/work-selected/chungho-223477113233-966-dc833180d00e.webp",
+          "width": 966,
+          "height": 966
+        }
+      ]
+    }
+  ],
+  "reels": [
+    {
+      "id": "DWf7BjEj2Fo",
+      "title": "정숙과 영철이 다시 찾은 오션더힐",
+      "date": "2026.03.30",
+      "url": "https://www.instagram.com/reel/DWf7BjEj2Fo/",
+      "poster": [
+        {
+          "src": "/assets/work-selected/ocean-DWf7BjEj2Fo-480-78653747f97b.webp",
+          "width": 480,
+          "height": 853
+        },
+        {
+          "src": "/assets/work-selected/ocean-DWf7BjEj2Fo-1080-45af5c6d956b.webp",
+          "width": 1080,
+          "height": 1920
+        }
+      ],
+      "video": {
+        "src": "/assets/work-selected/ocean-DWf7BjEj2Fo-c4a9cb4a362c.mp4",
+        "bytes": 8048733
+      }
+    },
+    {
+      "id": "DWlbImrD-PI",
+      "title": "바다 앞에서 이어지는 두 사람의 이야기",
+      "date": "2026.04.01",
+      "url": "https://www.instagram.com/reel/DWlbImrD-PI/",
+      "poster": [
+        {
+          "src": "/assets/work-selected/ocean-DWlbImrD-PI-480-9908f4f8f057.webp",
+          "width": 480,
+          "height": 853
+        },
+        {
+          "src": "/assets/work-selected/ocean-DWlbImrD-PI-1080-6203d5f104f1.webp",
+          "width": 1080,
+          "height": 1920
+        }
+      ],
+      "video": {
+        "src": "/assets/work-selected/ocean-DWlbImrD-PI-36c778c30ef6.mp4",
+        "bytes": 17491673
+      }
+    }
+  ],
+  "chunghoDetail": [
+    {
+      "src": "/assets/work-selected/chungho-product-480-d3261c19b893.webp",
+      "width": 480,
+      "height": 480
+    },
+    {
+      "src": "/assets/work-selected/chungho-product-966-ba4a90debcda.webp",
+      "width": 966,
+      "height": 966
+    }
+  ],
+  "oceanView": [
+    {
+      "src": "/assets/work-selected/ocean-view-480-057a11d7605c.webp",
+      "width": 480,
+      "height": 853
+    },
+    {
+      "src": "/assets/work-selected/ocean-view-720-9b9d872fdcbb.webp",
+      "width": 720,
+      "height": 1280
+    }
+  ]
+}

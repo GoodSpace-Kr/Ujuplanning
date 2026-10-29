@@ -170,7 +170,7 @@ export function ServicesSection() {
                 </select>
               </div>
               <aside className="service-notion-sidebar">
-                <div className="service-notion-logo"><i /> WOOJU PLANNING</div>
+                <div className="service-notion-logo"><i /> WOOJU COMMUNICATIONS</div>
                 <div className="service-notion-service-list">
                   <span className="service-notion-section-label">Services</span>
                   <nav className="service-notion-primary" aria-label="Services">

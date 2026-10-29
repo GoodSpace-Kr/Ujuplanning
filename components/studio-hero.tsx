@@ -8,6 +8,7 @@ import { createStudioFrames } from '@/lib/studio-frames';
 import { setAutomaticScrollActive } from '@/lib/scroll-motion';
 import './studio-hero.css';
 import { projects } from '@/lib/site-content';
+import { ProjectArtwork } from './project-artwork';
 
 export function StudioHero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -254,23 +255,18 @@ export function StudioHero() {
           <span>연결하다</span>
         </h1>
         <div ref={projectsRef} className="studio-projects" aria-hidden={!showProjects}>
-          <div className="studio-project-top"><span>WOOJU PLANNING</span><span>SELECTED PROJECTS</span></div>
           {projects.map((project, index) => (
             <article key={project.name} className={`studio-project ${activeProject === index ? 'is-active' : ''}`} aria-hidden={activeProject !== index} inert={!showProjects || activeProject !== index}>
               <div className="studio-project-title">
-                <p className="studio-project-number">PROJECT {String(index + 1).padStart(2, '0')} <span>/ 05</span></p>
-                <h2>{project.name}</h2>
                 <p className="studio-project-category">{project.category}</p>
+                <h2>{project.name}</h2>
+                <p className="studio-project-description">{project.description}</p>
                 <a className="studio-project-link" href={`/work#${project.id}`} aria-label={`${project.name.replace(/\n/g, ' ')} 프로젝트 보기`}>
                   <span>프로젝트 보기</span>
                   <ArrowUpRight size={17} strokeWidth={1.6} aria-hidden="true" />
                 </a>
               </div>
-              <div className="studio-project-copy">
-                <h3>{project.headline}</h3>
-                <p>{project.description}</p>
-                <ul>{project.tags.map(tag => <li key={tag}>{tag}</li>)}</ul>
-              </div>
+              <ProjectArtwork id={project.id} ready={index === 0 || showProjects && index <= activeProject + 1} />
             </article>
           ))}
           <div className="studio-project-bottom"><span>{String(activeProject + 1).padStart(2, '0')}</span><div className="studio-project-track"><span /></div><span>05</span></div>
