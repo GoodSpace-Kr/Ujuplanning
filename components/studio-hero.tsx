@@ -1,22 +1,20 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
 import { STUDIO_FRAMES, studioGeometry, studioTimeline } from '@/lib/studio-journey';
 import { STUDIO_ENTRY_START, STUDIO_ENTRY_END, shouldStartStudioEntry, studioEntryProgress } from '@/lib/studio-journey';
 import { createStudioFrames } from '@/lib/studio-frames';
 import { setAutomaticScrollActive } from '@/lib/scroll-motion';
 import './studio-hero.css';
-import { projects } from '@/lib/site-content';
-import { ProjectArtwork } from './project-artwork';
+import { ProjectJourney, type ProjectJourneyHandle } from './project-journey';
 
 export function StudioHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const projectsRef = useRef<HTMLDivElement>(null);
+  const journeyRef = useRef<ProjectJourneyHandle>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
-  const [activeProject, setActiveProject] = useState(0);
   const [showProjects, setShowProjects] = useState(false);
 
   useEffect(() => {
@@ -30,7 +28,7 @@ export function StudioHero() {
     const initialRect = section.getBoundingClientRect();
     let disposed = false, active = initialRect.top < innerHeight + 200 && initialRect.bottom > -200, ready = false;
     let raf = 0, lastTime = 0, progress = 0, viewWidth = 1, viewHeight = 1;
-    let currentProject = 0, projectsVisible = false;
+    let projectsVisible = false;
     let paintedFrame = -1, paintedZoom = -1, paintedImage: unknown;
     let autoEntering = false;
     let directNavigation = false;
@@ -170,6 +168,7 @@ export function StudioHero() {
       }
       section!.style.setProperty('--studio-opening', String(state.opening));
       section!.style.setProperty('--studio-project-progress', String(state.projectProgress));
+      journeyRef.current?.update(state.projectProgress);
       section!.dataset.phase = state.phase;
       section!.dataset.frame = String(paintedFrame);
       section!.dataset.zoom = zoom.toFixed(4);
@@ -182,7 +181,6 @@ export function StudioHero() {
       section!.dataset.maxSeekMs = frames.stats().maxSeekMs.toFixed(1);
       section!.dataset.mediaError = frames.stats().downloadError;
       section!.dataset.receivedBytes = String(frames.stats().receivedBytes);
-      if (currentProject !== state.projectIndex) { currentProject = state.projectIndex; setActiveProject(currentProject); }
       if (projectsVisible !== (projectOpacity > .5)) { projectsVisible = projectOpacity > .5; setShowProjects(projectsVisible); }
       if (autoEntering || target !== progress) schedule();
     }
@@ -255,21 +253,13 @@ export function StudioHero() {
           <span>연결하다</span>
         </h1>
         <div ref={projectsRef} className="studio-projects" aria-hidden={!showProjects}>
-          {projects.map((project, index) => (
-            <article key={project.name} className={`studio-project ${activeProject === index ? 'is-active' : ''}`} aria-hidden={activeProject !== index} inert={!showProjects || activeProject !== index}>
-              <div className="studio-project-title">
-                <p className="studio-project-category">{project.category}</p>
-                <h2>{project.name}</h2>
-                <p className="studio-project-description">{project.description}</p>
-                <a className="studio-project-link" href={`/work#${project.id}`} aria-label={`${project.name.replace(/\n/g, ' ')} 프로젝트 보기`}>
-                  <span>프로젝트 보기</span>
-                  <ArrowUpRight size={17} strokeWidth={1.6} aria-hidden="true" />
-                </a>
-              </div>
-              <ProjectArtwork id={project.id} ready={index === 0 || showProjects && index <= activeProject + 1} />
-            </article>
-          ))}
-          <div className="studio-project-bottom"><span>{String(activeProject + 1).padStart(2, '0')}</span><div className="studio-project-track"><span /></div><span>05</span></div>
+          <ProjectJourney ref={journeyRef} visible={showProjects} onNavigate={projectProgress => {
+            const section = sectionRef.current, stage = stageRef.current;
+            if (!section || !stage) return;
+            const top = window.scrollY + section.getBoundingClientRect().top;
+            const progress = STUDIO_ENTRY_END + projectProgress * (.975 - STUDIO_ENTRY_END);
+            window.scrollTo({ top: top + progress * (section.offsetHeight - stage.clientHeight), behavior: 'instant' });
+          }} />
         </div>
         {status !== 'ready' && <p className="sr-only" role="status">{status === 'failed' ? '영상을 불러오지 못했어요. 새로고침해 주세요.' : '장면을 준비하고 있어요.'}</p>}
       </div>
