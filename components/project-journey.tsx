@@ -101,7 +101,6 @@ function ProjectVisual({ id }: { id: Project['id'] }) {
   </div>;
   if (id === 'ohrun') return <div className="journey-visual journey-ohrun">
     <JourneyVideo src={`/api/scroll-video/${serviceMedia.video.src.split('/').pop()}`} poster={images.ohrun[1].src} label="오륜스포츠" />
-    <div className="journey-production" aria-label="캠페인 제작 과정"><span>기획</span><i /><span>촬영</span><i /><span>편집</span><i /><span>송출</span></div>
   </div>;
   return <div className="journey-visual journey-byd">
     <div className="journey-orbits" aria-hidden="true"><i /><i /><i /></div>
