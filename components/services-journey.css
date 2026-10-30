@@ -207,7 +207,7 @@
 
 @media (max-width: 760px) {
   .service-journey {
-    --service-visual-top: calc(var(--uju-header-height, 68px) + 12px);
+    --service-visual-top: var(--uju-header-height, 68px);
     --service-visual-height: max(200px, calc(47svh - var(--uju-header-height, 68px)));
   }
   .service-journey-layout { display: flex; flex-direction: column; }

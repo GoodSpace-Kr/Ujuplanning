@@ -80,7 +80,7 @@ test('the workspace fits within its sticky visual on desktop and mobile', () => 
 test('mobile entry settles below the header without jumping at the end', () => {
   for (const [width, height] of [[320, 568], [390, 740], [430, 932]]) {
     const headerHeight = 68;
-    const panelTop = headerHeight + 12;
+    const panelTop = headerHeight;
     const panelHeight = Math.max(200, height * .47 - headerHeight);
     const nearEnd = serviceEntryPose(.99999, width, height, 0, panelTop, width, panelHeight);
     const end = serviceEntryPose(1, width, height, 0, panelTop, width, panelHeight);
