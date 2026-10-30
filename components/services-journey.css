@@ -1,6 +1,7 @@
 .service-journey {
   padding: 0;
   background: #f6f7f9;
+  overflow-x: clip;
 }
 
 .service-journey-layout {

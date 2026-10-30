@@ -1,19 +1,18 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { STUDIO_FRAMES, studioGeometry, studioTimeline } from '@/lib/studio-journey';
+import { STUDIO_FRAMES, studioGeometry, studioTimeline, studioScrollProgress, studioScrollOffset } from '@/lib/studio-journey';
 import { STUDIO_ENTRY_START, STUDIO_ENTRY_END, shouldStartStudioEntry, studioEntryProgress } from '@/lib/studio-journey';
 import { createStudioFrames } from '@/lib/studio-frames';
 import { setAutomaticScrollActive } from '@/lib/scroll-motion';
 import './studio-hero.css';
-import { ProjectJourney, type ProjectJourneyHandle } from './project-journey';
+import { ProjectJourney, ProjectOpening } from './project-journey';
 
 export function StudioHero() {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const projectsRef = useRef<HTMLDivElement>(null);
-  const journeyRef = useRef<ProjectJourneyHandle>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
   const [showProjects, setShowProjects] = useState(false);
 
@@ -37,7 +36,9 @@ export function StudioHero() {
     const frames = createStudioFrames(schedule, () => { if (!disposed && !ready) setStatus('failed'); });
 
     function measure() {
-      return Math.max(0, Math.min(1, -section!.getBoundingClientRect().top / Math.max(1, section!.offsetHeight - stage!.clientHeight)));
+      const value = studioScrollProgress(-section!.getBoundingClientRect().top, section!.offsetHeight - stage!.clientHeight);
+      section!.toggleAttribute('data-projects-ready', value >= STUDIO_ENTRY_END - .0006);
+      return value;
     }
     function schedule() {
       if (!disposed && active && !document.hidden && !raf) raf = requestAnimationFrame(render);
@@ -51,7 +52,7 @@ export function StudioHero() {
     }
     function scrollToProgress(value: number) {
       const top = window.scrollY + section!.getBoundingClientRect().top;
-      const scrollY = top + value * Math.max(1, section!.offsetHeight - stage!.clientHeight);
+      const scrollY = top + studioScrollOffset(value, section!.offsetHeight - stage!.clientHeight);
       window.scrollTo({ top: scrollY, behavior: 'instant' });
       previousScroll = value;
     }
@@ -167,8 +168,6 @@ export function StudioHero() {
         projectsRef.current.style.opacity = String(projectOpacity);
       }
       section!.style.setProperty('--studio-opening', String(state.opening));
-      section!.style.setProperty('--studio-project-progress', String(state.projectProgress));
-      journeyRef.current?.update(state.projectProgress);
       section!.dataset.phase = state.phase;
       section!.dataset.frame = String(paintedFrame);
       section!.dataset.zoom = zoom.toFixed(4);
@@ -239,6 +238,7 @@ export function StudioHero() {
   }, []);
 
   return (
+    <>
     <section ref={sectionRef} className={`studio-hero ${status === 'ready' ? 'is-ready' : ''}`} aria-label="우주기획 소개와 프로젝트">
       <div ref={stageRef} className="studio-stage">
         <picture className="studio-poster" aria-hidden="true">
@@ -253,16 +253,12 @@ export function StudioHero() {
           <span>연결하다</span>
         </h1>
         <div ref={projectsRef} className="studio-projects" aria-hidden={!showProjects}>
-          <ProjectJourney ref={journeyRef} visible={showProjects} onNavigate={projectProgress => {
-            const section = sectionRef.current, stage = stageRef.current;
-            if (!section || !stage) return;
-            const top = window.scrollY + section.getBoundingClientRect().top;
-            const progress = STUDIO_ENTRY_END + projectProgress * (.975 - STUDIO_ENTRY_END);
-            window.scrollTo({ top: top + progress * (section.offsetHeight - stage.clientHeight), behavior: 'instant' });
-          }} />
+          <ProjectOpening />
         </div>
         {status !== 'ready' && <p className="sr-only" role="status">{status === 'failed' ? '영상을 불러오지 못했어요. 새로고침해 주세요.' : '장면을 준비하고 있어요.'}</p>}
       </div>
     </section>
+    <ProjectJourney />
+    </>
   );
 }

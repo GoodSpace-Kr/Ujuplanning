@@ -1,45 +1,39 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { projectJourney, projectArtworkPose, projectScrollStop } from '../lib/project-journey.ts';
+import { projectScenePose } from '../lib/project-journey.ts';
 
-test('the project track moves forward continuously and retraces the same path in reverse', () => {
-  const samples = Array.from({ length: 1001 }, (_, i) => projectJourney(i / 1000));
-  const seen = new Set();
-  samples.forEach((state, i) => {
-    seen.add(state.active);
-    assert.ok(state.position >= 0 && state.position <= 4);
-    if (i) {
-      assert.ok(state.position >= samples[i - 1].position);
-      assert.ok(state.position - samples[i - 1].position < .011, 'no scene-boundary jump');
+test('native vertical progress drives artwork continuously in both scroll directions', () => {
+  const samples = Array.from({ length: 1601 }, (_, i) => projectScenePose(800 - i, 800, 800));
+  for (let i = 0; i < samples.length; i++) {
+    const pose = samples[i];
+    assert.ok(pose.enter >= 0 && pose.enter <= 1);
+    if (i > 0) {
+      assert.ok(pose.progress >= samples[i - 1].progress);
+      assert.ok(Math.abs(pose.lift - samples[i - 1].lift) < 1, 'no scene boundary jump');
     }
-  });
-  for (let i = 1000; i >= 0; i--) assert.deepEqual(projectJourney(i / 1000), samples[i]);
-  assert.deepEqual([...seen], [0, 1, 2, 3, 4]);
-});
-
-test('navigation stops center the selected project, including the first and last', () => {
-  for (let index = 0; index < 5; index++) {
-    const state = projectJourney(projectScrollStop(index));
-    assert.equal(state.active, index);
-    assert.ok(Math.abs(state.position - index) < 1e-10);
   }
-  assert.deepEqual(projectJourney(-1), projectJourney(0));
-  assert.deepEqual(projectJourney(2), projectJourney(1));
-  assert.equal(projectJourney(.98).position, 4, 'last card is settled before the sticky stage releases');
+  for (let i = 1600; i >= 0; i--) assert.deepEqual(projectScenePose(800 - i, 800, 800), samples[i]);
 });
 
-test('artwork settles squarely on the reading position without moving explanatory copy', () => {
-  for (let index = 0; index < 5; index++) {
-    const pose = projectArtworkPose(index, index, 1);
-    assert.equal(pose.x, 0);
-    assert.equal(pose.y, 0);
-    assert.equal(pose.scale, 1);
-    assert.equal(Math.abs(pose.rotation), 0);
-    assert.equal(pose.opacity, 1);
-    for (const position of [0, .5, 1.5, 3, 4]) {
-      const moving = projectArtworkPose(position, index, 1);
-      assert.ok(Math.abs(moving.rotation) <= 2.4 + 1e-10);
-      assert.ok(moving.scale >= .94 && moving.scale <= 1);
-    }
+test('the first scene meets the phone preview at its neutral composition', () => {
+  const pose = projectScenePose(0, 900, 900);
+  assert.equal(pose.enter, 1);
+  assert.equal(pose.lift, 0);
+  assert.equal(pose.drift, 0);
+  assert.equal(pose.turn, 0);
+  assert.equal(pose.scale, 1);
+});
+
+test('mobile uses smaller movements and reduced motion leaves all artwork readable', () => {
+  for (const top of [900, 400, 0, -400, -900]) {
+    const desktop = projectScenePose(top, 900, 900);
+    const mobile = projectScenePose(top, 900, 900, true);
+    assert.ok(Math.abs(mobile.lift) <= Math.abs(desktop.lift));
+    assert.ok(Math.abs(mobile.turn) <= Math.abs(desktop.turn));
+    const reduced = projectScenePose(top, 900, 900, true, true);
+    assert.equal(reduced.enter, 1);
+    assert.equal(reduced.lift, 0);
+    assert.equal(reduced.drift, 0);
+    assert.equal(reduced.scale, 1);
   }
 });

@@ -6,7 +6,7 @@ import ts from 'typescript';
 const source = readFileSync(new URL('../lib/studio-journey.ts', import.meta.url), 'utf8')
   .replace("'./hero-transition'", JSON.stringify(new URL('../lib/hero-transition.ts', import.meta.url).href));
 const js = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
-const { studioTimeline, studioGeometry, STUDIO_FRAMES, STUDIO_SCREEN, shouldStartStudioEntry, studioEntryProgress, STUDIO_ENTRY_START, STUDIO_ENTRY_END, STUDIO_ENTRY_DURATION } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
+const { studioTimeline, studioGeometry, STUDIO_FRAMES, STUDIO_SCREEN, shouldStartStudioEntry, studioEntryProgress, STUDIO_ENTRY_START, STUDIO_ENTRY_END, STUDIO_ENTRY_DURATION, studioScrollProgress, studioScrollOffset } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
 
 test('automatic entry starts at the straight-on phone and stops on the first project', () => {
   assert.equal(shouldStartStudioEntry(STUDIO_ENTRY_START - .01, STUDIO_ENTRY_START), true);
@@ -18,7 +18,6 @@ test('automatic entry starts at the straight-on phone and stops on the first pro
   for (let ms=0; ms<=STUDIO_ENTRY_DURATION; ms+=16) {
     const t=studioTimeline(studioEntryProgress(ms));
     assert.equal(t.frame, STUDIO_FRAMES - 1);
-    assert.equal(t.projectIndex,0);
     assert.ok(t.zoom>=lastZoom);
     lastZoom=t.zoom;
   }
@@ -41,24 +40,22 @@ test('forward scrolling never contracts the phone or rewinds the studio video', 
   }
 });
 
-test('all five projects stay readable at full zoom until the stage releases into services', () => {
-  const seen = new Set();
-  for (let i=600; i<=1000; i++) {
-    const t=studioTimeline(i/1000);
-    assert.equal(t.zoom,1);
-    assert.equal(t.projectOpacity,1);
-    seen.add(t.projectIndex);
-    assert.equal(shouldStartStudioEntry(i/1000, i/1000+.00001), false);
+test('entry ends exactly where the native project section starts at every viewport size', () => {
+  for (const entryDistance of [800, 1184, 2340, 2808]) {
+    assert.equal(studioScrollProgress(0, entryDistance), 0);
+    assert.equal(studioScrollProgress(entryDistance, entryDistance), STUDIO_ENTRY_END);
+    assert.equal(studioScrollProgress(entryDistance * 5, entryDistance), STUDIO_ENTRY_END);
+    for (let i = 0; i <= 100; i++) {
+      const offset = entryDistance * i / 100;
+      const progress = studioScrollProgress(offset, entryDistance);
+      assert.ok(Math.abs(studioScrollOffset(progress, entryDistance) - offset) < 1e-7);
+    }
+    const end = studioTimeline(studioScrollProgress(entryDistance, entryDistance));
+    assert.equal(end.phase, 'projects');
+    assert.equal(end.projectOpacity, 1);
+    assert.equal(end.zoom, 1);
+    assert.equal(shouldStartStudioEntry(STUDIO_ENTRY_END, STUDIO_ENTRY_END), false);
   }
-  assert.deepEqual([...seen], [0,1,2,3,4]);
-  const end=studioTimeline(1);
-  assert.equal(end.phase,'projects');
-  assert.equal(end.projectIndex,4);
-  assert.equal(end.projectProgress,1);
-  assert.deepEqual(studioTimeline(1.2),end);
-  // Scrolling back from services should show the last project, not the opening footage.
-  assert.equal(studioTimeline(.99).projectIndex,4);
-  assert.equal(studioTimeline(.99).frame, STUDIO_FRAMES - 1);
 });
 
 test('phone and final-frame background share one transform at every responsive size', () => {
@@ -77,7 +74,7 @@ test('phone and final-frame background share one transform at every responsive s
   }
 });
 
-test('reduced motion uses static endpoint scenes and keeps the final project visible', () => {
+test('reduced motion uses static endpoint scenes and reveals the native project section', () => {
   for(let i=0; i<=100; i++) {
     const t=studioTimeline(i/100,true);
     assert.ok([0,STUDIO_FRAMES-1].includes(t.frame));
@@ -87,5 +84,4 @@ test('reduced motion uses static endpoint scenes and keeps the final project vis
   assert.equal(end.frame,STUDIO_FRAMES-1);
   assert.equal(end.zoom,1);
   assert.equal(end.projectOpacity,1);
-  assert.equal(end.projectIndex,4);
 });

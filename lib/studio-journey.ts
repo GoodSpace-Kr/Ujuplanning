@@ -13,6 +13,14 @@ export const STUDIO_ENTRY_START = .39;
 export const STUDIO_ENTRY_END = .6;
 export const STUDIO_ENTRY_DURATION = 2000;
 
+export function studioScrollProgress(offset: number, entryDistance: number) {
+  return clamp(offset / Math.max(1, entryDistance)) * STUDIO_ENTRY_END;
+}
+
+export function studioScrollOffset(progress: number, entryDistance: number) {
+  return clamp(progress / STUDIO_ENTRY_END) * Math.max(1, entryDistance);
+}
+
 export function shouldStartStudioEntry(previous: number, next: number, reduced = false) {
   return !reduced && previous < STUDIO_ENTRY_END && next > previous &&
     next >= STUDIO_ENTRY_START && next < STUDIO_ENTRY_END;
@@ -25,8 +33,8 @@ export function studioEntryProgress(elapsed: number, from = STUDIO_ENTRY_START) 
 
 export function studioTimeline(progress: number, reduced = false) {
   const p = clamp(progress);
-  // The timeline ends on the fifth project. The sticky stage then releases
-  // straight into services, with no contraction or return to the studio.
+  // At STUDIO_ENTRY_END the enlarged phone hands off to projects in the
+  // normal page flow, with no contraction or return to the studio.
   const forward = range(p, .03, STUDIO_ENTRY_START);
   const zoom = reduced ? (p >= .5 ? 1 : 0) : smooth(range(p, .42, .585));
   const frame = reduced
@@ -38,8 +46,6 @@ export function studioTimeline(progress: number, reduced = false) {
     phase: p < .42 ? 'approach' : p < .585 ? 'expand' : 'projects',
     opening: 1 - smooth(range(p, .0375, .1125)),
     projectOpacity: smooth(range(p, .566, STUDIO_ENTRY_END)),
-    projectIndex: Math.min(4, Math.floor(range(p, STUDIO_ENTRY_END, .975) * 5)),
-    projectProgress: range(p, STUDIO_ENTRY_END, .975),
   };
 }
 
