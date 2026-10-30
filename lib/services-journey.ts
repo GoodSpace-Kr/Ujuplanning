@@ -58,12 +58,12 @@ export function serviceEntryPose(
   const startX = viewportWidth / 2;
   const endX = visualLeft + visualWidth / 2;
   const startY = viewportHeight * .7 + SERVICE_PAGE.height * peekScale / 2;
-  const endY = visualHeight / 2;
+  const endY = visualTop + visualHeight / 2;
   const globalX = startX + (endX - startX) * settle;
   const globalY = startY + (endY - startY) * settle;
   return {
     x: globalX - visualLeft,
-    y: p >= 1 ? endY : globalY - visualTop,
+    y: globalY - visualTop,
     scale: peekScale + (settledScale - peekScale) * settle,
     opacity: smoothstep((progress + .1) / .1),
     titleScale: .8 + .2 * smoothstep(p / SERVICE_TITLE_TYPING_END),

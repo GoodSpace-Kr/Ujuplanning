@@ -206,23 +206,32 @@
 .service-journey-page .creative-workspace { overflow: hidden; overscroll-behavior: auto; }
 
 @media (max-width: 760px) {
+  .service-journey {
+    --service-visual-top: calc(var(--uju-header-height, 68px) + 12px);
+    --service-visual-height: max(200px, calc(47svh - var(--uju-header-height, 68px)));
+  }
   .service-journey-layout { display: flex; flex-direction: column; }
   .service-journey-visual {
     z-index: 2;
     order: -1;
+    top: var(--service-visual-top);
     width: 100%;
-    height: 47svh;
-    min-height: 290px;
+    height: var(--service-visual-height);
+    min-height: 0;
     border-bottom: 1px solid #e2e7ee;
   }
-  .service-journey-copy-list { width: 100%; padding-inline: 7%; padding-bottom: 47svh; }
+  .service-journey-copy-list {
+    width: 100%;
+    padding-inline: 7%;
+    padding-bottom: calc(var(--service-visual-top) + var(--service-visual-height));
+  }
   .service-journey-intro { min-height: 100svh; padding: 40px 7%; }
   .service-journey-intro-content > p { font-size: 13px; margin-bottom: 18px; }
   .service-journey-intro h2 { font-size: clamp(38px, 9vw, 54px); }
   .service-journey-copy {
     min-height: 75svh;
     padding-block: 42px;
-    scroll-margin-top: max(47svh, 290px);
+    scroll-margin-top: calc(var(--service-visual-top) + var(--service-visual-height) + 12px);
   }
   .service-journey-copy .service-kicker { font-size: 11px; margin-bottom: 10px; }
   .service-journey-step { margin-bottom: 18px; font-size: 10px; }

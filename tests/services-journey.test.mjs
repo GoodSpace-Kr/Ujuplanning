@@ -76,3 +76,17 @@ test('the workspace fits within its sticky visual on desktop and mobile', () => 
     assert.ok(SERVICE_PAGE.height * scale <= height - 48);
   }
 });
+
+test('mobile entry settles below the header without jumping at the end', () => {
+  for (const [width, height] of [[320, 568], [390, 740], [430, 932]]) {
+    const headerHeight = 68;
+    const panelTop = headerHeight + 12;
+    const panelHeight = Math.max(200, height * .47 - headerHeight);
+    const nearEnd = serviceEntryPose(.99999, width, height, 0, panelTop, width, panelHeight);
+    const end = serviceEntryPose(1, width, height, 0, panelTop, width, panelHeight);
+    assert.ok(Math.abs(nearEnd.y - end.y) < .01, 'the last animation frame must stay continuous');
+    assert.ok(Math.abs(end.y - panelHeight / 2) < .001);
+    const pageTop = panelTop + end.y - SERVICE_PAGE.height * end.scale / 2;
+    assert.ok(pageTop >= headerHeight + 12, 'the complete workspace stays below the menu');
+  }
+});

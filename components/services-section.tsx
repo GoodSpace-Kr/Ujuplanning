@@ -78,15 +78,16 @@ export function ServicesSection() {
       introTitle.style.transform = settled ? 'none' : `scale(${entry.titleScale})`;
 
       const compact = window.innerWidth <= 760;
-      const visibleCenter = compact
-        ? (visual.clientHeight + window.innerHeight) / 2
-        : window.innerHeight / 2;
+      // Use the pinned panel's bottom, including the header clearance, as the
+      // start of the mobile reading area in both scroll directions.
+      const visualTop = Number.parseFloat(window.getComputedStyle(visual).top) || 0;
+      const readingTop = compact ? visualTop + visual.clientHeight : 0;
+      const readingHeight = Math.max(window.innerHeight - readingTop, 1);
+      const visibleCenter = readingTop + readingHeight / 2;
       const centers = copyRefs.current.map((copy) => {
         if (!copy) return Number.POSITIVE_INFINITY;
         const frame = copy.firstElementChild as HTMLElement | null;
         if (!frame) return Number.POSITIVE_INFINITY;
-        const readingTop = compact ? visual.clientHeight : 0;
-        const readingHeight = window.innerHeight - readingTop;
         const stickyTop = readingTop + Math.max(12, (readingHeight - frame.offsetHeight) / 2);
         const top = `${stickyTop}px`;
         if (frame.style.top !== top) frame.style.top = top;
