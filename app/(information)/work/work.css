@@ -147,8 +147,6 @@
 }
 
 /* Selected client work: original artwork stays legible and keeps its proportions. */
-.work-period { display: flex; flex-wrap: wrap; gap: 14px; margin: 23px 0 0; font-size: 13px; color: #8b94a0; }
-.work-period span { color: #525e70; }
 .work-ocean-landscape { height: 520px; border-radius: 26px; overflow: hidden; background: #e8ece9; }
 .work-ocean-landscape img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 65%; }
 .work-deliverables { margin-top: 90px; }

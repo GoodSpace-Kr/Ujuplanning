@@ -96,7 +96,7 @@ function ProjectVisual({ id }: { id: Project['id'] }) {
   </div>;
   if (id === 'ocean') return <div className="journey-visual journey-ocean">
     <div className="journey-ocean-view"><PortfolioImage variants={selected.oceanView} alt="오션더힐 바다 앞 풍경" sizes="(max-width: 760px) 35vw, 360px" /></div>
-    {selected.reels.map((reel, index) => <JourneyVideo key={reel.id} className={`journey-reel journey-reel-${index}`}
+    {selected.reels.map((reel, index) => <JourneyVideo key={reel.id} className="journey-reel"
       src={`/api/scroll-video/${previews[index].src.split('/').pop()}`} poster={reel.poster[0].src} label={reel.title} />)}
   </div>;
   if (id === 'ohrun') return <div className="journey-visual journey-ohrun">

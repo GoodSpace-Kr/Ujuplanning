@@ -78,7 +78,6 @@ export default function WorkPage() {
               <p className="work-case-brand">{project.name.replace('\n', ' ')}</p>
               <h2 id={`${project.id}-heading`}>{project.headline}</h2>
               <p className="work-case-description">{project.introduction}</p>
-              {(project.id === 'chungho' || project.id === 'ocean') && <p className="work-period">운영 기간 <span>{project.id === 'chungho' ? '2023.09 — 2024.08' : '2026.03 — 현재'}</span></p>}
               <ul className="work-tags" aria-label="작업 분야">{project.tags.map(tag => <li key={tag}>{tag}</li>)}</ul>
               <details className="work-case-detail">
                 <summary>작업 내용 살펴보기 <Plus size={18} aria-hidden="true" /></summary>
