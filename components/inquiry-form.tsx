@@ -87,12 +87,8 @@ export function InquiryForm() {
       <div className="inquiry-story">
         <div className="inquiry-image">
           <img src="/assets/telescope-sequence/desktop/0000.webp" alt="창 너머를 망원경으로 바라보며 새로운 가능성을 찾는 모습" loading="lazy" />
-          <span className="inquiry-image-brand">WOOJU COMMUNICATIONS</span>
         </div>
         <div className="inquiry-guide">
-          <p className="inquiry-guide-title">당신의 이야기를 기다립니다.</p>
-          <p>브랜드의 고민부터 아직 구체화되지 않은 아이디어까지, 편하게 들려주세요. 남겨주신 내용을 꼼꼼히 살펴보고 담당자가 영업일 1~2일 이내로 연락드리겠습니다.</p>
-          <p>함께할 가능성을 열어주셔서 감사합니다.<br />브랜드에 꼭 맞는 다음 항로를 함께 고민하겠습니다.</p>
           <span className="inquiry-response-time"><span aria-hidden="true" />영업일 1~2일 이내 답변</span>
         </div>
       </div>
