@@ -33,6 +33,7 @@ export default function ContactPage() {
     <footer className="contact-footer contact-container" aria-label="우주기획 회사 정보">
       <p>우주기획 <span aria-hidden="true">·</span> 대표 남상빈 <span className="contact-footer-divider" aria-hidden="true">·</span><span className="contact-registration">사업자등록번호 149-40-01125</span></p>
       <small>© WOOJU COMMUNICATIONS. All rights reserved.</small>
+      <a className="contact-privacy-link" href="/privacy">개인정보처리방침</a>
     </footer>
   </div>;
 }

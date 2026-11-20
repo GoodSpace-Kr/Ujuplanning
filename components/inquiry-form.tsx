@@ -71,7 +71,7 @@ export function InquiryFields() {
               <div className="inquiry-honey" aria-hidden="true">
                 <label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
               </div>
-              <p className="inquiry-privacy">남겨주신 정보는 문의 확인과 답변을 위해 담당자에게 전달됩니다.</p>
+              <p className="inquiry-privacy">남겨주신 정보는 문의 확인과 답변을 위해 담당자에게 전달되며, 접수일로부터 1년간 보관됩니다. <a href="/privacy" target="_blank" rel="noopener noreferrer">개인정보처리방침 보기 (새 탭)</a></p>
               {state === 'error' && <p className="inquiry-error" role="alert">{error}</p>}
               <button className="inquiry-submit" type="submit">{state === 'sending' ? '문의 보내는 중…' : '문의 보내기'}<span aria-hidden="true">↗</span></button>
             </fieldset>

@@ -48,6 +48,9 @@
 .contact-footer p { font-size: 10px; line-height: 1.9; }
 .contact-footer p > span[aria-hidden] { padding-inline: 9px; color: #c4ccd6; }
 .contact-footer small { font-size: 9px; white-space: nowrap; }
+.contact-footer { flex-wrap: wrap; }
+.contact-footer .contact-privacy-link { color: #435f84; font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+.contact-privacy-link:focus-visible { outline: 2px solid #3978cf; outline-offset: 5px; }
 @media (max-width: 1000px) {
   .contact-layout { gap: 6%; padding-top: 60px; }
   .contact-form-card { padding: 25px; }

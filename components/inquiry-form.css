@@ -24,6 +24,8 @@
 .inquiry-field-row { display: grid; grid-template-columns: .8fr 1.2fr; gap: 16px; }
 .inquiry-honey { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
 .inquiry-privacy { margin: 4px 0 12px; color: #7d889a; font-size: 11px; line-height: 1.7; word-break: keep-all; }
+.inquiry-privacy a { color: #3e6091; font-weight: 550; text-decoration: underline; text-underline-offset: 3px; }
+.inquiry-privacy a:focus-visible { outline: 2px solid #678cc3; outline-offset: 3px; }
 .inquiry-submit, .inquiry-success button { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 10px 17px; border: 0; border-radius: 10px; background: linear-gradient(120deg, #344b71, #536c94); color: white; font-size: 14px; font-weight: 500; cursor: pointer; transition: filter .2s; }
 .inquiry-submit span, .inquiry-success button span { font-size: 20px; font-weight: 400; }
 .inquiry-submit:hover, .inquiry-success button:hover { filter: brightness(1.12); }

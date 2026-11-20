@@ -55,7 +55,10 @@ export function SiteFooter({ showInquiry = true }: { showInquiry?: boolean }) {
       <p className="uju-footer-wordmark">WOOJU COMMUNICATIONS</p>
       <div className="uju-footer-bottom">
         <small>© WOOJU COMMUNICATIONS. All rights reserved.</small>
-        <a href="#site-top">맨 위로 <span aria-hidden="true">↑</span></a>
+        <div className="uju-footer-bottom-links">
+          <a className="uju-footer-privacy" href="/privacy">개인정보처리방침</a>
+          <a href="#site-top">맨 위로 <span aria-hidden="true">↑</span></a>
+        </div>
       </div>
     </footer>
   );
