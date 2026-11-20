@@ -24,7 +24,6 @@ export function ServicesSection() {
   const pageRef = useRef<HTMLDivElement>(null);
   const copyRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [strategyMotionActive, setStrategyMotionActive] = useState(false);
   const [typedTitleLength, setTypedTitleLength] = useState(0);
   const creative = useServiceDemoPlayback(strategyRef, activeIndex === 1, CREATIVE_PAGES, 4000);
   const creativePanelId = useId();
@@ -101,8 +100,6 @@ export function ServicesSection() {
       });
       const nextIndex = activeServiceIndex(centers, visibleCenter);
       setActiveIndex((current) => current === nextIndex ? current : nextIndex);
-      const nextStrategyMotionActive = introBounds.bottom < window.innerHeight * .35 && nextIndex === 0;
-      setStrategyMotionActive((current) => current === nextStrategyMotionActive ? current : nextStrategyMotionActive);
     };
 
     const requestUpdate = () => {
@@ -205,7 +202,7 @@ export function ServicesSection() {
                       key={service.id}
                     >
                       <div className={`service-visual service-visual-${service.id}`}>
-                      {service.id === 'strategy' ? <StrategyDocuments active={strategyMotionActive} />
+                      {service.id === 'strategy' ? <StrategyDocuments />
                           : service.id === 'creative' ? activeIndex === 1 && <CreativeStudio page={creative.page} panelId={creativePanelId} active running={creative.running} reduced={creative.reduced} />
                             : service.id === 'performance' ? activeIndex === 2 && <PerformanceStudio /> : activeIndex === 3 && <SocialStudio active />}
                       </div>

@@ -126,7 +126,7 @@ function CampaignPlan({ sample }: { sample: StrategySample }) {
   );
 }
 
-export function StrategyDocuments({ active }: { active: boolean }) {
+export function StrategyDocuments() {
   const [sample, setSample] = useState(INITIAL_STRATEGY_SAMPLE);
   const refresh = () => {
     setSample(createStrategySample());
@@ -140,7 +140,7 @@ export function StrategyDocuments({ active }: { active: boolean }) {
   ];
 
   return (
-    <section className="strategy-report strategy-dashboard" aria-label="전략기획 통합 대시보드" data-motion={active ? 'playing' : 'idle'}>
+    <section className="strategy-report strategy-dashboard" aria-label="전략기획 통합 대시보드">
       <div className="strategy-dashboard-utility">
         <div className="strategy-dashboard-breadcrumb"><span>WOOJU COMMUNICATIONS</span><i />브랜드 성장 설계</div>
         <div className="strategy-dashboard-utility-meta"><span>최근 4주</span><span className="strategy-dashboard-status"><i />데모 데이터</span></div>
