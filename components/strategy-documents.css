@@ -257,8 +257,8 @@
   border-radius: 2px;
 }
 
-.strategy-color-blue { background: #7194c8; }
-.strategy-color-teal { background: #74a9a1; }
+.strategy-color-blue { background: var(--strategy-blue); }
+.strategy-color-navy { background: var(--strategy-navy); }
 .strategy-color-gray { background: #d6dbe2; }
 
 .strategy-score-chart {
@@ -352,7 +352,7 @@
 
 .strategy-report-summary .strategy-positive {
   margin-left: auto;
-  color: #50887f;
+  color: var(--strategy-navy);
   font-size: 10px;
 }
 
@@ -403,7 +403,7 @@
 }
 
 .strategy-allocation-table td:nth-child(2) {
-  color: #4c6686;
+  color: var(--strategy-navy);
   font-weight: 600;
 }
 
@@ -489,10 +489,8 @@
 }
 
 .strategy-progress-track::-webkit-progress-bar { background: #edf1f5; }
-.strategy-progress-track::-webkit-progress-value {
-  background: #74a9a1;
-}
-.strategy-progress-track::-moz-progress-bar { background: #74a9a1; }
+.strategy-progress-track::-webkit-progress-value { background: var(--strategy-blue); }
+.strategy-progress-track::-moz-progress-bar { background: var(--strategy-blue); }
 
 .service-mobile-picker { display: none; }
 
@@ -596,6 +594,8 @@
 }
 
 .strategy-dashboard {
+  --strategy-blue: #2968d1;
+  --strategy-navy: #174a9e;
   background: #fff;
   scrollbar-color: #cbd5e2 transparent;
 }
@@ -605,8 +605,7 @@
 .strategy-dashboard-utility-meta,
 .strategy-dashboard-status,
 .strategy-dashboard-header,
-.strategy-dashboard-card-header,
-.strategy-dashboard-card-header > div {
+.strategy-dashboard-card-header {
   display: flex;
   align-items: center;
 }
@@ -622,7 +621,7 @@
 }
 
 .strategy-dashboard-breadcrumb { gap: 9px; font-weight: 600; }
-.strategy-dashboard-breadcrumb > span { color: #315d91; font-size: 9px; letter-spacing: .08em; }
+.strategy-dashboard-breadcrumb > span { color: var(--strategy-navy); font-size: 9px; letter-spacing: .08em; }
 .strategy-dashboard-breadcrumb i { width: 1px; height: 11px; background: #c8d1dc; }
 .strategy-dashboard-utility-meta { gap: 13px; color: #7b8796; }
 .strategy-dashboard-status { gap: 5px; }
@@ -638,13 +637,6 @@
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 8px;
-}
-
-.strategy-dashboard-eyebrow {
-  color: #6e87aa;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .14em;
 }
 
 .strategy-dashboard-header h4 {
@@ -666,7 +658,7 @@
   border: 1px solid #d8e1ed;
   border-radius: 5px;
   background: #fff;
-  color: #4b6383;
+  color: var(--strategy-navy);
   font: inherit;
   font-size: 10px;
   font-weight: 600;
@@ -696,7 +688,7 @@
   align-items: baseline;
   gap: 4px;
   margin: 3px 0 0;
-  color: #2a3950;
+  color: var(--strategy-navy);
   font-size: 21px;
   font-weight: 700;
   line-height: 1.1;
@@ -716,16 +708,13 @@
   box-shadow: 0 2px 8px rgb(48 70 99 / 3%);
 }
 .strategy-dashboard-card-header {
-  justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   min-height: 23px;
   margin-bottom: 6px;
   padding-bottom: 6px;
   border-bottom: 1px solid #edf0f4;
 }
-.strategy-dashboard-card-header > div { gap: 6px; }
-.strategy-dashboard-card-header svg { width: 14px; height: 14px; color: #5c7fab; }
-.strategy-dashboard-card-header span { color: #8aa0bb; font-size: 9px; font-weight: 700; }
+.strategy-dashboard-card-header svg { width: 14px; height: 14px; color: var(--strategy-blue); }
 .strategy-dashboard-card-header h5 { color: #2d3c50; font-size: 12px; font-weight: 700; }
 .strategy-dashboard-card .strategy-report-section-heading { margin-bottom: 6px; }
 .strategy-dashboard-card .strategy-report-section-heading h5 { color: #5c687a; font-size: 10px; }
@@ -780,7 +769,7 @@
   white-space: nowrap;
 }
 .strategy-comparison-row > :last-child {
-  color: #5379ad;
+  color: var(--strategy-navy);
   font-size: 10px;
   font-weight: 700;
   text-align: right;
@@ -802,7 +791,7 @@
   border-radius: 0 2px 2px 0;
 }
 .strategy-comparison-market { background: #d6dce5; }
-.strategy-comparison-brand { background: #7397cb; }
+.strategy-comparison-brand { background: var(--strategy-blue); }
 .strategy-audience-row {
   display: grid;
   grid-template-columns: minmax(0, 53px) 27px minmax(0, 1fr);
@@ -819,7 +808,7 @@
   white-space: nowrap;
 }
 .strategy-audience-row > :nth-child(2) {
-  color: #4c6686;
+  color: var(--strategy-navy);
   font-weight: 700;
   text-align: right;
 }
@@ -833,7 +822,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #85a8c2;
+  background: var(--strategy-blue);
 }
 .strategy-dashboard-card .strategy-report-summary {
   min-height: 23px;
@@ -872,7 +861,7 @@
 .strategy-marketing-funnel > div > strong {
   display: block;
   margin-top: 2px;
-  color: #416286;
+  color: var(--strategy-navy);
   font-size: 12px;
   font-weight: 700;
   line-height: 1.1;
@@ -901,7 +890,7 @@
   border-top: 0;
   border-left: 1px solid #edf0f4;
 }
-.strategy-dashboard-campaign .strategy-progress-summary strong { color: #2b3e58; font-size: 18px; }
+.strategy-dashboard-campaign .strategy-progress-summary strong { color: var(--strategy-navy); font-size: 18px; }
 .strategy-dashboard-campaign .strategy-progress-track { width: 100%; min-height: 5px; flex: 0 0 5px; }
 .strategy-dashboard-campaign .strategy-progress-summary .strategy-positive { margin-left: 0; }
 .strategy-campaign-status-list {
@@ -920,7 +909,7 @@
   font-size: 10px;
 }
 .strategy-campaign-status-list > div > :last-child {
-  color: #4d6888;
+  color: var(--strategy-navy);
   font-weight: 700;
   white-space: nowrap;
 }

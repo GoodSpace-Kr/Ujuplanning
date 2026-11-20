@@ -9,7 +9,7 @@ const SCORE_LABELS = ['인지도', '선호도', '재구매', '추천'];
 
 const CHANNELS = [
   { label: '검색', tone: 'blue' },
-  { label: '콘텐츠', tone: 'teal' },
+  { label: '콘텐츠', tone: 'navy' },
   { label: 'SNS', tone: 'gray' },
 ];
 
@@ -27,7 +27,7 @@ function BrandAnalysis({ sample }: { sample: StrategySample }) {
     <>
       <div className="strategy-analysis-grid">
         <section className="strategy-comparison" aria-labelledby="strategy-brand-chart-title">
-          <h6 id="strategy-brand-chart-title">브랜드 경쟁력 · 100점 기준</h6>
+          <h6 id="strategy-brand-chart-title">브랜드 경쟁력</h6>
           <div className="strategy-comparison-head" aria-hidden="true"><span>지표</span><span>시장 평균 / 브랜드</span><span>격차</span></div>
           {sample.scores.map(({ market, brand }, index) => (
             <div className="strategy-comparison-row" key={SCORE_LABELS[index]} aria-label={`${SCORE_LABELS[index]}: 시장 평균 ${market}점, 브랜드 ${brand}점, 격차 ${brand - market}점`}>
@@ -54,7 +54,7 @@ function BrandAnalysis({ sample }: { sample: StrategySample }) {
           </div>
         </section>
       </div>
-      <div className="strategy-report-summary"><span>진단 포인트</span><strong>{SCORE_LABELS[strongestIndex]} 차별화 · {SCORE_LABELS[weakestIndex]} 개선</strong><span className="strategy-positive">최대 격차 +{gaps[strongestIndex]}p</span></div>
+      <div className="strategy-report-summary"><span>진단 포인트</span><strong>{SCORE_LABELS[strongestIndex]} 차별화 · {SCORE_LABELS[weakestIndex]} 개선</strong></div>
     </>
   );
 }
@@ -92,7 +92,7 @@ function CampaignPlan({ sample }: { sample: StrategySample }) {
   const stages = [
     { label: '분석·기획', start: 0, span: 1, tone: 'gray', progress: 100, status: '완료' },
     { label: '콘텐츠 제작', start: 1, span: 2, tone: 'blue', progress, status: `${progress}%` },
-    { label: '검수·승인', start: 2, span: 1, tone: 'teal', progress: 50, status: '진행' },
+    { label: '검수·승인', start: 2, span: 1, tone: 'navy', progress: 50, status: '진행' },
     { label: '광고 송출', start: 2, span: 2, tone: 'blue', progress: 0, status: '예정' },
     { label: '성과 리뷰', start: 3, span: 1, tone: 'gray', progress: 0, status: '예정' },
   ];
@@ -147,7 +147,7 @@ export function StrategyDocuments() {
       </div>
       <div className="strategy-report-content strategy-dashboard-content">
         <header className="strategy-dashboard-header">
-          <div><span className="strategy-dashboard-eyebrow">STRATEGY INTELLIGENCE</span><h4>브랜드 성장 대시보드</h4><p>브랜드 분석부터 마케팅 전략, 캠페인 실행까지 한눈에 확인합니다.</p></div>
+          <div><h4>브랜드 성장 대시보드</h4><p>브랜드 분석부터 마케팅 전략, 캠페인 실행까지 한눈에 확인합니다.</p></div>
           <button type="button" onClick={refresh} aria-label="예시 데이터 새로고침"><RefreshCw aria-hidden="true" />새로고침</button>
         </header>
         <dl className="strategy-dashboard-metrics">
@@ -159,15 +159,15 @@ export function StrategyDocuments() {
         </dl>
         <div className="strategy-dashboard-grid">
           <article className="strategy-dashboard-card" aria-labelledby="strategy-analysis-heading">
-            <header className="strategy-dashboard-card-header"><div><ChartNoAxesColumnIncreasing aria-hidden="true" /><span>01</span><h5 id="strategy-analysis-heading">브랜드 분석</h5></div></header>
+            <header className="strategy-dashboard-card-header"><ChartNoAxesColumnIncreasing aria-hidden="true" /><h5 id="strategy-analysis-heading">브랜드 분석</h5></header>
             <BrandAnalysis sample={sample} />
           </article>
           <article className="strategy-dashboard-card" aria-labelledby="strategy-marketing-heading">
-            <header className="strategy-dashboard-card-header"><div><Target aria-hidden="true" /><span>02</span><h5 id="strategy-marketing-heading">마케팅 전략</h5></div></header>
+            <header className="strategy-dashboard-card-header"><Target aria-hidden="true" /><h5 id="strategy-marketing-heading">마케팅 전략</h5></header>
             <MarketingStrategy sample={sample} />
           </article>
           <article className="strategy-dashboard-card strategy-dashboard-campaign" aria-labelledby="strategy-campaign-heading">
-            <header className="strategy-dashboard-card-header"><div><CalendarDays aria-hidden="true" /><span>03</span><h5 id="strategy-campaign-heading">캠페인 실행 계획</h5></div></header>
+            <header className="strategy-dashboard-card-header"><CalendarDays aria-hidden="true" /><h5 id="strategy-campaign-heading">캠페인 실행 계획</h5></header>
             <CampaignPlan sample={sample} />
           </article>
         </div>
