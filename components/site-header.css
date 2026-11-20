@@ -8,8 +8,8 @@
 .uju-header-nav a { padding-block: 24px; font-size: 13px; font-weight: 500; letter-spacing: .025em; color: #66707b; transition: color .2s; }
 .uju-header-nav a:hover, .uju-header-nav a[aria-current="page"] { color: #1d5dc1; }
 .uju-header-actions { display: flex; align-items: center; gap: 12px; }
-.uju-header-contact { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; background: #f1f2f4; border-radius: 12px; font-size: 13px; font-weight: 550; white-space: nowrap; transition: background .2s; }
-.uju-header-contact:hover { background: #e6e8ec; }
+.uju-header-contact { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; background: #2968d1; color: #fff; border-radius: 12px; font-size: 13px; font-weight: 550; white-space: nowrap; transition: background .2s; }
+.uju-header-contact:hover { background: #2059b8; }
 .uju-header-toggle { display: none; padding: 10px; cursor: pointer; }
 .uju-header a:focus-visible, .uju-header button:focus-visible { outline: 2px solid #3475d8; outline-offset: 5px; border-radius: 6px; }
 @media (max-width: 800px) {
