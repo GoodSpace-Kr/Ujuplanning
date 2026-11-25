@@ -95,7 +95,6 @@
   list-style: none;
 }
 
-.service-preview-checklist li,
 .service-preview-agenda li {
   display: flex;
   align-items: center;
@@ -122,6 +121,113 @@
 .service-preview-icon.icon-violet { color: #8a67bc; background: #eee7fa; }
 .service-preview-icon.icon-teal { color: #258b90; background: #dff4ef; }
 .service-preview-icon.icon-apricot { color: #bb7352; background: #ffebda; }
+
+/* Use the finished brief on touchscreens and when reduced motion is requested. */
+.service-preview-strategy {
+  --preview-motion: none;
+  --scan-opacity: 0;
+  --finding-opacity: 1;
+  --finding-offset: 0px;
+  --row-scale: 1;
+  --scan-playback: paused;
+}
+
+.strategy-analysis-heading { display: grid; }
+.strategy-analysis-heading > div { grid-area: 1 / 1; }
+.strategy-analysis-status {
+  display: block;
+  margin-bottom: 1.7cqw;
+  color: #5f7088;
+  font-size: 3.85cqw;
+  font-weight: 550;
+  line-height: 1.3;
+}
+.strategy-analysis-loading { opacity: var(--scan-opacity); }
+.strategy-analysis-result,
+.strategy-analysis-finding {
+  opacity: var(--finding-opacity);
+  transform: translateY(var(--finding-offset));
+}
+.strategy-analysis-dots { margin-left: .5cqw; letter-spacing: .15em; }
+
+.service-preview-checklist li {
+  --resting-width: 1;
+  position: relative;
+  isolation: isolate;
+}
+.service-preview-checklist li:nth-child(2) { --resting-width: .89; --scan-delay: .32s; }
+.service-preview-checklist li:nth-child(3) { --resting-width: .78; --scan-delay: .64s; }
+.service-preview-checklist li:nth-child(4) { --resting-width: .67; --scan-delay: .96s; }
+.service-preview-checklist li::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 3.2cqw;
+  background: #ffffffdf;
+  transform: scaleX(var(--row-scale));
+  transform-origin: left;
+}
+.strategy-analysis-finding {
+  display: flex;
+  align-items: center;
+  gap: 1.7cqw;
+  padding: 2.1cqw 2.5cqw;
+  font-size: 4cqw;
+  font-weight: 550;
+  white-space: nowrap;
+}
+.strategy-analysis-finding .service-preview-icon { width: 6.7cqw; }
+.strategy-analysis-finding strong {
+  margin-left: auto;
+  color: #235ab2;
+  font-size: 4.15cqw;
+  font-weight: 650;
+  letter-spacing: -.035em;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .offering-overview-card:not(:hover):not(:focus-visible) .service-preview-strategy {
+    --scan-opacity: 1;
+    --finding-opacity: 0;
+    --finding-offset: 1.4cqw;
+    --scan-playback: running;
+  }
+  .offering-overview-card:not(:hover):not(:focus-visible) .service-preview-checklist li {
+    --row-scale: var(--resting-width);
+  }
+  .strategy-analysis-loading,
+  .strategy-analysis-result,
+  .strategy-analysis-finding { transition: opacity .25s ease, transform .32s ease-out; }
+  .service-preview-checklist li::before { transition: transform .38s cubic-bezier(.2, .7, .25, 1); }
+  .strategy-analysis-finding { transition-delay: calc(var(--scan-delay, 0s) * .14); }
+  .service-preview-checklist li::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: calc(var(--resting-width) * 100%);
+    border-radius: 3.2cqw;
+    opacity: var(--scan-opacity);
+    background: linear-gradient(105deg, transparent 28%, #d6e7ffb3 48%, transparent 68%);
+    background-size: 300% 100%;
+    background-position: 100% 0;
+    animation: strategy-analysis-sweep 3.4s ease-in-out var(--scan-delay, 0s) infinite;
+    animation-play-state: var(--scan-playback);
+    transition: opacity .2s ease;
+  }
+  .strategy-analysis-dots {
+    animation: strategy-analysis-pulse 1.7s ease-in-out infinite alternate;
+    animation-play-state: var(--scan-playback);
+  }
+}
+@keyframes strategy-analysis-sweep {
+  0% { background-position: 100% 0; }
+  65%, 100% { background-position: 0 0; }
+}
+@keyframes strategy-analysis-pulse {
+  from { opacity: .35; }
+  to { opacity: 1; }
+}
 
 .service-preview-film-frame {
   position: relative;

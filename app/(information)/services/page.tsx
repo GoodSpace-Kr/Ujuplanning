@@ -23,9 +23,11 @@ export default function ServicesPage() {
         </div>
         <div className="offering-overview" aria-label="네 가지 서비스">
           {serviceOfferings.map(service => (
-            <a className="offering-overview-card" key={service.id} href={`#${service.id}`}>
+            <a className="offering-overview-card" key={service.id} href={`#${service.id}`}
+              aria-labelledby={service.id === 'strategy' ? 'strategy-card-caption' : undefined}
+              aria-describedby={service.id === 'strategy' ? 'strategy-preview-result strategy-preview-findings' : undefined}>
               <ServiceCardPreview id={service.id} />
-              <div className="offering-card-caption">
+              <div className="offering-card-caption" id={service.id === 'strategy' ? 'strategy-card-caption' : undefined}>
                 <h2>{service.label}</h2>
                 <p>{service.short}</p>
               </div>

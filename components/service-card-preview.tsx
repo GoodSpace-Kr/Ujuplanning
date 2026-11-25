@@ -1,17 +1,18 @@
 /* oxlint-disable next/no-img-element -- The artwork uses an existing small WebP preview. */
 import {
-  ArrowDown, CalendarDays, Check, Compass, Flag, Image as Photo, Layers,
-  MessageCircle, Play, ScanLine, TrendingUp, Video,
+  ArrowDown, CalendarDays, Check, Flag, Image as Photo, Layers,
+  MessageCircle, Play, ScanLine, TrendingUp, Users, Video,
 } from 'lucide-react';
 import images from '@/lib/work-images.generated.json';
 import type { OfferingId } from '@/lib/services-content';
 import './service-card-preview.css';
 
-const briefSteps = [
-  { label: '브랜드 방향', icon: Compass, tone: 'blue' },
-  { label: '핵심 메시지', icon: MessageCircle, tone: 'violet' },
-  { label: '채널 선택', icon: Layers, tone: 'teal' },
-  { label: '실행 계획', icon: Flag, tone: 'apricot' },
+const strategyHeadline = '체험형 러닝 캠페인';
+const strategyFindings = [
+  { label: '목표 고객', result: '입문 러너', icon: Users, tone: 'blue' },
+  { label: '핵심 메시지', result: '첫 러닝을 가볍게', icon: MessageCircle, tone: 'violet' },
+  { label: '추천 채널', result: '인스타그램 릴스', icon: Layers, tone: 'teal' },
+  { label: '실행 방안', result: '러닝 체험단', icon: Flag, tone: 'apricot' },
 ] as const;
 
 const weeks = [
@@ -24,10 +25,25 @@ const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
 
 function StrategyPreview() {
   return <>
-    <span className="service-preview-title">캠페인 기획안 <Check /></span>
-    <ul className="service-preview-checklist">
-      {briefSteps.map(({ label, icon: Icon, tone }) => (
-        <li key={label}><span className={`service-preview-icon icon-${tone}`}><Icon /></span>{label}</li>
+    <div className="strategy-analysis-heading">
+      <div className="strategy-analysis-loading">
+        <span className="strategy-analysis-status">브랜드 분석 중<span className="strategy-analysis-dots">···</span></span>
+        <span className="service-preview-title">캠페인 방향 찾기</span>
+      </div>
+      <div className="strategy-analysis-result" id="strategy-preview-result">
+        <span className="strategy-analysis-status">분석 완료 · 기획 예시</span>
+        <span className="service-preview-title">{strategyHeadline} <Check /></span>
+      </div>
+    </div>
+    <ul className="service-preview-checklist" id="strategy-preview-findings">
+      {strategyFindings.map(({ label, result, icon: Icon, tone }) => (
+        <li key={label}>
+          <div className="strategy-analysis-finding">
+            <span className={`service-preview-icon icon-${tone}`}><Icon /></span>
+            <span>{label}</span>
+            <strong>{result}</strong>
+          </div>
+        </li>
       ))}
     </ul>
   </>;
