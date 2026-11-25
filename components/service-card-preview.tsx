@@ -1,18 +1,16 @@
 /* oxlint-disable next/no-img-element -- The artwork uses an existing small WebP preview. */
 import {
   ArrowDown, CalendarDays, Check, Flag, Image as Photo, Layers,
-  MessageCircle, Play, ScanLine, TrendingUp, Users, Video,
+  Play, ScanLine, TrendingUp, Users, Video,
 } from 'lucide-react';
 import images from '@/lib/work-images.generated.json';
 import type { OfferingId } from '@/lib/services-content';
 import './service-card-preview.css';
 
-const strategyHeadline = '체험형 러닝 캠페인';
 const strategyFindings = [
-  { label: '목표 고객', result: '입문 러너', icon: Users, tone: 'blue' },
-  { label: '핵심 메시지', result: '첫 러닝을 가볍게', icon: MessageCircle, tone: 'violet' },
-  { label: '추천 채널', result: '인스타그램 릴스', icon: Layers, tone: 'teal' },
-  { label: '실행 방안', result: '러닝 체험단', icon: Flag, tone: 'apricot' },
+  { label: '고객', result: '입문 러너', icon: Users, tone: 'blue' },
+  { label: '채널', result: '인스타그램 릴스', icon: Layers, tone: 'teal' },
+  { label: '실행', result: '러닝 체험단', icon: Flag, tone: 'apricot' },
 ] as const;
 
 const weeks = [
@@ -26,14 +24,10 @@ const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
 function StrategyPreview() {
   return <>
     <div className="strategy-analysis-heading">
-      <div className="strategy-analysis-loading">
-        <span className="strategy-analysis-status">브랜드 분석 중<span className="strategy-analysis-dots">···</span></span>
-        <span className="service-preview-title">캠페인 방향 찾기</span>
-      </div>
-      <div className="strategy-analysis-result" id="strategy-preview-result">
-        <span className="strategy-analysis-status">분석 완료 · 기획 예시</span>
-        <span className="service-preview-title">{strategyHeadline} <Check /></span>
-      </div>
+      <span className="strategy-analysis-loading">브랜드 분석 중<span className="strategy-analysis-dots">···</span></span>
+      <span className="strategy-analysis-result" id="strategy-preview-result">
+        분석 완료 <Check aria-hidden="true" /><span className="sr-only">러닝 캠페인 예시</span>
+      </span>
     </div>
     <ul className="service-preview-checklist" id="strategy-preview-findings">
       {strategyFindings.map(({ label, result, icon: Icon, tone }) => (

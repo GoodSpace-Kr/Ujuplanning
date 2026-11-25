@@ -81,11 +81,6 @@
   stroke-width: 2.6;
 }
 
-.service-preview-strategy .service-preview-title svg {
-  color: #fff;
-  background: var(--accent);
-}
-
 .service-preview-checklist,
 .service-preview-agenda {
   display: grid;
@@ -132,15 +127,28 @@
   --scan-playback: paused;
 }
 
-.strategy-analysis-heading { display: grid; }
-.strategy-analysis-heading > div { grid-area: 1 / 1; }
-.strategy-analysis-status {
-  display: block;
-  margin-bottom: 1.7cqw;
-  color: #5f7088;
-  font-size: 3.85cqw;
+.strategy-analysis-heading {
+  display: grid;
+  margin-bottom: 5cqw;
+  font-size: clamp(11px, 4.85cqw, 15px);
   font-weight: 550;
-  line-height: 1.3;
+  line-height: 1.4;
+  letter-spacing: -.025em;
+}
+.strategy-analysis-heading > span {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+}
+.strategy-analysis-result svg {
+  width: 1em;
+  height: 1em;
+  margin-left: .45em;
+  padding: .14em;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--accent);
+  stroke-width: 2.6;
 }
 .strategy-analysis-loading { opacity: var(--scan-opacity); }
 .strategy-analysis-result,
@@ -155,9 +163,8 @@
   position: relative;
   isolation: isolate;
 }
-.service-preview-checklist li:nth-child(2) { --resting-width: .89; --scan-delay: .32s; }
-.service-preview-checklist li:nth-child(3) { --resting-width: .78; --scan-delay: .64s; }
-.service-preview-checklist li:nth-child(4) { --resting-width: .67; --scan-delay: .96s; }
+.service-preview-checklist li:nth-child(2) { --resting-width: .84; --scan-delay: .32s; }
+.service-preview-checklist li:nth-child(3) { --resting-width: .68; --scan-delay: .64s; }
 .service-preview-checklist li::before {
   content: '';
   position: absolute;
@@ -172,18 +179,19 @@
   display: flex;
   align-items: center;
   gap: 1.7cqw;
-  padding: 2.1cqw 2.5cqw;
-  font-size: 4cqw;
-  font-weight: 550;
+  padding: 3cqw;
+  color: #596779;
+  font-size: clamp(9px, 3.75cqw, 11px);
+  font-weight: 450;
+  line-height: 1.4;
   white-space: nowrap;
 }
 .strategy-analysis-finding .service-preview-icon { width: 6.7cqw; }
 .strategy-analysis-finding strong {
   margin-left: auto;
   color: #235ab2;
-  font-size: 4.15cqw;
-  font-weight: 650;
-  letter-spacing: -.035em;
+  font-weight: 550;
+  letter-spacing: -.015em;
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
