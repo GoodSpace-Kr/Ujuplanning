@@ -4,12 +4,17 @@ import { ServiceCardPreview } from '@/components/service-card-preview';
 import { SiteFooter } from '@/components/site-footer';
 import { ServicesNavigation } from '@/components/services-navigation';
 import { ServicesVisual } from '@/components/services-visuals';
-import { serviceOfferings } from '@/lib/services-content';
+import { serviceOfferings, type OfferingId } from '@/lib/services-content';
 import './services.css';
 
 export const metadata = {
   title: 'SERVICES · 우주기획',
   description: '브랜드 전략부터 영상·사진·콘텐츠 제작, 디지털 퍼포먼스, SNS·바이럴 마케팅까지. 우주기획은 브랜드에 필요한 전략과 실행을 하나의 방향으로 연결합니다.',
+};
+
+const previewDescriptions: Partial<Record<OfferingId, string>> = {
+  strategy: 'strategy-preview-result strategy-preview-findings',
+  creative: 'creative-preview-result',
 };
 
 export default function ServicesPage() {
@@ -24,10 +29,10 @@ export default function ServicesPage() {
         <div className="offering-overview" aria-label="네 가지 서비스">
           {serviceOfferings.map(service => (
             <a className="offering-overview-card" key={service.id} href={`#${service.id}`}
-              aria-labelledby={service.id === 'strategy' ? 'strategy-card-caption' : undefined}
-              aria-describedby={service.id === 'strategy' ? 'strategy-preview-result strategy-preview-findings' : undefined}>
+              aria-labelledby={`${service.id}-card-caption`}
+              aria-describedby={previewDescriptions[service.id]}>
               <ServiceCardPreview id={service.id} />
-              <div className="offering-card-caption" id={service.id === 'strategy' ? 'strategy-card-caption' : undefined}>
+              <div className="offering-card-caption" id={`${service.id}-card-caption`}>
                 <h2>{service.label}</h2>
                 <p>{service.short}</p>
               </div>

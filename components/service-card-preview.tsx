@@ -1,9 +1,9 @@
 /* oxlint-disable next/no-img-element -- The artwork uses an existing small WebP preview. */
 import {
   ArrowDown, CalendarDays, Flag, Image as Photo, Layers, MessageCircle,
-  Play, ScanLine, TrendingUp, Users, Video,
+  TrendingUp, Users, Video,
 } from 'lucide-react';
-import images from '@/lib/work-images.generated.json';
+import { CreativeFilmPreview } from '@/components/creative-film-preview';
 import type { OfferingId } from '@/lib/services-content';
 import './service-card-preview.css';
 
@@ -45,17 +45,22 @@ function StrategyPreview() {
 }
 
 function CreativePreview() {
-  const frame = images.ohrun[0];
-
   return <>
-    <span className="service-preview-title">브랜드 필름 <ScanLine /></span>
-    <div className="service-preview-film-frame">
-      <img src={frame.src} width={frame.width} height={frame.height} alt="" decoding="async" />
-      <span className="service-preview-play"><Play /></span>
+    <div className="film-status">
+      <span className="film-editing">컷 편집 중</span>
+      <span className="film-finished">편집 완료</span>
     </div>
-    <div className="service-preview-film-track">
-      <span>오륜스포츠</span>
-      <div className="service-preview-film-timeline"><i /><i /><i /></div>
+    <div className="service-preview-film-frame">
+      <img src="/ohrun-frame-03.webp" width="1280" height="720" alt="" decoding="async" />
+      <CreativeFilmPreview />
+      <div className="film-rough-cut film-editing">
+        <img src="/ohrun-frame-01.webp" width="1280" height="720" alt="" decoding="async" />
+        <img src="/ohrun-frame-02.webp" width="1280" height="720" alt="" decoding="async" />
+      </div>
+    </div>
+    <div className="film-footer">
+      <div className="film-editing film-timeline"><i /><i /><i /></div>
+      <span className="film-finished" id="creative-preview-result">오륜스포츠 브랜드 필름</span>
     </div>
   </>;
 }
