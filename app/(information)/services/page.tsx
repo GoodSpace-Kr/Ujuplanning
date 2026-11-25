@@ -1,5 +1,5 @@
 /* oxlint-disable next/no-html-link-for-pages -- Keep native cross-page hash navigation consistent with the scroll-driven homepage and WORK page. */
-import { ArrowDown, ArrowRight, ArrowUpRight, Compass, Film, MessagesSquare, Target } from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { SiteFooter } from '@/components/site-footer';
 import { ServicesNavigation } from '@/components/services-navigation';
 import { ServicesVisual } from '@/components/services-visuals';
@@ -11,8 +11,6 @@ export const metadata = {
   description: '브랜드 전략부터 영상·사진·콘텐츠 제작, 디지털 퍼포먼스, SNS·바이럴 마케팅까지. 우주기획은 브랜드에 필요한 전략과 실행을 하나의 방향으로 연결합니다.',
 };
 
-const icons = [Compass, Film, Target, MessagesSquare];
-
 export default function ServicesPage() {
   return <>
     <div className="offering-page">
@@ -23,16 +21,21 @@ export default function ServicesPage() {
           <div className="offering-hero-intro"><p>방향을 정하고, 콘텐츠를 만들고,<br />고객에게 전하고, 관계를 이어갑니다.<br />브랜드의 다음 걸음에 필요한 네 가지 연결.</p><a className="offering-text-link" href="#strategy">서비스 둘러보기 <ArrowDown size={17} aria-hidden="true" /></a></div>
         </div>
         <div className="offering-overview" aria-label="네 가지 서비스">
-          {serviceOfferings.map((service, index) => {
-            const Icon = icons[index];
-            return <a className={`offering-overview-card offering-overview-${service.id}`} key={service.id} href={`#${service.id}`}>
-              <div className="offering-overview-top"><span>{service.number} / {service.word}</span><ArrowUpRight size={17} aria-hidden="true" /></div>
-              <div className="offering-overview-icon"><Icon size={43} strokeWidth={1.15} aria-hidden="true" /></div>
-              <h2>{service.label}</h2><p>{service.short}</p>
-            </a>;
-          })}
+          {serviceOfferings.map(service => (
+            <a className={`offering-overview-card offering-overview-${service.id}`} key={service.id} href={`#${service.id}`}>
+              <div className="offering-card-scene" aria-hidden="true">
+                <img className="offering-card-model" src={`/assets/service-cards/${service.id}.webp`} alt="" width={720} height={720} decoding="async" />
+              </div>
+              <div className="offering-card-caption">
+                <div>
+                  <h2>{service.label}</h2>
+                  <p>{service.short}</p>
+                </div>
+                <ArrowDown className="offering-card-arrow" size={16} aria-hidden="true" />
+              </div>
+            </a>
+          ))}
         </div>
-    
       </section>
 
       <ServicesNavigation />
