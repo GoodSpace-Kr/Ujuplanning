@@ -16,15 +16,10 @@
 .offering-overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 60px; }
 .offering-overview-card { display: flex; flex-direction: column; min-width: 0; color: var(--offering-ink); }
 .offering-card-caption {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
   padding: 17px 2px 0;
 }
 .offering-overview-card h2 { font-size: clamp(16px, 1.7vw, 22px); font-weight: 650; letter-spacing: -.035em; }
 .offering-overview-card p { margin-top: 6px; color: #5f6b7d; font-size: 13px; line-height: 1.65; }
-.offering-card-arrow { flex: none; margin-top: 6px; color: var(--offering-blue); }
 .offering-hero-footnote { display: flex; justify-content: space-between; gap: 20px; margin-top: 20px; color: #8b95a3; font-size: 11px; }
 .offering-hero-footnote span:last-child { font-size: 9px; letter-spacing: .05em; }
 .offering-navigation { position: sticky; top: var(--uju-header-height); z-index: 30; background: #fffffff5; border-block: 1px solid #edf0f4; }
@@ -90,8 +85,7 @@
   .offering-hero h1 { font-size: clamp(32px, 6.3vw, 44px); }
   .offering-text-link { font-size: 12px; margin-top: 20px; }
   .offering-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 35px; gap: 25px 12px; }
-  .offering-card-caption { padding-top: 11px; gap: 5px; }
-  .offering-card-arrow { width: 13px; height: 13px; }
+  .offering-card-caption { padding-top: 11px; }
   .offering-overview-card p { font-size: 12px; margin-top: 4px; }
   .offering-hero-footnote { font-size: 10px; }
   .offering-hero-footnote span:last-child { display: none; }

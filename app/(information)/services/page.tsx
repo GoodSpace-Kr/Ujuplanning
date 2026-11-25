@@ -26,11 +26,8 @@ export default function ServicesPage() {
             <a className="offering-overview-card" key={service.id} href={`#${service.id}`}>
               <ServiceCardPreview id={service.id} />
               <div className="offering-card-caption">
-                <div>
-                  <h2>{service.label}</h2>
-                  <p>{service.short}</p>
-                </div>
-                <ArrowDown className="offering-card-arrow" size={16} aria-hidden="true" />
+                <h2>{service.label}</h2>
+                <p>{service.short}</p>
               </div>
             </a>
           ))}
