@@ -15,31 +15,31 @@
 .offering-text-link:hover svg { transform: translate(2px, -2px); }
 .offering-overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 60px; }
 .offering-overview-card {
-  --stage-light: #e7f2ff;
-  --stage-tone: #abcbf3;
-  --stage-shadow: #244b8b42;
-  --model-turn: -5deg;
+  --stage-light: #f4f8ff;
+  --stage-tone: #e5edf9;
+  --stage-shadow: #536f9a21;
+  --model-turn: -2deg;
   display: flex;
   flex-direction: column;
   min-width: 0;
   color: var(--offering-ink);
 }
 .offering-overview-creative {
-  --stage-light: #f0edff;
-  --stage-tone: #c3b4e9;
-  --stage-shadow: #4b427b40;
-  --model-turn: 5deg;
+  --stage-light: #f8f6fd;
+  --stage-tone: #ede8f8;
+  --stage-shadow: #6b5d8c20;
+  --model-turn: 2deg;
 }
 .offering-overview-performance {
-  --stage-light: #e9f8fc;
-  --stage-tone: #a0d1e4;
-  --stage-shadow: #2d6f9742;
+  --stage-light: #f2f9fb;
+  --stage-tone: #e4f0f5;
+  --stage-shadow: #4f788b20;
 }
 .offering-overview-social {
-  --stage-light: #fff6e9;
-  --stage-tone: #eec6ae;
-  --stage-shadow: #87543739;
-  --model-turn: 5deg;
+  --stage-light: #faf7f5;
+  --stage-tone: #f4e9e4;
+  --stage-shadow: #896e6420;
+  --model-turn: 2deg;
 }
 .offering-card-scene {
   position: relative;
@@ -51,35 +51,27 @@
   aspect-ratio: 1 / 1.04;
   border-radius: 24px;
   background:
-    radial-gradient(ellipse at 31% 21%, #fff9, transparent 57%),
-    linear-gradient(145deg, var(--stage-light) 16%, var(--stage-tone));
-}
-.offering-card-scene::before {
-  position: absolute;
-  inset: 17% -13%;
-  border: 1px solid #fff8;
-  border-radius: 50%;
-  content: '';
-  transform: rotate(-27deg);
+    radial-gradient(ellipse at 30% 18%, #fff9, transparent 66%),
+    linear-gradient(145deg, var(--stage-light), var(--stage-tone));
 }
 .offering-card-scene::after {
   position: absolute;
   z-index: -1;
-  inset: 70% 15% 13%;
+  inset: 69% 20% 15%;
   border-radius: 50%;
   background: var(--stage-shadow);
-  filter: blur(15px);
+  filter: blur(16px);
   content: '';
-  transition: transform .5s ease, opacity .5s ease;
 }
 .offering-card-model {
   position: absolute;
-  width: 104%;
+  width: 100%;
   max-width: none;
   height: auto;
   user-select: none;
   pointer-events: none;
-  transition: transform .6s cubic-bezier(.2, .7, .2, 1);
+  transform: var(--model-motion, none);
+  transition: transform .5s cubic-bezier(.2, .7, .25, 1);
 }
 .offering-card-caption {
   display: flex;
@@ -90,16 +82,16 @@
 }
 .offering-overview-card h2 { font-size: clamp(16px, 1.7vw, 22px); font-weight: 650; letter-spacing: -.035em; }
 .offering-overview-card p { margin-top: 6px; color: #5f6b7d; font-size: 13px; line-height: 1.65; }
-.offering-card-arrow { flex: none; margin-top: 6px; color: var(--offering-blue); transition: transform .3s ease; }
+.offering-card-arrow { flex: none; margin-top: 6px; color: var(--offering-blue); }
 @media (prefers-reduced-motion: no-preference) {
-  .offering-overview-card:focus-visible .offering-card-model { transform: translateY(-6%) rotateZ(var(--model-turn)) rotateY(8deg) scale(1.04); }
-  .offering-overview-card:focus-visible .offering-card-scene::after { transform: scale(.9); opacity: .6; }
-  .offering-overview-card:focus-visible .offering-card-arrow { transform: translateY(3px); }
-}
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .offering-overview-card:hover .offering-card-model { transform: translateY(-6%) rotateZ(var(--model-turn)) rotateY(8deg) scale(1.04); }
-  .offering-overview-card:hover .offering-card-scene::after { transform: scale(.9); opacity: .6; }
-  .offering-overview-card:hover .offering-card-arrow { transform: translateY(3px); }
+  .offering-overview-card:focus-visible {
+    --model-motion: translateY(-2.5%) rotateZ(var(--model-turn)) rotateY(4deg);
+  }
+  @media (hover: hover) {
+    .offering-overview-card:hover {
+      --model-motion: translateY(-2.5%) rotateZ(var(--model-turn)) rotateY(4deg);
+    }
+  }
 }
 .offering-hero-footnote { display: flex; justify-content: space-between; gap: 20px; margin-top: 20px; color: #8b95a3; font-size: 11px; }
 .offering-hero-footnote span:last-child { font-size: 9px; letter-spacing: .05em; }
