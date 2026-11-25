@@ -1,5 +1,6 @@
 /* oxlint-disable next/no-html-link-for-pages -- Keep native cross-page hash navigation consistent with the scroll-driven homepage and WORK page. */
 import { ArrowDown, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ServiceCardPreview } from '@/components/service-card-preview';
 import { SiteFooter } from '@/components/site-footer';
 import { ServicesNavigation } from '@/components/services-navigation';
 import { ServicesVisual } from '@/components/services-visuals';
@@ -22,10 +23,8 @@ export default function ServicesPage() {
         </div>
         <div className="offering-overview" aria-label="네 가지 서비스">
           {serviceOfferings.map(service => (
-            <a className={`offering-overview-card offering-overview-${service.id}`} key={service.id} href={`#${service.id}`}>
-              <div className="offering-card-scene" aria-hidden="true">
-                <img className="offering-card-model" src={`/assets/service-cards/${service.id}.webp`} alt="" width={720} height={720} decoding="async" />
-              </div>
+            <a className="offering-overview-card" key={service.id} href={`#${service.id}`}>
+              <ServiceCardPreview id={service.id} />
               <div className="offering-card-caption">
                 <div>
                   <h2>{service.label}</h2>
