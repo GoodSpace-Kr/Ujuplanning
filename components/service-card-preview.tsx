@@ -1,6 +1,6 @@
 /* oxlint-disable next/no-img-element -- The artwork uses an existing small WebP preview. */
 import {
-  ArrowDown, CalendarDays, Flag, Image as Photo, Layers,
+  ArrowDown, CalendarDays, Flag, Image as Photo, Layers, MessageCircle,
   Play, ScanLine, TrendingUp, Users, Video,
 } from 'lucide-react';
 import images from '@/lib/work-images.generated.json';
@@ -11,6 +11,7 @@ const strategyFindings = [
   { label: '추천 전략', result: '러닝 체험단', icon: Flag },
   { label: '고객', result: '입문 러너', icon: Users },
   { label: '채널', result: '인스타그램 릴스', icon: Layers },
+  { label: '핵심 메시지', result: '첫 러닝을 가볍게', icon: MessageCircle },
 ] as const;
 
 const weeks = [
