@@ -12,9 +12,11 @@ export const metadata = {
   description: '브랜드 전략부터 영상·사진·콘텐츠 제작, 디지털 퍼포먼스, SNS·바이럴 마케팅까지. 우주기획은 브랜드에 필요한 전략과 실행을 하나의 방향으로 연결합니다.',
 };
 
-const previewDescriptions: Partial<Record<OfferingId, string>> = {
+const previewDescriptions: Record<OfferingId, string> = {
   strategy: 'strategy-preview-result strategy-preview-findings',
   creative: 'creative-preview-result',
+  performance: 'performance-preview-result',
+  social: 'social-preview-result',
 };
 
 export default function ServicesPage() {

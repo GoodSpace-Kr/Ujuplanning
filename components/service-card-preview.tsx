@@ -1,9 +1,9 @@
 /* oxlint-disable next/no-img-element -- The artwork uses an existing small WebP preview. */
 import {
-  ArrowDown, CalendarDays, Flag, Image as Photo, Layers, MessageCircle,
-  TrendingUp, Users, Video,
+  ArrowDown, Flag, Image as Photo, Layers, MessageCircle, Users,
 } from 'lucide-react';
 import { CreativeFilmPreview } from '@/components/creative-film-preview';
+import serviceMedia from '@/lib/service-media.generated.json';
 import type { OfferingId } from '@/lib/services-content';
 import './service-card-preview.css';
 
@@ -14,13 +14,8 @@ const strategyFindings = [
   { label: '핵심 메시지', result: '첫 러닝을 가볍게', icon: MessageCircle },
 ] as const;
 
-const weeks = [
-  { visits: 48, conversions: 25 },
-  { visits: 64, conversions: 39 },
-  { visits: 74, conversions: 46 },
-  { visits: 95, conversions: 63 },
-];
 const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+const conversionTrend = 'M12 64 C38 64 48 44 74 44 S110 36 136 36 S170 12 198 12';
 
 function StrategyPreview() {
   return <>
@@ -65,33 +60,55 @@ function CreativePreview() {
   </>;
 }
 
+function PreviewStatus({ pending, complete }: { pending: string; complete: string }) {
+  return <div className="preview-status preview-layers">
+    <span className="preview-pending">{pending}</span>
+    <span className="preview-complete">{complete}</span>
+  </div>;
+}
+
 function PerformancePreview() {
   return <>
-    <span className="service-preview-title">캠페인 리포트 <TrendingUp /></span>
-    <div className="service-preview-chart">
-      {weeks.map(({ visits, conversions }, index) => (
-        <div className="service-preview-week" key={index}>
-          <div className="service-preview-bars">
-            <i style={{ height: `${visits}%` }} /><i style={{ height: `${conversions}%` }} />
-          </div>
-          <span>{index + 1}주</span>
-        </div>
-      ))}
+    <PreviewStatus pending="성과 집계 중" complete="성과 리포트 · 예시" />
+    <div className="performance-plot">
+      <svg viewBox="0 0 210 82" aria-hidden="true">
+        <defs>
+          <linearGradient id="conversion-area" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+            <stop stopColor="#80b4e4" stopOpacity=".30" />
+            <stop offset="1" stopColor="#80b4e4" stopOpacity=".02" />
+          </linearGradient>
+        </defs>
+        <path d="M12 20H198 M12 47H198 M12 74H198" stroke="#d9e5ef" strokeDasharray="2 4" fill="none" />
+        <path d={`${conversionTrend} V74 H12 Z`} fill="url(#conversion-area)" />
+        <path d={conversionTrend} fill="none" stroke="#abc6de" strokeWidth="2.5" />
+        <path className="performance-trace" d={conversionTrend} pathLength="1" fill="none" stroke="#437eb7" strokeLinecap="round" strokeWidth="2.5" />
+        <g className="preview-complete">
+          <circle cx="198" cy="12" r="8" fill="#dbeafa" />
+          <circle cx="198" cy="12" r="3.5" fill="#346da5" />
+        </g>
+      </svg>
+      <div className="performance-axis"><span>1주</span><span>2주</span><span>3주</span><span>4주</span></div>
     </div>
-    <div className="service-preview-legend"><span>유입</span><span>전환</span></div>
+    <div className="preview-summary preview-layers">
+      <span className="preview-pending">주간 전환 추이</span>
+      <span className="preview-complete" id="performance-preview-result"><span className="sr-only">주간 성과 예시. </span>4주차 전환 최다</span>
+    </div>
   </>;
 }
 
 function SocialPreview() {
   return <>
-    <span className="service-preview-title">콘텐츠 캘린더 <CalendarDays /></span>
-    <div className="service-preview-weekdays">
-      {weekdays.map((day, index) => <span key={day}>{day}<b>{index + 12}</b></span>)}
+    <PreviewStatus pending="피드 발행 준비 중" complete="피드 발행 완료" />
+    <div className="social-publish-stage preview-layers">
+      <div className="social-planner preview-pending">
+        <div className="social-week">{weekdays.map(day => <span key={day}>{day}</span>)}</div>
+        <div className="social-slot"><Photo />캠페인 피드</div>
+        <div className="social-slot"><MessageCircle />브랜드 소식</div>
+      </div>
+      <img className="social-published preview-complete" src={serviceMedia.images['mini-campaign-grid.png']}
+        width="1620" height="1076" alt="" decoding="async" />
     </div>
-    <ul className="service-preview-agenda">
-      <li><span className="service-preview-icon icon-apricot"><Photo /></span>브랜드 소식 <small>피드</small></li>
-      <li><span className="service-preview-icon icon-violet"><Video /></span>현장 스케치 <small>릴스</small></li>
-    </ul>
+    <div className="preview-summary" id="social-preview-result">MINI 캠페인 피드</div>
   </>;
 }
 

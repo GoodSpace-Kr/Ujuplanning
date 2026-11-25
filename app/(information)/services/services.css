@@ -14,8 +14,7 @@
 .offering-text-link svg { flex: none; transition: transform .2s ease; }
 .offering-text-link:hover svg { transform: translate(2px, -2px); }
 .offering-overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 60px; }
-.offering-overview-card { display: flex; flex-direction: column; min-width: 0; color: var(--offering-ink); }
-.offering-overview-card:is([href='#strategy'], [href='#creative']) { font-family: 'Pretendard', sans-serif; }
+.offering-overview-card { display: flex; flex-direction: column; min-width: 0; color: var(--offering-ink); font-family: 'Pretendard', sans-serif; }
 .offering-card-caption {
   padding: 17px 2px 0;
 }
